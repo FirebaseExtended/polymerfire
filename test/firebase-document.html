@@ -11,7 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>carbon-firebase-document tests</title>
+  <title>firebase-document tests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
@@ -19,35 +19,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <link rel="import" href="../../carbon-storage/test/carbon-storage-compatibility-suite.html">
   <link rel="import" href="../firebase.html">
-  <link rel="import" href="../carbon-firebase-app.html">
-  <link rel="import" href="../carbon-firebase-document.html">
+  <link rel="import" href="../firebase-app.html">
+  <link rel="import" href="../firebase-document.html">
 </head>
 <body>
 
-  <carbon-firebase-app
+  <firebase-app
       name="test"
       api-key="AIzaSyBsj9AQZxPzW1i7ybjRDYZb_e12djdYZPU"
       auth-domain="carbon-storage-demo-3e146.firebaseapp.com"
       database-url="https://carbon-storage-demo-3e146.firebaseio.com">
-  </carbon-firebase-app>
+  </firebase-app>
 
   <test-fixture id="BasicStorage">
     <template>
-      <carbon-firebase-document app-name="test" path="/compat" log></carbon-firebase-document>
+      <firebase-document app-name="test" path="/compat" log></firebase-document>
     </template>
   </test-fixture>
 
   <test-fixture id="SyncingStorage">
     <template>
-      <carbon-firebase-document app-name="test" path="/compat"></carbon-firebase-document>
-      <carbon-firebase-document app-name="test" path="/compat"></carbon-firebase-document>
+      <firebase-document app-name="test" path="/compat"></firebase-document>
+      <firebase-document app-name="test" path="/compat"></firebase-document>
     </template>
   </test-fixture>
 
-  <carbon-firebase-document app-name="test" path="/compat"></carbon-firebase-document>
+  <firebase-document app-name="test" path="/compat"></firebase-document>
   <script>
     testCarbonStorageDocumentCompatibility({
-      tagName: 'carbon-firebase-document',
+      tagName: 'firebase-document',
       awaitUpdate: function(element) {
         return new Promise(function(resolve) {
           element.ref.on('value', function onValue() {
