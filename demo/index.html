@@ -14,35 +14,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
     <title>seed-element Demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
-    <link rel="import" href="../seed-element.html">
   </head>
-  <body unresolved>
-
-    <p>An example of <code>&lt;seed-element&gt;</code>:</p>
-
-    <p>Make words! <button id="saybtn">Say Something</button></p>
-    <p>Make lasers! <button id="laserbtn">Fire lasers</button></p>
-
-    <seed-element author='{"name": "Lord Meowser", "image": "http://lorempixel.com/g/300/200/cats/"}' fancy>
-      <h2>Hello seed-element</h2>
-    </seed-element>
-
-    <script>
-      var seedElement = document.querySelector('seed-element');
-
-      document.querySelector('#saybtn').addEventListener('click', function() {
-        alert(seedElement.sayHello('Hallo!'));
-      });
-
-      document.querySelector('#laserbtn').addEventListener('click', function() {
-        seedElement.fireLasers();
-      });
-
-      document.addEventListener("seed-element-lasers", function(e) {
-        console.log(e.detail.sound);
-      });
-
-    </script>
-
+  <body>
+    <ul>
+      <li><a href="firebase-auth.html">firebase-auth</a></li>
+    </ul>
   </body>
 </html>

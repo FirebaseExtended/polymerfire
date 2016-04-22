@@ -1,0 +1,124 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase.html">
+<link rel="import" href="firebase-common-behavior.html">
+<dom-module id="firebase-auth">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'firebase-auth',
+
+        behaviors: [
+          Polymer.FirebaseCommonBehavior
+        ],
+
+        properties: {
+          auth: {
+            type: Object,
+            computed: '_computeAuth(app)'
+          },
+
+          provider: {
+            type: String,
+            notify: true
+          },
+
+          signedIn: {
+            type: Boolean,
+            computed: '_computeSignedIn(user)',
+            notify: true
+          },
+
+          user: {
+            type: Object,
+            readOnly: true,
+            value: null,
+            notify: true
+          }
+        },
+
+        observers: [
+          '_listen(auth)'
+        ],
+
+        signInAnonymously: function() {
+          if (!this.auth) {
+            return Promise.reject('No app configured for firebase-auth!');
+          }
+
+          return this._handleSignIn(this.auth.signInAnonymously());
+        },
+
+        signInWithPopup: function(provider) {
+          return this._attemptProviderSignIn(provider, this.auth.signInWithPopup);
+        },
+
+        signInWithRedirect: function(provider) {
+          return this._attemptProviderSignIn(provider, this.auth.signInWithRedirect);
+        },
+
+        signInWithEmailAndPassword: function(email, password) {
+          return this._handleSignIn(this.signInWithEmailAndPassword(email, password));
+        },
+
+        signOut: function() {
+          if (!this.auth) {
+            return Promise.reject('No app configured for auth!');
+          }
+
+          return this.auth.signOut();
+        },
+
+        _attemptProviderSignIn: function(provider, method) {
+          provider = provider || this._providerFromName(this.provider);
+          if (!provider) {
+            return Promise.reject('Must supply a provider for popup sign in.');
+          }
+          if (!auth) {
+            return Promise.reject('No app configured for firebase-auth!');
+          }
+
+          return this._handleSignIn(method(provider));
+        },
+
+        _providerFromName: function(name) {
+          switch (name) {
+            case 'facebook': return new firebase.auth.FacebookAuthProvider();
+            case 'github': return new firebase.auth.GithubAuthProvider();
+            case 'google': return new firebase.auth.GoogleAuthProvider();
+            case 'twitter': return new firebase.auth.TwitterAuthProvider();
+            default: this.fire('error', 'Unrecognized firebase-auth provider "' + name + '"');
+          }
+        },
+
+        _handleSignIn: function(promise) {
+          promise.catch(function(err) {
+            this.emit('error', err);
+          }.bind(this));
+        },
+
+        _computeSignedIn: function(user) {
+          return !!user;
+        },
+
+        _computeAuth: function(app) {
+          return this.app.auth();
+        },
+
+        _listen: function(app) {
+          if (this.auth) {
+            this._unsubscribe = this.auth.onAuthStateChanged(function(user) {
+              this._setUser(user);
+            }.bind(this), function(err) {
+              this.fire('error', err);
+            }.bind(this));
+          } else if (this._unsubscribe) {
+            this._unsubscribe();
+            this._unsubscribe = null;
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

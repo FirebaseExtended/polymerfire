@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>firebase-auth demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../../polymer/polymer.html">
+    <link rel="import" href="../firebase-app.html">
+    <link rel="import" href="../firebase-auth.html">
+    <style media="screen">
+      body {
+        font-family: Roboto, sans-serif;
+        padding: 36px;
+      }
+      table {
+        margin: 24px 0;
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+      }
+      th, td {
+        padding: 8px;
+        border-bottom: 1px solid #ccc;
+      }
+      th {
+        text-align: right;
+      }
+    </style>
+  </head>
+  <body>
+    <template id="app" is="dom-bind">
+      <firebase-app auth-domain="dinosaur-facts-demo-94b9b.firebaseapp.com"
+        database-url="https://dinosaur-facts-demo-94b9b.firebaseio.com/"
+        api-key="AIzaSyDQq7zg-hTts3pvYHYpFCkHzm9SQffpFCA"></firebase-app>
+      <firebase-auth id="auth" user="{{user}}"></firebase-auth>
+
+      <div hidden$="[[user]]">
+        <button on-tap="signInAnonymously">Sign In Anonymously</button>
+      </div>
+      <div hidden$="[[!user]]">
+        <table>
+          <tr><th>uid</th> <td>[[user.uid]]</td></tr>
+          <tr><th>displayName</th> <td>[[user.displayName]]</td></tr>
+          <tr><th>email</th> <td>[[user.email]]</td></tr>
+          <tr><th>emailVerified</th> <td>[[user.emailVerified]]</td></tr>
+        </table>
+
+        <button on-tap="signOut">Sign Out</button>
+      </div>
+    </template>
+    <script type="text/javascript">
+      document.addEventListener('WebComponentsReady', function() {
+        var app = document.getElementById('app');
+
+        app.signInAnonymously = function() {
+          this.$.auth.signInAnonymously();
+        };
+
+        app.signOut = function() {
+          this.$.auth.signOut();
+        };
+      });
+    </script>
+  </body>
+</html>

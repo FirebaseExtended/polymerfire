@@ -5,7 +5,7 @@
   (function() {
     'use strict';
 
-    Polymer.CarbonFirebaseCommonBehaviorImpl = {
+    Polymer.FirebaseCommonBehaviorImpl = {
       properties: {
         app: {
           type: Object,
@@ -14,7 +14,8 @@
 
         appName: {
           type: String,
-          notify: true
+          notify: true,
+          value: ''
         }
       },
 
@@ -37,13 +38,15 @@
           } else {
             this.app = firebase.app(appName);
           }
+        } else {
+          this.app = firebase;
         }
       }
     };
 
-    Polymer.CarbonFirebaseCommonBehavior = [
+    Polymer.FirebaseCommonBehavior = [
       Polymer.CarbonNetworkStatusBehavior,
-      Polymer.CarbonFirebaseCommonBehaviorImpl
+      Polymer.FirebaseCommonBehaviorImpl
     ];
   })();
 </script>

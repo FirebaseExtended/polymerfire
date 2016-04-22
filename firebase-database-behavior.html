@@ -6,7 +6,7 @@
   (function() {
     'use strict';
 
-    Polymer.CarbonFirebaseDatabaseBehaviorImpl = {
+    Polymer.FirebaseDatabaseBehaviorImpl = {
       properties: {
         ref: {
           type: Object,
@@ -85,10 +85,10 @@
       }
     };
 
-    Polymer.CarbonFirebaseDatabaseBehavior = [
+    Polymer.FirebaseDatabaseBehavior = [
       Polymer.CarbonStorageBehavior,
-      Polymer.CarbonFirebaseCommonBehavior,
-      Polymer.CarbonFirebaseDatabaseBehaviorImpl
+      Polymer.FirebaseCommonBehavior,
+      Polymer.FirebaseDatabaseBehaviorImpl
     ];
   })();
 </script>
