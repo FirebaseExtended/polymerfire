@@ -1,0 +1,112 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="carbon-firebase-database-behavior.html">
+<link rel="import" href="firebase.html">
+<script>
+  'use strict';
+
+  Polymer({
+    is: 'carbon-firebase-document',
+
+    behaviors: [
+      Polymer.CarbonFirebaseDatabaseBehavior
+    ],
+
+    attached: function() {
+      this.__refChanged(this.ref, this.ref);
+    },
+
+    detached: function() {
+      if (this.ref) {
+        this.ref.off();
+      }
+    },
+
+    observers: [
+      '__refChanged(ref)'
+    ],
+
+    get isNew() {
+      return !this.path;
+    },
+
+    get zeroValue() {
+      return {};
+    },
+
+    save: function(parentPath, key) {
+      return new Promise(function(resolve, reject) {
+        var path;
+
+        if (!this.app) {
+          reject(new Error('No app configured!'));
+        }
+
+        if (key) {
+          path = parentPath + '/' + key;
+          resolve(this._setFirebaseValue(path, this.data));
+        } else {
+          path = firebase.database(this.app).ref(parentPath)
+              .push(this.data, function(error) {
+                if (error) {
+                  reject(error);
+                  return;
+                }
+
+                resolve();
+              }).path.toString();
+        }
+
+        this.path = path;
+      }.bind(this));
+    },
+
+    reset: function() {
+      this.path = null;
+      return Promise.resolve();
+    },
+
+    getStoredValue: function(path) {
+      return new Promise(function(resolve, reject) {
+          this.ref.child(path).once('value', function(snapshot) {
+            var value = snapshot.val();
+            console.log('GOT FIREBASE VALUE', value);
+            if (value == null) {
+              resolve(this.zeroValue);
+            }
+            resolve(value);
+          }, this);
+        }.bind(this));
+    },
+
+    setStoredValue: function(path, value) {
+      this._setFirebaseValue(path, value);
+    },
+
+    __refChanged: function(ref, oldRef) {
+      if (oldRef) {
+        oldRef.off('value', this.__onFirebaseValue, this);
+      }
+
+      if (ref) {
+        ref.on('value', this.__onFirebaseValue, this);
+      }
+    },
+
+    __onFirebaseValue: function(snapshot) {
+      var value = snapshot.val();
+
+      if (value == null && this.valueIsEmpty(this.data)) {
+        value = this.zeroValue;
+      }
+
+      if (!this.new) {
+        this.async(function() {
+          this.syncToMemory(function() {
+            this._log('Updating data from Firebase value:', value);
+            this.set('data', value);
+          });
+        });
+      }
+    }
+  });
+</script>

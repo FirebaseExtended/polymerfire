@@ -1,0 +1,30 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase.html">
+<link rel="import" href="carbon-firebase-auth-behavior.html">
+<dom-module id="carbon-firebase-anonymous-auth">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'carbon-firebase-anonymous-auth',
+
+        behaviors: [
+          Polymer.CarbonFirebaseAuthBehavior
+        ],
+
+        _attemptSignIn: function() {
+          return this.auth.signInAnonymously().then(function(user) {
+            this._setUser(user);
+          }).catch(function(error) {
+            this._setUser(null);
+          });
+        },
+
+        __computeAuth: function(app) {
+          return this.app.auth();
+        }
+      });
+    })();
+  </script>
+</dom-module>

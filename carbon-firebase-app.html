@@ -1,0 +1,58 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase.html">
+<dom-module id="carbon-firebase-app">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'carbon-firebase-app',
+
+        properties: {
+          name: {
+            type: String,
+            value: ''
+          },
+
+          apiKey: {
+            type: String
+          },
+
+          authDomain: {
+            type: String
+          },
+
+          databaseUrl: {
+            type: String
+          },
+
+          app: {
+            type: Object,
+            notify: true,
+            computed: '__computeApp(name, apiKey, authDomain, databaseUrl)'
+          }
+        },
+
+        __computeApp: function(name, apiKey, authDomain, databaseUrl) {
+          if (apiKey && authDomain && databaseUrl) {
+            var init = [{
+              apiKey: apiKey,
+              authDomain: authDomain,
+              databaseURL: databaseUrl
+            }];
+
+            if (name) {
+              init.push(name);
+            }
+
+            firebase.initializeApp.apply(firebase, init);
+          } else {
+            return null;
+          }
+
+          return firebase.app(name);
+        }
+      });
+    })();
+  </script>
+</dom-module>

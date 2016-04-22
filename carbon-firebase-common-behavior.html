@@ -1,0 +1,49 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../carbon-storage/carbon-network-status-behavior.html">
+<link rel="import" href="firebase.html">
+<script>
+  (function() {
+    'use strict';
+
+    Polymer.CarbonFirebaseCommonBehaviorImpl = {
+      properties: {
+        app: {
+          type: Object,
+          notify: true
+        },
+
+        appName: {
+          type: String,
+          notify: true
+        }
+      },
+
+      observers: [
+        '__detectApp(app)',
+        '__detectApp(appName)'
+      ],
+
+      __detectApp: function(appOrAppName) {
+        var app = this.app;
+        var appName = this.appName;
+
+        if (app && !appName) {
+          this.appName = app.name;
+        } else if (appName && !app) {
+          this.app = firebase.app(appName);
+        } else if (app && appName && appName !== app.name) {
+          if (Object.prototype.isPrototypeOf(appOrAppName)) {
+            this.appName = app.name;
+          } else {
+            this.app = firebase.app(appName);
+          }
+        }
+      }
+    };
+
+    Polymer.CarbonFirebaseCommonBehavior = [
+      Polymer.CarbonNetworkStatusBehavior,
+      Polymer.CarbonFirebaseCommonBehaviorImpl
+    ];
+  })();
+</script>

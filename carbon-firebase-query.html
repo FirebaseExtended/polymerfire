@@ -1,0 +1,148 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="carbon-firebase-database-behavior.html">
+<link rel="import" href="firebase.html">
+<dom-module id="carbon-firebase-query">
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'carbon-firebase-query',
+
+        behaviors: [
+          Polymer.CarbonFirebaseDatabaseBehavior
+        ],
+
+        properties: {
+          query: {
+            type: Object,
+            computed: '__computeQuery(ref, orderByChild, limitToFirst, limitToLast)',
+            observer: '__queryChanged'
+          },
+
+          orderByChild: {
+            type: String,
+            value: ''
+          },
+
+          limitToFirst: {
+            type: Number,
+            value: 0
+          },
+
+          limitToLast: {
+            type: Number,
+            value: 0
+          }
+        },
+
+        created: function() {
+          this.__map = {};
+        },
+
+        attached: function() {
+          this.__queryChanged(this.query, this.query);
+        },
+
+        detached: function() {
+          if (this.query == null) {
+            return;
+          }
+
+          this.query.off();
+        },
+
+        get zeroValue() {
+          return [];
+        },
+
+        setStoredValue: function(storagePath, value) {
+          var storagePathParts = storagePath.split('/');
+          var lastPart = storagePathParts[storagePathParts.length - 1];
+
+          if (storagePathParts > 2 && lastPart !== '$firebaseKey') {
+            return this._setFirebaseValue(storagePath, value);
+          } else {
+            return Promise.resolve();
+          }
+        },
+
+        __computeQuery: function(ref, orderByChild, limitToFirst, limitToLast) {
+          if (ref == null) {
+            return null;
+          }
+
+          var query;
+
+          if (orderByChild) {
+            query = ref.orderByChild(orderByChild);
+          } else {
+            query = ref.orderByKey();
+          }
+
+          if (limitToFirst) {
+            query = query.limitToFirst(limitToFirst);
+          } else if (limitToLast) {
+            query = query.limitToLast(limitToLast);
+          }
+
+          return query;
+        },
+
+        __queryChanged: function(query, oldQuery) {
+          if (oldQuery) {
+            oldQuery.off();
+          }
+
+          if (query) {
+            query.on('child_added', this.__onFirebaseChildAdded, this);
+            query.on('child_removed', this.__onFirebaseChildRemoved, this);
+            query.on('child_changed', this.__onFirebaseChildChanged, this);
+          }
+        },
+
+        __onFirebaseChildAdded: function(snapshot) {
+          var value = snapshot.val();
+          var key = snapshot.key;
+
+          value.$firebaseKey = key;
+
+          this.__map[key] = value;
+          this.push('data', value);
+        },
+
+        __onFirebaseChildRemoved: function(snapshot) {
+          var key = snapshot.key;
+          var value = this.__map[key];
+
+          if (value) {
+            this.__map[key] = null;
+            this.async(function() {
+              this.syncToMemory(function() {
+                this.splice('data', this.data.indexOf(value), 1);
+              });
+            });
+          }
+        },
+
+        __onFirebaseChildChanged: function(snapshot) {
+          var key = snapshot.key;
+          var value = this.__map[key];
+
+          if (value) {
+            var index = this.data.indexOf(value);
+            value = snapshot.val();
+            value.$firebaseKey = key;
+            this.__map[key] = value;
+
+            this.async(function() {
+              this.syncToMemory(function() {
+                this.set(['data', index], value);
+              });
+            });
+          }
+        }
+      });
+    })();
+  </script>
+</dom-module>

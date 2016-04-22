@@ -1,0 +1,94 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../carbon-storage-behavior.html">
+<link rel="import" href="carbon-firebase-common-behavior.html">
+<link rel="import" href="firebase.html">
+<script>
+  (function() {
+    'use strict';
+
+    Polymer.CarbonFirebaseDatabaseBehaviorImpl = {
+      properties: {
+        ref: {
+          type: Object,
+          computed: '__computeRef(app, path)'
+        },
+
+        path: {
+          type: String,
+          observer: '__pathChanged',
+          value: null
+        }
+      },
+
+      observers: [
+        '__onlineChanged(online)'
+      ],
+
+      memoryPathToStoragePath: function(path) {
+        return this.path + path.replace(/^data\.?/, '/').split('.').join('/');
+      },
+
+      storagePathToMemoryPath: function(storagePath) {
+        var path = 'data';
+
+        storagePath =
+            storagePath.replace(this.path, '').split('/').join('.');
+
+        if (storagePath) {
+          path += '.' + storagePath;
+        }
+
+        return path;
+      },
+
+      _setFirebaseValue: function(path, value) {
+        this._log('Setting Firebase value at', path, 'to', value)
+        var key = value && value.$firebaseKey;
+        if (key) {
+          value.$firebaseKey = null;
+        }
+        var result = firebase.database(this.app).ref(path).set(value);
+        if (key) {
+          value.$firebaseKey = key;
+        }
+        return result;
+      },
+
+      __computeRef: function(app, path) {
+        if (this.ref) {
+          this.ref.off();
+        }
+
+        if (app == null || path == null) {
+          return null;
+        }
+
+        return firebase.database(app).ref(path);
+      },
+
+      __pathChanged: function(path, oldPath) {
+        if (oldPath != null && !this.valueIsEmpty(this.data)) {
+          this.data = this.zeroValue;
+        }
+      },
+
+      __onlineChanged: function(online) {
+        if (!this.ref) {
+          return;
+        }
+
+        if (online) {
+          this.ref.goOnline();
+        } else {
+          this.ref.goOffline();
+        }
+      }
+    };
+
+    Polymer.CarbonFirebaseDatabaseBehavior = [
+      Polymer.CarbonStorageBehavior,
+      Polymer.CarbonFirebaseCommonBehavior,
+      Polymer.CarbonFirebaseDatabaseBehaviorImpl
+    ];
+  })();
+</script>
