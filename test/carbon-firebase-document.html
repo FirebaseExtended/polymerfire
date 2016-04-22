@@ -1,0 +1,71 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>carbon-firebase-document tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../carbon-storage/test/carbon-storage-compatibility-suite.html">
+  <link rel="import" href="../firebase.html">
+  <link rel="import" href="../carbon-firebase-app.html">
+  <link rel="import" href="../carbon-firebase-document.html">
+</head>
+<body>
+
+  <carbon-firebase-app
+      name="test"
+      api-key="AIzaSyBsj9AQZxPzW1i7ybjRDYZb_e12djdYZPU"
+      auth-domain="carbon-storage-demo-3e146.firebaseapp.com"
+      database-url="https://carbon-storage-demo-3e146.firebaseio.com">
+  </carbon-firebase-app>
+
+  <test-fixture id="BasicStorage">
+    <template>
+      <carbon-firebase-document app-name="test" path="/compat" log></carbon-firebase-document>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="SyncingStorage">
+    <template>
+      <carbon-firebase-document app-name="test" path="/compat"></carbon-firebase-document>
+      <carbon-firebase-document app-name="test" path="/compat"></carbon-firebase-document>
+    </template>
+  </test-fixture>
+
+  <carbon-firebase-document app-name="test" path="/compat"></carbon-firebase-document>
+  <script>
+    testCarbonStorageDocumentCompatibility({
+      tagName: 'carbon-firebase-document',
+      awaitUpdate: function(element) {
+        return new Promise(function(resolve) {
+          element.ref.on('value', function onValue() {
+            element.ref.off('value', onValue);
+            Polymer.Base.async(resolve, 1);
+          });
+        });
+      },
+      fetchStoredValue: window.foo = function(storagePath) {
+        return new Promise(function(resolve) {
+          var ref = firebase.app('test').database().ref(storagePath);
+          ref.on('value', function(snapshot) {
+            ref.off('value');
+            resolve(snapshot.val());
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
