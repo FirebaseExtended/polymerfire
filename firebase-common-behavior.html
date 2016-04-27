@@ -39,7 +39,11 @@
             this.app = firebase.app(appName);
           }
         } else {
-          this.app = firebase;
+          try {
+            this.app = firebase.app();
+          } catch (e) {
+            // app hasn't been initialized yet
+          }
         }
       }
     };

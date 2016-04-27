@@ -59,7 +59,11 @@
         },
 
         signInWithEmailAndPassword: function(email, password) {
-          return this._handleSignIn(this.signInWithEmailAndPassword(email, password));
+          return this._handleSignIn(this.auth.signInWithEmailAndPassword(email, password));
+        },
+
+        createUserWithEmailAndPassword: function(email, password) {
+          return this._handleSignIn(this.auth.createUserWithEmailAndPassword(email, password));
         },
 
         signOut: function() {
@@ -79,7 +83,7 @@
             return Promise.reject('No app configured for firebase-auth!');
           }
 
-          return this._handleSignIn(method(provider));
+          return this._handleSignIn(method.call(this.auth, provider));
         },
 
         _providerFromName: function(name) {
@@ -94,7 +98,7 @@
 
         _handleSignIn: function(promise) {
           promise.catch(function(err) {
-            this.emit('error', err);
+            this.fire('error', err);
           }.bind(this));
         },
 
