@@ -95,7 +95,7 @@
     __onFirebaseValue: function(snapshot) {
       var value = snapshot.val();
 
-      if (value == null && this.valueIsEmpty(this.data)) {
+      if (value == null) {
         value = this.zeroValue;
       }
 

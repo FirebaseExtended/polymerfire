@@ -33,7 +33,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <test-fixture id="BasicStorage">
     <template>
-      <firebase-document app-name="test" path="/compat" log></firebase-document>
+      <firebase-document app-name="test" path="/compat"></firebase-document>
     </template>
   </test-fixture>
 
@@ -44,7 +44,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
-  <firebase-document app-name="test" path="/compat"></firebase-document>
   <script>
     testCarbonStorageDocumentCompatibility({
       tagName: 'firebase-document',
