@@ -67,8 +67,10 @@
       },
 
       __pathChanged: function(path, oldPath) {
-        if (oldPath != null && !this.valueIsEmpty(this.data)) {
-          this.data = this.zeroValue;
+        if (oldPath != null) {
+          this.syncToMemory(function() {
+            this.data = this.zeroValue;
+          });
         }
       },
 
