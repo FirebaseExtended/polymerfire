@@ -47,7 +47,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             this.app = firebase.app(appName);
           }
         } else {
-          this.app = firebase;
+          try {
+            this.app = firebase.app();
+          } catch (e) {
+            // app hasn't been initialized yet
+          }
         }
       }
     };

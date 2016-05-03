@@ -32,17 +32,58 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       th {
         text-align: right;
       }
+      button {
+        background: #2196F3;
+        color: white;
+        border: 0;
+        border-radius: 3px;
+        text-transform: uppercase;
+        padding: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      input {
+        padding: 8px;
+        font-size: 14px;
+        font-family: Roboto, sans-serif;
+        border: 1px solid #ddd;
+        display: block;
+        max-width: 300px;
+        margin-bottom: 8px;
+      }
+      .error {
+        background: #f44336;
+        color: white;
+        padding: 8px;
+        font-size: 14px;
+        border-radius: 3px;
+        margin: 16px auto;
+        max-width: 800px;
+      }
     </style>
   </head>
   <body>
     <template id="app" is="dom-bind">
-      <firebase-app auth-domain="dinosaur-facts-demo-94b9b.firebaseapp.com"
-        database-url="https://dinosaur-facts-demo-94b9b.firebaseio.com/"
-        api-key="AIzaSyDQq7zg-hTts3pvYHYpFCkHzm9SQffpFCA"></firebase-app>
-      <firebase-auth id="auth" user="{{user}}"></firebase-auth>
+      <firebase-app auth-domain="polymerfire-test.firebaseapp.com"
+        database-url="https://polymerfire-test.firebaseio.com/"
+        api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"></firebase-app>
+      <firebase-auth id="auth" user="{{user}}" provider="google" on-error="showError"></firebase-auth>
 
+      <div class="error" hidden$="[[!error]]">[[error.code]]: [[error.message]]</div>
       <div hidden$="[[user]]">
-        <button on-tap="signInAnonymously">Sign In Anonymously</button>
+        <h3>Email/Password</h3>
+        <form on-submit="signInWithEmailAndPassword">
+          <input value="{{email::input}}" type="email" placeholder="Email">
+          <input value="{{password::input}}" type="password" placeholder="Password">
+          <button type="submit" on-tap="signInWithEmailAndPassword">Sign In</button>
+          <button type="button" on-tap="createUserWithEmailAndPassword">Sign Up</button>
+        </form>
+        <h3>Anonymous/OAuth</h3>
+        <p>
+          <button on-tap="signInAnonymously">Sign In Anonymously</button>
+          <button on-tap="signInWithGoogle">Sign In With Google</button>
+        </p>
       </div>
       <div hidden$="[[!user]]">
         <table>
@@ -58,12 +99,38 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     <script type="text/javascript">
       document.addEventListener('WebComponentsReady', function() {
         var app = document.getElementById('app');
+        app.error = null;
+        app.showError = function(e) {
+          this.error = e.detail;
+        };
 
         app.signInAnonymously = function() {
+          this.error = null;
           this.$.auth.signInAnonymously();
         };
 
+        app.signInWithGoogle = function() {
+          this.error = null;
+          this.$.auth.signInWithPopup();
+        };
+
+        app.signInWithEmailAndPassword = function(e) {
+          if (e) { e.preventDefault(); }
+          this.error = null;
+          this.$.auth.signInWithEmailAndPassword(this.email, this.password);
+          this.email = null;
+          this.password = null;
+        };
+
+        app.createUserWithEmailAndPassword = function() {
+          this.error = null;
+          this.$.auth.createUserWithEmailAndPassword(this.email, this.password);
+          this.email = null;
+          this.password = null;
+        }
+
         app.signOut = function() {
+          this.error = null;
           this.$.auth.signOut();
         };
       });

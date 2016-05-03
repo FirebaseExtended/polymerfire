@@ -18,8 +18,8 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#extends",
-    "firebase": "http://www.gstatic.com/firebasejs/staging/3.0.0-eap.5/firebase.js",
+    "polymer": "Polymer/polymer#^1.2.0",
+    "firebase": "http://www.gstatic.com/firebasejs/staging/3.0.0-eap.6/firebase.js",
     "carbon-storage": "git@github.com:polymerelements/carbon-storage.git"
   },
   "devDependencies": {

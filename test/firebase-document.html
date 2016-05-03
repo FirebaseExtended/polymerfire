@@ -24,15 +24,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 <body>
 
   <firebase-app
-      name="test"
-      api-key="AIzaSyBsj9AQZxPzW1i7ybjRDYZb_e12djdYZPU"
-      auth-domain="carbon-storage-demo-3e146.firebaseapp.com"
-      database-url="https://carbon-storage-demo-3e146.firebaseio.com">
+    name="test"
+    api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+    auth-domain="polymerfire-test.firebaseapp.com"
+    database-url="https://polymerfire-test.firebaseio.com">
   </firebase-app>
 
   <test-fixture id="BasicStorage">
     <template>
-      <firebase-document app-name="test" path="/compat" log></firebase-document>
+      <firebase-document app-name="test" path="/compat"></firebase-document>
     </template>
   </test-fixture>
 
@@ -43,7 +43,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </template>
   </test-fixture>
 
-  <firebase-document app-name="test" path="/compat"></firebase-document>
   <script>
     testCarbonStorageDocumentCompatibility({
       tagName: 'firebase-document',
