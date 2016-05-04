@@ -24,13 +24,28 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         properties: {
           query: {
             type: Object,
-            computed: '__computeQuery(ref, orderByChild, limitToFirst, limitToLast)',
+            computed: '__computeQuery(ref, orderByChild, limitToFirst, limitToLast, startAt, endAt, equalTo)',
             observer: '__queryChanged'
           },
 
           orderByChild: {
             type: String,
             value: ''
+          },
+
+          startAt: {
+            type: String,
+            value: ''
+          },
+
+          endAt: {
+            type: String,
+            value: ''
+          },
+
+          equalTo: {
+            type: Object,
+            value: null
           },
 
           limitToFirst: {
@@ -60,6 +75,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           this.query.off();
         },
 
+        child: function(key) {
+          return this.__map[key];
+        },
+
         get zeroValue() {
           return [];
         },
@@ -75,7 +94,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }
         },
 
-        __computeQuery: function(ref, orderByChild, limitToFirst, limitToLast) {
+        __computeQuery: function(ref, orderByChild, limitToFirst, limitToLast, startAt, endAt, equalTo) {
           if (ref == null) {
             return null;
           }
@@ -94,12 +113,27 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             query = query.limitToLast(limitToLast);
           }
 
+          if (startAt) {
+            query = query.startAt(startAt);
+          }
+
+          if (endAt) {
+            query = query.endAt(endAt);
+          }
+
+          if (equalTo) {
+            query = query.equalTo(equalTo);
+          }
+
           return query;
         },
 
         __queryChanged: function(query, oldQuery) {
           if (oldQuery) {
-            oldQuery.off();
+            oldQuery.off('child_added', this.__onFirebaseChildAdded);
+            oldQuery.off('child_added', this.__onFirebaseChildRemoved);
+            oldQuery.off('child_added', this.__onFirebaseChildChanged);
+            this.set('data', this.zeroValue);
           }
 
           if (query) {
