@@ -51,13 +51,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       _setFirebaseValue: function(path, value) {
         this._log('Setting Firebase value at', path, 'to', value)
-        var key = value && value.$firebaseKey;
+        var key = value && value.$key;
         if (key) {
-          value.$firebaseKey = null;
+          value.$key = null;
         }
         var result = firebase.database(this.app).ref(path).set(value);
         if (key) {
-          value.$firebaseKey = key;
+          value.$key = key;
         }
         return result;
       },
@@ -67,7 +67,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           this.ref.off();
         }
 
-        if (app == null || path == null) {
+        if (app == null || path == null || path.split('/').indexOf('') >= 0)) {
           return null;
         }
 

@@ -68,7 +68,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           var storagePathParts = storagePath.split('/');
           var lastPart = storagePathParts[storagePathParts.length - 1];
 
-          if (storagePathParts > 2 && lastPart !== '$firebaseKey') {
+          if (storagePathParts > 2 && lastPart !== '$key') {
             return this._setFirebaseValue(storagePath, value);
           } else {
             return Promise.resolve();
@@ -113,7 +113,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           var value = snapshot.val();
           var key = snapshot.key;
 
-          value.$firebaseKey = key;
+          value.$key = key;
 
           this.__map[key] = value;
           this.push('data', value);
@@ -140,7 +140,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           if (value) {
             var index = this.data.indexOf(value);
             value = snapshot.val();
-            value.$firebaseKey = key;
+            value.$key = key;
             this.__map[key] = value;
 
             this.async(function() {
