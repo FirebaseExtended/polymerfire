@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
-    "firebase": "http://www.gstatic.com/firebasejs/staging/3.0.0-eap.6/firebase.js",
+    "firebase": "http://www.gstatic.com/firebasejs/staging/3.0.0-rc.1/firebase.js",
     "carbon-storage": "git@github.com:polymerelements/carbon-storage.git"
   },
   "devDependencies": {
