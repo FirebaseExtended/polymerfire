@@ -17,42 +17,40 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       properties: {
         app: {
           type: Object,
-          notify: true
+          notify: true,
+          observer: '__appChanged'
         },
 
         appName: {
           type: String,
           notify: true,
-          value: ''
+          value: '',
+          observer: '__appNameChanged'
         }
       },
 
-      observers: [
-        '__detectApp(app)',
-        '__detectApp(appName)'
-      ],
+      __appNameChanged: function(appName) {
+        if (this.app && this.app.name === appName) {
+          return;
+        }
 
-      __detectApp: function(appOrAppName) {
-        var app = this.app;
-        var appName = this.appName;
-
-        if (app && !appName) {
-          this.appName = app.name;
-        } else if (appName && !app) {
-          this.app = firebase.app(appName);
-        } else if (app && appName && appName !== app.name) {
-          if (Object.prototype.isPrototypeOf(appOrAppName)) {
-            this.appName = app.name;
+        try {
+          if (appName == null) {
+            this.app = firebase.app();
           } else {
             this.app = firebase.app(appName);
           }
-        } else {
-          try {
-            this.app = firebase.app();
-          } catch (e) {
-            // app hasn't been initialized yet
-          }
+        } catch (e) {
+          // appropriate app hasn't been initialized yet
         }
+      },
+
+      __appChanged: function(app) {
+        if (app && app.name === this.appName) {
+          return;
+        }
+
+        this.appName = app ? app.name : '';
       }
     };
 

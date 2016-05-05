@@ -1,0 +1,112 @@
+<!doctype html>
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>FirebaseCommonBehavior tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../../carbon-storage/test/carbon-storage-compatibility-suite.html">
+  <link rel="import" href="../firebase.html">
+  <link rel="import" href="../firebase-common-behavior.html">
+  <link rel="import" href="../firebase-app.html">
+</head>
+<body>
+
+  <firebase-app
+      name="test"
+      api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+      auth-domain="polymerfire-test.firebaseapp.com"
+      database-url="https://polymerfire-test.firebaseio.com">
+  </firebase-app>
+
+  <firebase-app
+      name="alt"
+      api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+      auth-domain="polymerfire-test.firebaseapp.com"
+      database-url="https://polymerfire-test.firebaseio.com">
+  </firebase-app>
+
+  <firebase-app
+      api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+      auth-domain="polymerfire-test.firebaseapp.com"
+      database-url="https://polymerfire-test.firebaseio.com">
+  </firebase-app>
+
+  <test-fixture id="BasicCommon">
+    <template>
+      <x-firebase-common></x-firebase-common>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="NamedCommon">
+    <template>
+      <x-firebase-common app-name="test"></x-firebase-common>
+    </template>
+  </test-fixture>
+
+  <script>
+    HTMLImports.whenReady(function() {
+      Polymer({
+        is: 'x-firebase-common',
+
+        behaviors: [
+          Polymer.FirebaseCommonBehavior
+        ]
+      });
+    });
+
+    suite('FirebaseCommonBehavior', function() {
+      var commonElement;
+
+      suite('without a name', function() {
+        setup(function() {
+          commonElement = fixture('BasicCommon');
+        });
+
+        test('sets app to the default app', function() {
+          expect(commonElement.app.name).to.be.equal(firebase.app().name);
+        });
+
+        suite('when an app is set', function() {
+          test('changes the appName to the app\'s name', function() {
+            commonElement.app = firebase.app('test');
+            expect(commonElement.appName).to.be.equal('test');
+          });
+        });
+      });
+
+      suite('with a name', function() {
+        setup(function() {
+          commonElement = fixture('NamedCommon');
+        });
+
+        test('sets app to the named app', function() {
+          expect(commonElement.app.name).to.be.equal(firebase.app('test').name);
+        });
+
+        suite('when the name is changed', function() {
+          test('changes to the appropriate app', function() {
+            commonElement.appName = 'alt';
+            expect(commonElement.app.name).to.be.equal(firebase.app('alt').name);
+          });
+
+          test('if no name is specified, selects default app', function() {
+            commonElement.appName = null;
+            expect(commonElement.app.name).to.be.equal(firebase.app().name);
+          });
+        });
+      });
+    });
+  </script>
+</body>
