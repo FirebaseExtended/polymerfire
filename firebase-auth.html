@@ -15,6 +15,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       'use strict';
 
       Polymer({
+
         is: 'firebase-auth',
 
         behaviors: [
@@ -24,7 +25,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         properties: {
           auth: {
             type: Object,
-            computed: '_computeAuth(app)'
+            computed: '_computeAuth(app)',
+            observer: '__authChanged'
           },
 
           provider: {
@@ -45,10 +47,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             notify: true
           }
         },
-
-        observers: [
-          '_listen(auth)'
-        ],
 
         signInAnonymously: function() {
           if (!this.auth) {
@@ -118,16 +116,18 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           return this.app.auth();
         },
 
-        _listen: function(app) {
+        __authChanged: function(auth, oldAuth) {
+          if (oldAuth !== auth && this._unsubscribe) {
+            this._unsubscribe();
+            this._unsubscribe = null;
+          }
+
           if (this.auth) {
             this._unsubscribe = this.auth.onAuthStateChanged(function(user) {
               this._setUser(user);
             }.bind(this), function(err) {
               this.fire('error', err);
             }.bind(this));
-          } else if (this._unsubscribe) {
-            this._unsubscribe();
-            this._unsubscribe = null;
           }
         }
       });
