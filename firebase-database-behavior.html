@@ -16,9 +16,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
     Polymer.FirebaseDatabaseBehaviorImpl = {
       properties: {
+        db: {
+          type: Object,
+          computed: '__computeDb(app)'
+        },
+
         ref: {
           type: Object,
-          computed: '__computeRef(app, path)'
+          computed: '__computeRef(db, path)'
         },
 
         path: {
@@ -55,23 +60,29 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         if (key) {
           value.$key = null;
         }
-        var result = firebase.database(this.app).ref(path).set(value);
+        var result = this.db.ref(path).set(value);
         if (key) {
           value.$key = key;
         }
         return result;
       },
 
-      __computeRef: function(app, path) {
+      __computeDb: function(app) {
+        return app ? app.database() : null;
+      },
+
+      __computeRef: function(db, path) {
         if (this.ref) {
           this.ref.off();
         }
 
-        if (app == null || path == null || path.split('/').slice(1).indexOf('') >= 0) {
+        if (db == null ||
+            path == null ||
+            path.split('/').slice(1).indexOf('') >= 0) {
           return null;
         }
 
-        return firebase.database(app).ref(path);
+        return db.ref(path);
       },
 
       __pathChanged: function(path, oldPath) {
@@ -88,9 +99,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }
 
         if (online) {
-          this.ref.goOnline();
+          this.db.goOnline();
         } else {
-          this.ref.goOffline();
+          this.db.goOffline();
         }
       }
     };

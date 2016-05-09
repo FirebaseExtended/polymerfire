@@ -73,11 +73,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return Promise.resolve();
     },
 
+    destroy: function() {
+      return this._setFirebaseValue(this.path, null).then(function() {
+        return this.reset();
+      }.bind(this));
+    },
+
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
           this.ref.child(path).once('value', function(snapshot) {
             var value = snapshot.val();
-            console.log('GOT FIREBASE VALUE', value);
             if (value == null) {
               resolve(this.zeroValue);
             }
@@ -87,7 +92,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     },
 
     setStoredValue: function(path, value) {
-      this._setFirebaseValue(path, value);
+      return this._setFirebaseValue(path, value);
     },
 
     __refChanged: function(ref, oldRef) {
