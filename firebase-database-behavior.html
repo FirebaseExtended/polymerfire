@@ -37,23 +37,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         '__onlineChanged(online)'
       ],
 
-      memoryPathToStoragePath: function(path) {
-        return this.path + path.replace(/^data\.?/, '/').split('.').join('/');
-      },
-
-      storagePathToMemoryPath: function(storagePath) {
-        var path = 'data';
-
-        storagePath =
-            storagePath.replace(this.path, '').split('/').join('.');
-
-        if (storagePath) {
-          path += '.' + storagePath;
-        }
-
-        return path;
-      },
-
       _setFirebaseValue: function(path, value) {
         this._log('Setting Firebase value at', path, 'to', value)
         var key = value && value.$key;

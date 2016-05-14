@@ -1,0 +1,226 @@
+<!doctype html>
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>firebase-query tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../firebase-app.html">
+  <link rel="import" href="../firebase-query.html">
+</head>
+<body>
+  <firebase-app
+      name="test"
+      api-key="AIzaSyBzKhxNa2k9pA3m9_Ji3POFAKyGGFnyshI"
+      auth-domain="note-app-firebase-3a483.firebaseapp.com"
+      database-url="https://note-app-firebase-3a483.firebaseio.com">
+  </firebase-app>
+
+  <test-fixture id="BasicQuery">
+    <template>
+      <firebase-query app-name="test" log></firebase-query>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="DomRepeatQuery">
+    <template is="dom-template">
+      <firebase-query app-name="test" path="/list" data="{{data}}"></firebase-query>
+      <template is="dom-repeat" items="[[data]]">
+        <div>[[item.val]]</div>
+      </template>
+    </template>
+  </test-fixture>
+
+  <script>
+    function expectFirebasePathValueToEql(path, value) {
+      return getFirebaseValue(path).then(function(fbValue) {
+        var key = value.$key;
+        if (key) {
+          delete value.$key;
+        }
+        expect(value).to.be.eql(fbValue);
+        if (key) {
+          value.$key = key;
+        }
+      });
+    }
+
+    function pushFirebaseValue(path, value) {
+      return firebase.app('test').database().ref(path).push(value);
+    }
+
+    function setFirebaseValue(path, value) {
+      return firebase.app('test').database().ref(path).set(value);
+    }
+
+    function clearFirebaseValue(path) {
+      return firebase.app('test').database().ref(path).set(null);
+    }
+
+    function getFirebaseValue(path) {
+      return new Promise(function(resolve, reject) {
+        var ref = firebase.app('test').database().ref(path);
+        ref.on('value', function(snapshot) {
+          ref.off();
+          resolve(snapshot.val());
+        });
+        ref.on('error', function(error) {
+          ref.off();
+          reject(error);
+        });
+      });
+    }
+
+    suite('<firebase-query>', function() {
+      var makeObject;
+      var root;
+
+      setup(function() {
+        var objectId = 0;
+        makeObject = function(value) {
+          return {
+            val: value || objectId++
+          };
+        };
+
+        return pushFirebaseValue('/test', { ignore: 'me' }).then(function(snapshot) {
+          root = '/test/' + snapshot.key;
+        });
+      });
+
+      teardown(function() {
+        return clearFirebaseValue(root);
+      });
+
+      suite('ordered query', function() {
+        var query;
+
+        setup(function() {
+          query = fixture('BasicQuery');
+          query.path = root + '/list';
+          return query.transactionsComplete;
+        });
+
+        test('can order by child', function() {
+          var values = [makeObject(2), makeObject(1), makeObject(0)];
+          query.orderByChild = 'val';
+          return setFirebaseValue(query.path, values).then(function() {
+            values.reverse();
+            query.data.forEach(function(value, index) {
+              expect(value.val).to.be.equal(values[index].val);
+            });
+          });
+        });
+      });
+
+      suite('basic query', function() {
+        var query;
+
+        setup(function() {
+          query = fixture('BasicQuery');
+          query.path = root + '/list';
+          return query.transactionsComplete;
+        });
+
+        test('updates data array child values', function() {
+          var object = makeObject();
+
+          return pushFirebaseValue(query.path, object).then(function() {
+            expect(query.data.length).to.be.equal(1);
+            expect(query.data[0]).to.be.okay;
+            expect(query.data[0].val).to.be.equal(object.val);
+          });
+        });
+
+        test('adds new children as they appear', function() {
+          var promiseChain = Promise.resolve();
+
+          [makeObject(), makeObject(), makeObject()].forEach(function(object, index) {
+            promiseChain = promiseChain.then(function() {
+              return pushFirebaseValue(query.path, object).then(function() {
+                expect(query.data.length).to.be.equal(index + 1);
+                expect(query.data[index]).to.be.okay;
+                expect(query.data[index].val).to.be.equal(object.val);
+              });
+            });
+          });
+
+          return promiseChain;
+        });
+
+        test('removes data items as children are removed', function() {
+          return Promise.all([makeObject(), makeObject(), makeObject()]
+              .map(function(object) {
+                return pushFirebaseValue(query.path, object);
+              })).then(function(results) {
+                return clearFirebaseValue(query.path + '/' + results[1].key).then(function() {
+
+                  expect(query.data.length).to.be.equal(2);
+
+                  return Promise.all([
+                    expectFirebasePathValueToEql(
+                        query.path + '/' + results[0].key, query.data[0]),
+                    expectFirebasePathValueToEql(
+                        query.path + '/' + results[2].key, query.data[1])
+                  ]);
+                });
+              });
+        });
+
+        test('updates values when array items change', function() {
+          var object = makeObject();
+
+          return pushFirebaseValue(query.path, object).then(function() {
+            query.set('data.0.val', object.val + 1);
+            return query.transactionsComplete;
+          }).then(function() {
+            return expectFirebasePathValueToEql(
+                query.path + '/' + query.data[0].$key, query.data[0]);
+          });
+        });
+      });
+
+      suite('coordinating with dom-repeat', function() {
+        var query;
+        var domRepeat;
+
+        setup(function() {
+          var elements = fixture('DomRepeatQuery', {
+            data: []
+          });
+          // NOTE(cdata): This works around a bug in `dom-template`. Track
+          // polymerelements/test-fixture#31 and remove this when that has been
+          // resolved:
+          var tmpl = document.querySelector('#DomRepeatQuery').fixtureTemplates[0];
+          tmpl._parentProps = {};
+
+          domRepeat = elements[1];
+          query = elements[0];
+          query.path = root + '/list';
+          return query.transactionsComplete;
+        });
+
+        test('updates repeated items when values change remotely', function() {
+          var object = makeObject();
+          return pushFirebaseValue(query.path, object).then(function() {
+            return setFirebaseValue(
+                query.path + '/' + query.data[0].$key + '/val', object.val + 1);
+          }).then(function() {
+            expect(domRepeat._instances[0].item).to.be.eql(query.data[0]);
+          });
+        });
+      });
+    });
+  </script>
+</body>

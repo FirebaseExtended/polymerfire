@@ -79,18 +79,61 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           return this.__map[key];
         },
 
+        get isNew() {
+          return !this.path;
+        },
+
         get zeroValue() {
           return [];
         },
 
-        setStoredValue: function(storagePath, value) {
-          var storagePathParts = storagePath.split('/');
-          var lastPart = storagePathParts[storagePathParts.length - 1];
+        memoryPathToStoragePath: function(path) {
+          var storagePath = this.path;
 
-          if (storagePathParts > 2 && lastPart !== '$key') {
-            return this._setFirebaseValue(storagePath, value);
-          } else {
+          if (path !== 'data') {
+            var parts = path.split('.');
+            var index = window.parseInt(parts[1], 10);
+
+            if (index != null && !isNaN(index)) {
+              parts[1] = this.data[index] != null && this.data[index].$key;
+            }
+
+            storagePath += parts.join('/').replace(/^data\.?/, '');
+          }
+
+          return storagePath;
+        },
+
+        storagePathToMemoryPath: function(storagePath) {
+          var path = 'data';
+
+          if (storagePath !== this.path) {
+            var parts = storagePath.replace(this.path + '/', '').split('/');
+            var key = parts[0];
+            var datum = this.__map[key];
+
+            if (datum) {
+              parts[0] = this.data.indexOf(datum);
+            }
+
+            path += '.' + parts.join('.');
+          }
+
+          return path;
+        },
+
+        setStoredValue: function(storagePath, value) {
+          if (storagePath === this.path || /\$key$/.test(storagePath)) {
             return Promise.resolve();
+          } else {
+            return this._setFirebaseValue(storagePath, value);
+          }
+        },
+
+        _propertyToKey: function(property) {
+          var index = window.parseInt(property, 10);
+          if (index != null && !isNaN(index)) {
+            return this.data[index].$key;
           }
         },
 
@@ -130,22 +173,25 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         __queryChanged: function(query, oldQuery) {
           if (oldQuery) {
-            oldQuery.off('child_added', this.__onFirebaseChildAdded);
-            oldQuery.off('child_added', this.__onFirebaseChildRemoved);
-            oldQuery.off('child_added', this.__onFirebaseChildChanged);
-            this.set('data', this.zeroValue);
+            oldQuery.off();
+            this.syncToMemory(function() {
+              this.set('data', this.zeroValue);
+            });
           }
 
           if (query) {
             query.on('child_added', this.__onFirebaseChildAdded, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this);
+            query.on('child_moved', this.__onFirebaseChildMoved, this);
           }
         },
 
         __onFirebaseChildAdded: function(snapshot) {
           var value = snapshot.val();
           var key = snapshot.key;
+
+          this._log('Firebase child_added:', key, value);
 
           value.$key = key;
 
@@ -156,6 +202,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         __onFirebaseChildRemoved: function(snapshot) {
           var key = snapshot.key;
           var value = this.__map[key];
+
+          this._log('Firebase child_removed:', key, value);
 
           if (value) {
             this.__map[key] = null;
@@ -171,6 +219,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           var key = snapshot.key;
           var value = this.__map[key];
 
+          this._log('Firebase child_changed:', key, value);
+
           if (value) {
             var index = this.data.indexOf(value);
             value = snapshot.val();
@@ -179,7 +229,39 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
             this.async(function() {
               this.syncToMemory(function() {
-                this.set(['data', index], value);
+                // TODO(cdata): Update this as appropriate when dom-repeat
+                // supports custom object key indices.
+                if (value instanceof Object) {
+                  for (var property in value) {
+                    this.set(['data', index, property], value[property]);
+                  }
+                } else {
+                  this.set(['data', index], value);
+                }
+              });
+            });
+          }
+        },
+
+        __onFirebaseChildMoved: function(snapshot, previousChildKey) {
+          var key = snapshot.key;
+          var value = this.__map[key];
+          var previousChild = previousChildKey ? this.__map[previousChildKey] : null;
+          var targetIndex = previousChild ? this.data.indexOf(previousChild) : 0;
+
+          this._log('Firebase child_moved:', key, value,
+              'to index', targetIndex);
+
+          if (value) {
+            var index = this.data.indexOf(value);
+            value = snapshot.val();
+            value.$key = key;
+            this.__map[key] = value;
+
+            this.async(function() {
+              this.syncToMemory(function() {
+                this.splice('data', index, 1);
+                this.splice('data', targetIndex, 0, value);
               });
             });
           }

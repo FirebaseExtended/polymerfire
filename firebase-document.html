@@ -79,6 +79,29 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }.bind(this));
     },
 
+    memoryPathToStoragePath: function(path) {
+      var storagePath = this.path;
+
+      if (path !== 'data') {
+        storagePath += path.replace(/^data\.?/, '/').split('.').join('/');
+      }
+
+      return storagePath;
+    },
+
+    storagePathToMemoryPath: function(storagePath) {
+      var path = 'data';
+
+      storagePath =
+          storagePath.replace(this.path, '').split('/').join('.');
+
+      if (storagePath) {
+        path += '.' + storagePath;
+      }
+
+      return path;
+    },
+
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
           this.ref.child(path).once('value', function(snapshot) {
