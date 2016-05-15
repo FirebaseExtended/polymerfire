@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
-    "firebase": "http://www.gstatic.com/firebasejs/staging/3.0.0-rc.4/firebase.js",
+    "firebase": "http://www.gstatic.com/firebasejs/staging/3.0.0-rc.7/firebase.js",
     "app-storage": "git@github.com:polymerelements/app-storage.git"
   },
   "devDependencies": {

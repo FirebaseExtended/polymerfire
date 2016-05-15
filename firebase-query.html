@@ -113,7 +113,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             var datum = this.__map[key];
 
             if (datum) {
-              parts[0] = this.data.indexOf(datum);
+              parts[0] = this.__indexFromKey(key);
             }
 
             path += '.' + parts.join('.');
@@ -187,6 +187,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }
         },
 
+        __indexFromKey: function(key) {
+          for (var i = 0; i < this.data.length; i++) {
+            if (this.data[i].$key === key) {
+              return i;
+            }
+          }
+          return -1;
+        },
+
         __onFirebaseChildAdded: function(snapshot) {
           var value = snapshot.val();
           var key = snapshot.key;
@@ -209,7 +218,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             this.__map[key] = null;
             this.async(function() {
               this.syncToMemory(function() {
-                this.splice('data', this.data.indexOf(value), 1);
+                this.splice('data', this.__indexFromKey(key), 1);
               });
             });
           }
@@ -222,12 +231,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           this._log('Firebase child_changed:', key, value);
 
           if (value) {
-            var index = this.data.indexOf(value);
-            value = snapshot.val();
-            value.$key = key;
-            this.__map[key] = value;
-
             this.async(function() {
+              var index = this.__indexFromKey(key);
+              value = snapshot.val();
+              value.$key = key;
+              this.__map[key] = value;
+
               this.syncToMemory(function() {
                 // TODO(cdata): Update this as appropriate when dom-repeat
                 // supports custom object key indices.
@@ -246,14 +255,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         __onFirebaseChildMoved: function(snapshot, previousChildKey) {
           var key = snapshot.key;
           var value = this.__map[key];
-          var previousChild = previousChildKey ? this.__map[previousChildKey] : null;
-          var targetIndex = previousChild ? this.data.indexOf(previousChild) : 0;
+          var targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) : 0;
 
           this._log('Firebase child_moved:', key, value,
               'to index', targetIndex);
 
           if (value) {
-            var index = this.data.indexOf(value);
+            var index = this.__indexFromKey(key);
             value = snapshot.val();
             value.$key = key;
             this.__map[key] = value;
