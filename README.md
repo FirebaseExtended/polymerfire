@@ -84,4 +84,41 @@ app.
 
 
 
-<!-- No docs for <firebase-query> found. -->
+##&lt;firebase-query&gt;
+
+`firebase-query` combines the given properties into query options that generate
+a query, a request for a filtered, ordered, immutable set of Firebase data. The
+results of this Firebase query are then synchronized into the `data` parameter.
+
+Example usage:
+
+```html
+<firebase-query
+    id="query"
+    app-name="notes"
+    path="/notes/[[uid]]"
+    data="{{data}}">
+</firebase-query>
+
+<template is="dom-repeat" items="{{data}}" as="{{note}}">
+  <sticky-note note-data="{{note}}"></sticky-note>
+</template>
+
+<script>
+Polymer({
+  properties: {
+    uid: String,
+    data: {
+      type: Object,
+      observer: 'dataChanged'
+    }
+  },
+
+  dataChanged: function (newData, oldData) {
+    // do something when the query returns values
+  }
+});
+</script>
+```
+
+
