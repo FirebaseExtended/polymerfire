@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.2.0",
-    "firebase": "https://www.gstatic.com/firebasejs/3.0.0/firebase.js",
+    "firebase-sdk": "https://www.gstatic.com/firebasejs/3.0.0/firebase.js",
     "app-storage": "polymerelements/app-storage#~0.9.0"
   },
   "devDependencies": {
