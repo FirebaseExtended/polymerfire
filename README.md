@@ -12,7 +12,7 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 -->
 
-[![Build status](https://travis-ci.org/FirebasePrivate/polymerfire.svg?branch=master)](https://travis-ci.org/FirebasePrivate/polymerfire)
+[![Build status](https://travis-ci.org/firebase/polymerfire.svg?branch=master)](https://travis-ci.org/firebase/polymerfire)
 
 
 ##&lt;firebase-app&gt;
