@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "web-component-tester": "^4.0.0"
+    "web-component-tester": "^4.0.0",
+    "note-app-elements": "polymerlabs/note-app-elements"
   }
 }
