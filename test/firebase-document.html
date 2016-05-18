@@ -44,25 +44,27 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   </test-fixture>
 
   <script>
-    testAppStorageDocumentCompatibility({
-      tagName: 'firebase-document',
-      awaitUpdate: function(element) {
-        return new Promise(function(resolve) {
-          element.ref.on('value', function onValue() {
-            element.ref.off('value', onValue);
-            Polymer.Base.async(resolve, 1);
+    HTMLImports.whenReady(function() {
+      testAppStorageDocumentCompatibility({
+        tagName: 'firebase-document',
+        awaitUpdate: function(element) {
+          return new Promise(function(resolve) {
+            element.ref.on('value', function onValue() {
+              element.ref.off('value', onValue);
+              Polymer.Base.async(resolve, 1);
+            });
           });
-        });
-      },
-      fetchStoredValue: window.foo = function(storagePath) {
-        return new Promise(function(resolve) {
-          var ref = firebase.app('test').database().ref(storagePath);
-          ref.on('value', function(snapshot) {
-            ref.off('value');
-            resolve(snapshot.val());
+        },
+        fetchStoredValue: window.foo = function(storagePath) {
+          return new Promise(function(resolve) {
+            var ref = firebase.app('test').database().ref(storagePath);
+            ref.on('value', function(snapshot) {
+              ref.off('value');
+              resolve(snapshot.val());
+            });
           });
-        });
-      }
+        }
+      });
     });
   </script>
 </body>
