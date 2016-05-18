@@ -12,6 +12,26 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 <script>
   'use strict';
 
+  /**
+   * The firebase-document element is an easy way to interact with a firebase
+   * location as an object and expose it to the Polymer databinding system.
+   *
+   * For example:
+   *
+   *     <firebase-document
+   *       path="/users/{{userId}}/notes/{{noteId}}"
+   *       data="{{noteData}}">
+   *     </firebase-document>
+   *
+   * This fetches the `noteData` object from the firebase location at
+   * `/users/${userId}/notes/${noteId}` and exposes it to the Polymer
+   * databinding system. Changes to `noteData` will likewise be, sent back up
+   * and stored.
+   *
+   * `<firebase-document>` needs some information about how to talk to Firebase.
+   * Set this configuration by adding a `<firebase-app>` element anywhere in your
+   * app.
+   */
   Polymer({
     is: 'firebase-document',
 
@@ -33,14 +53,32 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       '__refChanged(ref)'
     ],
 
+    /**
+     * @override
+     */
     get isNew() {
       return !this.path;
     },
 
+    /**
+     * @override
+     */
     get zeroValue() {
       return {};
     },
 
+    /**
+     * Update the path and write this.data to that new location.
+     *
+     * Important note: `this.path` is updated asynchronously.
+     *
+     * @param {string} parentPath The new firebase location to write to.
+     * @param {string=} key The key within the parentPath to write `data` to. If
+     *     not given, a random key will be generated and used.
+     * @return {Promise} A promise that resolves once this.data has been
+     *     written to the new path.
+     * @override
+     */
     save: function(parentPath, key) {
       return new Promise(function(resolve, reject) {
         var path;
@@ -68,17 +106,26 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }.bind(this));
     },
 
+    /**
+     * @override
+     */
     reset: function() {
       this.path = null;
       return Promise.resolve();
     },
 
+    /**
+     * @override
+     */
     destroy: function() {
       return this._setFirebaseValue(this.path, null).then(function() {
         return this.reset();
       }.bind(this));
     },
 
+    /**
+     * @override
+     */
     memoryPathToStoragePath: function(path) {
       var storagePath = this.path;
 
@@ -89,6 +136,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return storagePath;
     },
 
+    /**
+     * @override
+     */
     storagePathToMemoryPath: function(storagePath) {
       var path = 'data';
 
@@ -102,6 +152,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return path;
     },
 
+    /**
+     * @override
+     */
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
           this.ref.child(path).once('value', function(snapshot) {
@@ -114,6 +167,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }.bind(this));
     },
 
+    /**
+     * @override
+     */
     setStoredValue: function(path, value) {
       return this._setFirebaseValue(path, value);
     },
