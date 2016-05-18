@@ -1,23 +1,24 @@
-<!-- Instructions: https://github.com/PolymerElements/seed-element/CONTRIBUTING.md#filing-issues -->
+<!-- Instructions: https://github.com/FirebasePrivate/polymerfire/CONTRIBUTING.md#filing-issues -->
 ### Description
-<!-- Example: The `firebase-auth` element isn't firing an error event properly. -->
+<!-- Example: The `paper-foo` element causes the page to turn pink when clicked. -->
 
 ### Expected outcome
 
-<!-- Example: The element fires an event. -->
+<!-- Example: The page stays the same color. -->
 
 ### Actual outcome
 
-<!-- Example: No event is fired. -->
+<!-- Example: The page turns pink. -->
 
 ### Live Demo
-<!-- Example: https://jsbin.com/... -->
+<!-- Example: https://jsbin.com/cagaye/edit?html,output -->
 
 ### Steps to reproduce
 
 <!-- Example
-1. Put a `firebase-auth` element in the page.
+1. Put a `paper-foo` element in the page.
 2. Open the page in a web browser.
+3. Click the `paper-foo` element.
 -->
 
 ### Browsers Affected
