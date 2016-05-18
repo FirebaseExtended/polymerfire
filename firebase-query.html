@@ -13,8 +13,38 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
 <!--
 `firebase-query` combines the given properties into query options that generate
-a query. The results of this Firebase query are then synchronized the `data`
-parameter.
+a query, a request for a filtered, ordered, immutable set of Firebase data. The
+results of this Firebase query are then synchronized into the `data` parameter.
+
+Example usage:
+```html
+<firebase-query
+    id="query"
+    app-name="notes"
+    path="/notes/[[uid]]"
+    data="{{data}}">
+</firebase-query>
+
+<template is="dom-repeat" items="{{data}}" as="{{note}}">
+  <sticky-note note-data="{{note}}"></sticky-note>
+</template>
+
+<script>
+Polymer({
+  properties: {
+    uid: String,
+    data: {
+      type: Object,
+      observer: 'dataChanged'
+    }
+  },
+
+  dataChanged: function (newData, oldData) {
+    // do something when the query returns values
+  }
+});
+</script>
+```
 -->
 <dom-module id="firebase-query">
   <script>
@@ -40,7 +70,7 @@ parameter.
           },
 
           /**
-           * The child key to order the query by.
+           * The child key of each query result to order the query by.
            *
            * Changing this value generates a new `query` ordered by the
            * specified child key.
@@ -75,7 +105,7 @@ parameter.
           },
 
           /**
-           * The value to match for.
+           * Specifies a child-key value that must be matched for each candidate result.
            *
            * Changing this value generates a new `query` which includes children
            * which match the specified value.
