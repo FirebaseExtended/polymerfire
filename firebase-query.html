@@ -285,6 +285,9 @@ Polymer({
           return -1;
         },
         
+        /**
+         * Fired when the value is changed.
+         */        
         __onFirebaseValue: function(snapshot){
           var value = snapshot.val();
           this.fire('firebase-value', value);
