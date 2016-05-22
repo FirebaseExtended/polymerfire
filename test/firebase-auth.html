@@ -1,0 +1,60 @@
+<!doctype html>
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>firebase-auth tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../firebase-app.html">
+  <link rel="import" href="../firebase-auth.html">
+</head>
+<body>
+
+  <firebase-app
+      name="test"
+      api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+      auth-domain="polymerfire-test.firebaseapp.com"
+      database-url="https://polymerfire-test.firebaseio.com">
+  </firebase-app>
+
+  <test-fixture id="BasicAuth">
+    <template>
+      <firebase-auth
+          app-name="test">
+      </firebase-auth>
+    </template>
+  </test-fixture>
+
+  <script>
+    suite('firebase-auth', function() {
+      var authElement;
+
+      suite('with no configured provider', function() {
+        setup(function() {
+          authElement = fixture('BasicAuth');
+        });
+
+        test('has an auth instance', function() {
+          expect(authElement.auth).to.be.ok;
+        });
+
+        test('eventually signs in', function() {
+          return authElement.signInAnonymously().then(function() {
+            expect(authElement.user).to.be.ok;
+          });
+        });
+      });
+    });
+  </script>
+</body>
