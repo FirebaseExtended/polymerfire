@@ -192,7 +192,7 @@ defined as the default provider.
           if (!provider) {
             return Promise.reject('Must supply a provider for popup sign in.');
           }
-          if (!auth) {
+          if (!this.auth) {
             return Promise.reject('No app configured for firebase-auth!');
           }
 
@@ -210,7 +210,7 @@ defined as the default provider.
         },
 
         _handleSignIn: function(promise) {
-          promise.catch(function(err) {
+          return promise.catch(function(err) {
             this.fire('error', err);
           }.bind(this));
         },
