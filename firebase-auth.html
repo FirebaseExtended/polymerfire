@@ -212,6 +212,7 @@ defined as the default provider.
         _handleSignIn: function(promise) {
           return promise.catch(function(err) {
             this.fire('error', err);
+            throw err;
           }.bind(this));
         },
 
