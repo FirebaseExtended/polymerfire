@@ -52,8 +52,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         test('eventually signs in', function() {
           return authElement.signInAnonymously().then(function(user) {
             expect(user.uid).to.be.ok;
-          }).catch(function() {
-            throw 'Sign in Anonymously should not have failed';
           });
         });
 
