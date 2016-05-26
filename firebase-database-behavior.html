@@ -26,6 +26,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           computed: '__computeRef(db, path)'
         },
 
+        /**
+         * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
+         */
         path: {
           type: String,
           observer: '__pathChanged',
