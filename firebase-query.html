@@ -53,6 +53,12 @@ Polymer({
 
       Polymer({
         is: 'firebase-query',
+        
+        /**
+         * Fired when the query has a new value
+         * 
+         * @event firebase-value
+         */        
 
         behaviors: [
           Polymer.FirebaseDatabaseBehavior
@@ -268,6 +274,7 @@ Polymer({
           }
 
           if (query) {
+            query.on('value', this.__onFirebaseValue, this);
             query.on('child_added', this.__onFirebaseChildAdded, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this);
@@ -282,6 +289,11 @@ Polymer({
             }
           }
           return -1;
+        },
+        
+        __onFirebaseValue: function(snapshot){
+          var value = snapshot.val();
+          this.fire('firebase-value', value);
         },
 
         __onFirebaseChildAdded: function(snapshot) {
