@@ -55,6 +55,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           });
         });
 
+        test('statusKnown changes', function() {
+          expect(authElement.statusKnown).to.be.equal(false);
+          return authElement.signInAnonymously().then(function(user) {
+            expect(user.uid).to.be.ok;
+            expect(authElement.statusKnown).to.be.equal(true);
+          });
+        });
+
         test('failed promises should be forwarded', function() {
           return authElement.signInWithEmailAndPassword('', '').then(function(user) {
             throw 'sign in with email and password should not have succeeded';
