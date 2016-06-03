@@ -157,6 +157,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      */
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
+          if(this.ref.root.key == null) {
+            reject();
+            return;
+          }
+
           this.ref.child(path).once('value', function(snapshot) {
             var value = snapshot.val();
             if (value == null) {
