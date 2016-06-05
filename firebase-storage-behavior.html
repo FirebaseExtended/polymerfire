@@ -1,0 +1,88 @@
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase-common-behavior.html">
+<link rel="import" href="firebase.html">
+<script>
+  (function() {
+    'use strict';
+
+    Polymer.FirebaseStorageBehaviorImpl = {
+      properties: {
+
+        /**
+         * App storage
+         */
+        storage: {
+          type: Object,
+          computed: '__computeStorage(app)'
+        },
+
+        /**
+         * Storage reference to a certain path
+         */
+        ref: {
+          type: Object,
+          computed: '__computeRef(storage, path)'
+        },
+
+        /**
+         * Path to a storage root or endpoint. N.B. `path` is case sensitive.
+         */
+        path: {
+          type: String,
+          value: null
+        },
+
+        /**
+         * Progress of the current transaction in percents
+         */
+        progress: {
+          type: Number,
+          value: 0
+        }
+      },
+
+      __computeStorage: function(app) {
+        return app ? app.storage() : null;
+      },
+
+      __computeRef: function(storage, path) {
+
+        if (storage == null ||
+            path == null ||
+            path.split('/').slice(1).indexOf('') >= 0) {
+          return null;
+        }
+        return storage.ref(path);
+      },
+
+      _uploadFile: function(file, metadata) {
+
+        var uploadTask = this.storage.ref(this.path + file.name).put(file, metadata);
+
+        return new Promise(function(resolve, reject) {
+          uploadTask.on('state_changed', function(snapshot){
+            this.progress = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+          }, function(error) {
+            reject(error);
+          }, function() {
+            resolve(uploadTask.snapshot.downloadURL);
+          });
+        });
+      },
+
+    };
+
+    Polymer.FirebaseStorageBehavior = [
+      Polymer.FirebaseStorageBehaviorImpl,
+      Polymer.FirebaseCommonBehavior
+    ];
+  })();
+</script>
