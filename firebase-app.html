@@ -69,23 +69,41 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           },
 
           /**
+           * The URL of your Firebase Storage Bucket. You can find this
+           * URL in the Storage panel of the Firebase Console.
+           * Available on the Firebase Console.
+           *
+           * For example: 'project-8118936357639140789.appspot.com'
+           */
+          storageBucket: {
+            type: String,
+            value: ''
+          },
+
+          /**
            * The Firebase app object constructed from the other fields of
            * this element.
            */
           app: {
             type: Object,
             notify: true,
-            computed: '__computeApp(name, apiKey, authDomain, databaseUrl)'
+            computed: '__computeApp(name, apiKey, authDomain, storageBucket, databaseUrl)'
           }
         },
 
-        __computeApp: function(name, apiKey, authDomain, databaseUrl) {
+        __computeApp: function(name, apiKey, authDomain, storageBucket, databaseUrl) {
           if (apiKey && authDomain && databaseUrl) {
-            var init = [{
+            var options = {
               apiKey: apiKey,
               authDomain: authDomain,
               databaseURL: databaseUrl
-            }];
+            };
+
+            if (storageBucket) {
+              options.storageBucket = storageBucket;
+            }
+
+            var init = [options];
 
             if (name) {
               init.push(name);
