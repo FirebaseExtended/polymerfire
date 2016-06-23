@@ -133,7 +133,7 @@ defined as the default provider.
          * @return {Promise} Promise that handles success and failure.
          */
         signInWithPopup: function(provider) {
-          return this._attemptProviderSignIn(provider, this.auth.signInWithPopup);
+          return this._attemptProviderSignIn(this._normalizeProvider(provider), this.auth.signInWithPopup);
         },
 
         /**
@@ -149,7 +149,7 @@ defined as the default provider.
          * before the redirect).
          */
         signInWithRedirect: function(provider) {
-          return this._attemptProviderSignIn(provider, this.auth.signInWithRedirect);
+          return this._attemptProviderSignIn(this._normalizeProvider(provider), this.auth.signInWithRedirect);
         },
 
         /**
@@ -207,6 +207,13 @@ defined as the default provider.
             case 'twitter': return new firebase.auth.TwitterAuthProvider();
             default: this.fire('error', 'Unrecognized firebase-auth provider "' + name + '"');
           }
+        },
+
+        _normalizeProvider: function(provider) {
+          if (typeof provider === 'string') {
+            return this._providerFromName(provider);
+          }
+          return provider;
         },
 
         _handleSignIn: function(promise) {
