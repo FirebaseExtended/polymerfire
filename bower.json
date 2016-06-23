@@ -18,12 +18,12 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.2.0",
-    "firebase": "https://www.gstatic.com/firebasejs/3.0.0/firebase.js",
-    "app-storage": "polymerelements/app-storage#~0.9.0"
+    "polymer": "Polymer/polymer#^1.2",
+    "firebase": "^3.0",
+    "app-storage": "polymerelements/app-storage#^0.9.0"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0",
     "web-component-tester": "^4.0.0",
     "note-app-elements": "polymerlabs/note-app-elements"
   }
