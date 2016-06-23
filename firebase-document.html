@@ -45,7 +45,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
     detached: function() {
       if (this.ref) {
-        this.ref.off();
+        this.ref.off('value', this.__onFirebaseValue, this);
       }
     },
 
@@ -157,14 +157,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      */
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
-          this.ref.child(path).once('value', function(snapshot) {
-            var value = snapshot.val();
-            if (value == null) {
-              resolve(this.zeroValue);
-            }
-            resolve(value);
-          }, this);
-        }.bind(this));
+        this.db.ref(path).once('value', function(snapshot) {
+          var value = snapshot.val();
+          if (value == null) {
+            resolve(this.zeroValue);
+          }
+          resolve(value);
+        }, this);
+      }.bind(this));
     },
 
     /**

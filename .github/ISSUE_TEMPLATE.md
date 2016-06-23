@@ -1,4 +1,4 @@
-<!-- Instructions: https://github.com/FirebasePrivate/polymerfire/CONTRIBUTING.md#filing-issues -->
+<!-- Instructions: https://github.com/firebase/polymerfire/CONTRIBUTING.md#filing-issues -->
 ### Description
 <!-- Example: The `paper-foo` element causes the page to turn pink when clicked. -->
 
