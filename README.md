@@ -48,7 +48,7 @@ JavaScript sign-in calls can then be made to the `firebase-auth` object to
 attempt authentication, e.g.:
 
 ```javascript
-this.$.signInWithPopup()
+this.$.auth.signInWithPopup()
     .then(function(response) {// successful authentication response here})
     .catch(function(error) {// unsuccessful authentication response here});
 ```
