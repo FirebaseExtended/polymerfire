@@ -122,6 +122,18 @@ defined as the default provider.
 
           return this._handleSignIn(this.auth.signInAnonymously());
         },
+        
+        /**
+         * Authenticates a Firebase client using a custom JSON Web Token.
+         *
+         * @return {Promise} Promise that handles success and failure.
+         */
+        signInWithCustomToken: function(token) {
+          if (!this.auth) {
+            return Promise.reject('No app configured for firebase-auth!');
+          }
+          return this._handleSignIn(this.auth.signInWithCustomToken(token));
+        },
 
         /**
          * Authenticates a Firebase client using a popup-based OAuth flow.
