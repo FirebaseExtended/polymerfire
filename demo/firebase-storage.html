@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>firebase-auth demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../../polymer/polymer.html">
+    <link rel="import" href="../firebase-app.html">
+    <link rel="import" href="../firebase-storage.html">
+    <style media="screen">
+      body {
+        font-family: Roboto, sans-serif;
+        padding: 36px;
+      }
+      button {
+        background: #2196F3;
+        color: white;
+        border: 0;
+        border-radius: 3px;
+        text-transform: uppercase;
+        padding: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+    </style>
+  </head>
+  <body>
+    <template id="app" is="dom-bind">
+      <firebase-app
+        name="storage-app"
+        auth-domain="polymerfire-test.firebaseapp.com"
+        database-url="https://polymerfire-test.firebaseio.com/"
+        api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+        storage-url="polymerfire-test.appspot.com">
+      </firebase-app>
+      <firebase-storage
+        id="storage"
+        app-name="storage-app"
+        path="images/">
+      </firebase-storage>
+
+        <button on-tap="openDialog">Upload File</button>
+        <input type="file" id="fileInput" on-change="fileChange" hidden>
+    </template>
+    <script type="text/javascript">
+      document.addEventListener('WebComponentsReady', function() {
+        var app = document.getElementById('app');
+        app.error = null;
+
+        app.fileChange = function(e) {
+          var file = e.target.files[0];
+          this.$.storage._uploadFile(file).then(function(response) {
+            console.log("Success!", response);
+          }, function(error) {
+            console.error("Failed!", error);
+          });
+        };
+        app.openDialog = function() {
+          var elem = this.$.fileInput;
+          if (elem && document.createEvent) { // sanity check
+            var evt = document.createEvent("MouseEvents");
+            evt.initEvent("click", true, false);
+            elem.dispatchEvent(evt);
+          }
+        };
+      });
+    </script>
+  </body>
+</html>
