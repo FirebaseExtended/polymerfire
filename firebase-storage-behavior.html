@@ -7,7 +7,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../app-storage/app-storage-behavior.html">
 <link rel="import" href="firebase-common-behavior.html">
 <link rel="import" href="firebase.html">
 <script>
@@ -34,16 +33,41 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           type: String,
           observer: '__pathChanged',
           value: null
+        },
+
+        files: {
+          type: Array,
+          observer: '__filesChanged',
+          value: []
+        },
+
+        uploadTasks: {
+          type: Array,
+          readOnly: true,
+          notify: true,
+          value: []
         }
       },
 
-      _putFirebaseFile: function(path, file) {
-        this._log('Putting Firebase file at', path, 'to', file.name);
+      get zeroValue() {
+        return [];
+      },
+
+      _putMultipleFirebaseFiles: function(path, files) {
+        this._log('Putting Multiple Firebase files at', path);
+        var uploadTaskList = [];
+        if (files && files.length > 0) {
+          for (var i = 0; i < files.length; i++) {
+            uploadTaskList.push(this._putFirebaseFile(path, files[0], files[0].metadata));
+          }
+        }
+        return uploadTaskList;
+      },
+
+      _putFirebaseFile: function(path, file, metadata) {
+        this._log('Putting Firebase file at', path);
         if (file) {
-          return new Promise(function(resolve, reject) {
-            var uploadTask = this.storage.ref.child(path).put(file);
-            resolve(uploadTask);
-          });
+          return this.storage.ref.child(path + '/' + file.name).put(file, metadata);
         }
         return this.storage.ref.child(path).delete();
       },
@@ -53,10 +77,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __computeRef: function(storage, path) {
-        if (this.ref) {
-          this.ref.off();
-        }
-
         if (storage == null ||
             path == null ||
             path.split('/').slice(1).indexOf('') >= 0) {
@@ -68,18 +88,23 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       __pathChanged: function(path, oldPath) {
         if (oldPath != null) {
-          this.syncToMemory(function() {
-            this.data = this.zeroValue;
-          });
+          this.files = this.zeroValue;
+          this.uploadTasks = this.zeroValue;
         }
       },
+
+      __filesChanged: function(files) {
+        var uploadTaskList = this._putMultipleFirebaseFiles(this.path, files);
+        for (var i = 0; i < uploadTaskList.length; i++) {
+          this.push('uploadTasks', uploadTaskList[i]);
+        }
+      }
     };
 
     /** @polymerBehavior */
-    Polymer.FirebaseDatabaseBehavior = [
-      Polymer.AppStorageBehavior,
+    Polymer.FirebaseStorageBehavior = [
       Polymer.FirebaseCommonBehavior,
-      Polymer.FirebaseDatabaseBehaviorImpl
+      Polymer.FirebaseStorageBehaviorImpl
     ];
   })();
 </script>
