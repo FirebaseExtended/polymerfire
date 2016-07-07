@@ -1,0 +1,85 @@
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../app-storage/app-storage-behavior.html">
+<link rel="import" href="firebase-common-behavior.html">
+<link rel="import" href="firebase.html">
+<script>
+  (function() {
+    'use strict';
+
+    /** @polymerBehavior Polymer.FirebaseStorageBehavior */
+    Polymer.FirebaseStorageBehaviorImpl = {
+      properties: {
+        storage : {
+          type: Object,
+          computed: '__computeStorage(app)'
+        },
+
+        ref: {
+          type: Object,
+          computed: '__computeRef(storage, path)'
+        },
+
+        /**
+         * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
+         */
+        path: {
+          type: String,
+          observer: '__pathChanged',
+          value: null
+        }
+      },
+
+      _putFirebaseFile: function(path, file) {
+        this._log('Putting Firebase file at', path, 'to', file.name);
+        if (file) {
+          return new Promise(function(resolve, reject) {
+            var uploadTask = this.storage.ref.child(path).put(file);
+            resolve(uploadTask);
+          });
+        }
+        return this.storage.ref.child(path).delete();
+      },
+
+      __computeStorage: function(app) {
+        return app ? app.storage() : null;
+      },
+
+      __computeRef: function(storage, path) {
+        if (this.ref) {
+          this.ref.off();
+        }
+
+        if (storage == null ||
+            path == null ||
+            path.split('/').slice(1).indexOf('') >= 0) {
+          return null;
+        }
+
+        return storage.ref(path);
+      },
+
+      __pathChanged: function(path, oldPath) {
+        if (oldPath != null) {
+          this.syncToMemory(function() {
+            this.data = this.zeroValue;
+          });
+        }
+      },
+    };
+
+    /** @polymerBehavior */
+    Polymer.FirebaseDatabaseBehavior = [
+      Polymer.AppStorageBehavior,
+      Polymer.FirebaseCommonBehavior,
+      Polymer.FirebaseDatabaseBehaviorImpl
+    ];
+  })();
+</script>
