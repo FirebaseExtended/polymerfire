@@ -25,7 +25,7 @@ Example usage:
     data="{{data}}">
 </firebase-query>
 
-<template is="dom-repeat" items="{{data}}" as="{{note}}">
+<template is="dom-repeat" items="{{data}}" as="note">
   <sticky-note note-data="{{note}}"></sticky-note>
 </template>
 
@@ -314,14 +314,14 @@ Polymer({
 
         __onFirebaseChildChanged: function(snapshot) {
           var key = snapshot.key;
-          var value = this.__map[key];
+          var prev = this.__map[key];
 
-          this._log('Firebase child_changed:', key, value);
+          this._log('Firebase child_changed:', key, prev);
 
-          if (value) {
+          if (prev) {
             this.async(function() {
               var index = this.__indexFromKey(key);
-              value = snapshot.val();
+              var value = snapshot.val();
               value.$key = key;
               this.__map[key] = value;
 
@@ -331,6 +331,11 @@ Polymer({
                 if (value instanceof Object) {
                   for (var property in value) {
                     this.set(['data', index, property], value[property]);
+                  }
+                  for (var property in prev) {
+                    if(!value.hasOwnProperty(property)) {
+                      this.set(['data', index, property], undefined);
+                    }
                   }
                 } else {
                   this.set(['data', index], value);
