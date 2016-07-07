@@ -1,0 +1,41 @@
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../polymerfire.html">
+
+<dom-module id="firebase-storage-demo">
+  <template>
+    <firebase-app
+      auth-domain="polymerfire-test-c9e51.firebaseapp.com"
+      database-url="https://polymerfire-test-c9e51.firebaseio.com"
+      api-key="AIzaSyAMbEOHMvYil6Cq8-oPnEahgeDqdQnSvBk"
+      storage-bucket="polymerfire-test-c9e51.appspot.com"></firebase-app>
+    <firebase-auth id="auth" user="{{user}}" provider="google" on-error="showError"></firebase-auth>
+
+    <button on-tap="signIn">Sign In With Google</button>
+
+    <template is="dom-if" if="{{user}}">
+
+    </template>
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      Polymer({
+        is: 'firebase-storage-demo',
+
+        signIn: function() {
+          this.$.auth.signInWithPopup();
+        }
+      });
+    })();
+  </script>
+</dom-module>
