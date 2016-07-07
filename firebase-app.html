@@ -69,22 +69,34 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           },
 
           /**
+           * The Firebase Storage bucket for your project. You can find this
+           * in the Firebase Console under "Web Setup".
+           *
+           * For example: `polymerfire-test.appspot.com`
+           */
+          storageBucket: {
+            type: String,
+            value: null
+          },
+
+          /**
            * The Firebase app object constructed from the other fields of
            * this element.
            */
           app: {
             type: Object,
             notify: true,
-            computed: '__computeApp(name, apiKey, authDomain, databaseUrl)'
+            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket)'
           }
         },
 
-        __computeApp: function(name, apiKey, authDomain, databaseUrl) {
+        __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket) {
           if (apiKey && authDomain && databaseUrl) {
             var init = [{
               apiKey: apiKey,
               authDomain: authDomain,
-              databaseURL: databaseUrl
+              databaseURL: databaseUrl,
+              storageBucket: storageBucket
             }];
 
             if (name) {
