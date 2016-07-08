@@ -8,6 +8,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../../paper-progress/paper-progress.html">
+<link rel="import" href="../../paper-toast/paper-toast.html">
 <link rel="import" href="../polymerfire.html">
 
 <dom-module id="firebase-storage-demo">
@@ -28,6 +29,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         files="[[files]]"
         upload-tasks="{{uploadTasks}}"
         uploaded-files="{{uploadedFiles}}"
+        on-error="catchError"
+        auto-upload>
+      </firebase-storage>
+
+      <firebase-storage
+        id="fsd"
         on-error="catchError">
       </firebase-storage>
 
@@ -37,12 +44,19 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         {{item.bytesTransferred}}<br/>
         <template is="dom-if" if="{{item.downloadURL}}">
           <a href="{{item.downloadURL}}">
-            <img src="{{item.downloadURL}}" />
-          </a>
+            <template is="dom-if" if="{{isImage(item.metadata.contentType)}}">
+              <img src="{{item.downloadURL}}" />
+            </template>
+            <template is="dom-if" if="{{!isImage(item.metadata.contentType)}}">
+              {{item.downloadURL}}"
+            </template>
+          </a><br/>
+          <button on-tap="deleteFile" value="{{item.ref.fullPath}}">Delete</button>
         </template>
         <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
         {{item.ref.fullPath}} <br/>
         {{item.state}} <br/>
+        {{item.metadata.contentType}} <br/>
         <button on-tap="cancel" value="{{index}}">Cancel</button><br/>
         <button on-tap="resume" value="{{index}}">resume</button><br/>
         <button on-tap="pause" value="{{index}}">pause</button><br/>
@@ -75,28 +89,37 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }
         },
 
-        // observers: [
-        //   '_check(uploadedFiles.splices)'
-        // ],
         catchError(e) {
-          console.log(e);
-          console.log(this.$$('#toaster'));
-          console.log(this.$.toaster)
-          // this.$$('#toaster').show({
-          //   text: e.detail.message
-          // });
+          this.$$('#toaster').show({
+            text: e.detail.message
+          });
         },
 
         cancel(e) {
-          console.log(this.$$('#fs').cancel(e.target.value));
+          this.$$('#fs').cancel(e.target.value);
         },
 
         resume(e) {
-          console.log(this.$$('#fs').resume(e.target.value));
+          this.$$('#fs').resume(e.target.value);
         },
 
         pause(e) {
-          console.log(this.$$('#fs').pause(e.target.value));
+          this.$$('#fs').pause(e.target.value);
+        },
+
+        deleteFile(e) {
+          this.$$('#fsd').path = e.target.value;
+          this.$$('#fsd').destroy().then(function(x){
+            console.log(x)
+            this.$$('#toaster').show({
+              text: 'Successfully deleted ' + e.target.value
+            });
+          }.bind(this)).catch(function(error){
+            console.log(error);
+            this.$$('#toaster').show({
+              text: error.message
+            });
+          })
         },
 
         _uploadTasksChanged(uploadTasks) {
@@ -109,6 +132,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         onFileUpload(e) {
           this.files = e.target.files;
+        },
+
+        isImage(c) {
+
+          return c && c.indexOf('image') === 0;
         },
 
         signIn: function() {

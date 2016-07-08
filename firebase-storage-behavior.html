@@ -20,7 +20,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           type: Object,
           computed: '__computeStorage(app)'
         },
-
         ref: {
           type: Object,
           computed: '__computeRef(storage, path)'
@@ -36,11 +35,21 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         files: {
-          type: Object,
-          observer: '__filesChanged'
+          type: Object
         },
 
         uploadedFiles: {
+          type: Array,
+          notify: true,
+          value: []
+        },
+
+        autoUpload: {
+          type: Boolean,
+          value: false
+        },
+
+        tasks: {
           type: Array,
           notify: true,
           value: []
@@ -50,6 +59,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       get zeroValue() {
         return [];
       },
+
+      observers: [
+        '__filesChanged(files, autoUpload)'
+      ],
 
       _updateUploadedFiles: function(j, snapshot) {
         if (this.uploadedFiles[j].ref.fullPath === snapshot.ref.fullPath) {
@@ -87,6 +100,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               this.fire('error', error, { bubble: false});
             }.bind(this));
             this.push('uploadedFiles', uploadTask.snapshot);
+            this.push('tasks', uploadTask);
           }
         } else if (files && files.name) {
           console.log(typeof files);
@@ -100,7 +114,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           var newPath = path ? path + '/' +  newFilename: newFilename;
           return this.ref.child(newPath).put(file, metadata);
         }
-        return this.ref.child(path).delete();
+        // console.log(this.ref, path)
+        return path ? this.ref.child(path).delete() : this.ref.delete();
       },
 
       __computeStorage: function(app) {
@@ -108,6 +123,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __computeRef: function(storage, path) {
+        console.log(path)
         if (storage == null ||
             path == null ||
             path.split('/').slice(1).indexOf('') >= 0) {
@@ -123,7 +139,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }
       },
 
-      __filesChanged: function(files, y) {
+      __filesChanged: function(files, autoUpload) {
         this._putMultipleFirebaseFiles(null, files);
       }
     };
