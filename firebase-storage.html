@@ -75,13 +75,37 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         if (path) {
           resolve(this._putMultipleFirebaseFiles(path, this.files));
         } else if (this.path) {
-          resolve(this._putMultipleFirebaseFiles(this.path, this.files));
+          resolve(this._putMultipleFirebaseFiles(null, this.files));
         } else {
           resolve(this._putMultipleFirebaseFiles('/', this.files));
         }
 
-        this.path = path;
+        this.path = path ? this.path + '/' + path : this.path;
       }.bind(this));
+    },
+
+    /**
+     * @override
+     */
+    cancel: function(i) {
+      var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
+      return this.uploadedFiles[x].task.cancel();
+    },
+
+    /**
+     * @override
+     */
+    resume: function(i) {
+      var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
+      return this.uploadedFiles[x].task.resume();
+    },
+
+    /**
+     * @override
+     */
+    pause: function(i) {
+      var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
+      return this.uploadedFiles[x].task.pause();
     },
 
     /**
@@ -90,7 +114,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     reset: function() {
       this.path = null;
       this.files = this.zeroValue;
-      this.uploadTasks = this.zeroValue;
+      this.uploadedFiles = this.zeroValue;
       return Promise.resolve();
     },
 
@@ -99,14 +123,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      */
     clearTasks: function() {
       this.files = this.zeroValue;
-      this.uploadTasks = this.zeroValue;
+      this.uploadedFiles = this.zeroValue;
     },
 
     /**
      * @override
      */
     destroy: function() {
-      return this._putFirebaseFile(this.path, null).then(function() {
+      return this._putFirebaseFile().then(function() {
         return this.reset();
       }.bind(this));
     },

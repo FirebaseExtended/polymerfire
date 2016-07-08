@@ -7,6 +7,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 -->
 
 <link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../../paper-progress/paper-progress.html">
 <link rel="import" href="../polymerfire.html">
 
 <dom-module id="firebase-storage-demo">
@@ -21,8 +22,34 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     <button on-tap="signIn">Sign In With Google</button>
 
     <template is="dom-if" if="{{user}}">
+      <firebase-storage
+        id="fs"
+        path="/users/{{user.uid}}/files"
+        files="[[files]]"
+        upload-tasks="{{uploadTasks}}"
+        uploaded-files="{{uploadedFiles}}"
+        on-error="catchError">
+      </firebase-storage>
 
+      <input id="file-uploader" type="file" on-change="onFileUpload" multiple /> <br/>
+
+      <template is="dom-repeat" items="{{uploadedFiles}}">
+        {{item.bytesTransferred}}<br/>
+        <template is="dom-if" if="{{item.downloadURL}}">
+          <a href="{{item.downloadURL}}">
+            <img src="{{item.downloadURL}}" />
+          </a>
+        </template>
+        <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
+        {{item.ref.fullPath}} <br/>
+        {{item.state}} <br/>
+        <button on-tap="cancel" value="{{index}}">Cancel</button><br/>
+        <button on-tap="resume" value="{{index}}">resume</button><br/>
+        <button on-tap="pause" value="{{index}}">pause</button><br/>
+        <br/>
+      </template>
     </template>
+    <paper-toast id="toaster"></paper-toast>
   </template>
 
   <script>
@@ -31,6 +58,58 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       Polymer({
         is: 'firebase-storage-demo',
+
+        properties: {
+          user: Object,
+          files: {
+            type: Array,
+            notify: true,
+            value: [],
+          },
+          uploadTasks: {
+            type: Array,
+            observer: '_uploadTasksChanged'
+          },
+          uploadedFiles: {
+            type: Array,
+          }
+        },
+
+        // observers: [
+        //   '_check(uploadedFiles.splices)'
+        // ],
+        catchError(e) {
+          console.log(e);
+          console.log(this.$$('#toaster'));
+          console.log(this.$.toaster)
+          // this.$$('#toaster').show({
+          //   text: e.detail.message
+          // });
+        },
+
+        cancel(e) {
+          console.log(this.$$('#fs').cancel(e.target.value));
+        },
+
+        resume(e) {
+          console.log(this.$$('#fs').resume(e.target.value));
+        },
+
+        pause(e) {
+          console.log(this.$$('#fs').pause(e.target.value));
+        },
+
+        _uploadTasksChanged(uploadTasks) {
+          console.log(uploadTasks);
+        },
+
+        _uploadedFilesChanged(uploadedFiles) {
+          console.log(uploadedFiles);
+        },
+
+        onFileUpload(e) {
+          this.files = e.target.files;
+        },
 
         signIn: function() {
           this.$.auth.signInWithPopup();
