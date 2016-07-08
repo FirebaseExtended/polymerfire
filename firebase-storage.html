@@ -89,6 +89,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      */
     cancel: function(i) {
       return new Promise(function(resolve, reject){
+        console.log(i)
         var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
         resolve(this.tasks[x].cancel());
       }.bind(this));

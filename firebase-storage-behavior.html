@@ -35,7 +35,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         files: {
-          type: Object
+          type: Array
         },
 
         uploadedFiles: {
@@ -89,6 +89,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       _putMultipleFirebaseFiles: function(path, files) {
         this._log('Putting Multiple Firebase files at',  path ? this.path + '/' + path : this.path);
+        files = files && typeof files === 'object' && files.name ? [files] : files;
         if (files && files.length > 0) {
           for (var i = 0; i < files.length; i++) {
             var uploadTask = this._putFirebaseFile(path, files[i], files[i].metadata);
@@ -102,8 +103,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             this.push('uploadedFiles', uploadTask.snapshot);
             this.push('tasks', uploadTask);
           }
-        } else if (files && files.name) {
-          console.log(typeof files);
         }
       },
 
@@ -114,7 +113,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           var newPath = path ? path + '/' +  newFilename: newFilename;
           return this.ref.child(newPath).put(file, metadata);
         }
-        // console.log(this.ref, path)
         return path ? this.ref.child(path).delete() : this.ref.delete();
       },
 
@@ -123,7 +121,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __computeRef: function(storage, path) {
-        console.log(path)
         if (storage == null ||
             path == null ||
             path.split('/').slice(1).indexOf('') >= 0) {
@@ -140,7 +137,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __filesChanged: function(files, autoUpload) {
-        this._putMultipleFirebaseFiles(null, files);
+        if (autoUpload) {
+          this._putMultipleFirebaseFiles(null, files);
+        }
       }
     };
 

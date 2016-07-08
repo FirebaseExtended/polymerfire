@@ -20,17 +20,25 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       storage-bucket="polymerfire-test-c9e51.appspot.com"></firebase-app>
     <firebase-auth id="auth" user="{{user}}" provider="google" on-error="showError"></firebase-auth>
 
-    <button on-tap="signIn">Sign In With Google</button>
+    <button on-tap="signIn">Sign In</button>
 
     <template is="dom-if" if="{{user}}">
       <firebase-storage
         id="fs"
         path="/users/{{user.uid}}/files"
         files="[[files]]"
-        upload-tasks="{{uploadTasks}}"
         uploaded-files="{{uploadedFiles}}"
         on-error="catchError"
         auto-upload>
+      </firebase-storage>
+
+      <firebase-storage
+        id="fs2"
+        path="/users/{{user.uid}}/file"
+        files="[[file]]"
+        uploaded-files="{{uploadedFile}}"
+        on-error="catchError"
+        >
       </firebase-storage>
 
       <firebase-storage
@@ -39,17 +47,31 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       </firebase-storage>
 
       <input id="file-uploader" type="file" on-change="onFileUpload" multiple /> <br/>
+      <input id="file-uploader2" type="file" on-change="onFileUpload2" />
 
+      <template is="dom-repeat" items="{{uploadedFile}}">
+        {{item.bytesTransferred}}<br/>
+        <template is="dom-if" if="{{item.downloadURL}}">
+          <a href="{{item.downloadURL}}">
+            {{item.downloadURL}}
+          </a><br/>
+          <button on-tap="deleteFile" value="{{item.ref.fullPath}}">Delete</button>
+        </template>
+        <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
+        {{item.ref.fullPath}} <br/>
+        {{item.state}} <br/>
+        {{item.metadata.contentType}} <br/>
+        <button on-tap="cancel" value="{{index}}">Cancel</button><br/>
+        <button on-tap="resume" value="{{index}}">resume</button><br/>
+        <button on-tap="pause" value="{{index}}">pause</button><br/>
+        <br/>
+      </template>
+      <hr/>
       <template is="dom-repeat" items="{{uploadedFiles}}">
         {{item.bytesTransferred}}<br/>
         <template is="dom-if" if="{{item.downloadURL}}">
           <a href="{{item.downloadURL}}">
-            <template is="dom-if" if="{{isImage(item.metadata.contentType)}}">
-              <img src="{{item.downloadURL}}" />
-            </template>
-            <template is="dom-if" if="{{!isImage(item.metadata.contentType)}}">
-              {{item.downloadURL}}"
-            </template>
+            {{item.downloadURL}}
           </a><br/>
           <button on-tap="deleteFile" value="{{item.ref.fullPath}}">Delete</button>
         </template>
@@ -110,7 +132,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         deleteFile(e) {
           this.$$('#fsd').path = e.target.value;
           this.$$('#fsd').destroy().then(function(x){
-            console.log(x)
             this.$$('#toaster').show({
               text: 'Successfully deleted ' + e.target.value
             });
@@ -134,13 +155,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           this.files = e.target.files;
         },
 
-        isImage(c) {
+        onFileUpload2(e) {
+          this.file = e.target.files[0];
+          this.$$('#fs2').upload();
+        },
 
+        isImage(c) {
           return c && c.indexOf('image') === 0;
         },
 
         signIn: function() {
-          this.$.auth.signInWithPopup();
+          this.$.auth.signInAnonymously();
         }
       });
     })();
