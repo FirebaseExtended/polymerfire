@@ -1,0 +1,91 @@
+<!doctype html>
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>FirebaseDatabaseBehavior tests</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+
+  <link rel="import" href="../firebase.html">
+  <link rel="import" href="../firebase-storage-behavior.html">
+  <link rel="import" href="../firebase-app.html">
+</head>
+<body>
+
+  <!--<firebase-app-->
+  <!--    name="test"-->
+  <!--    api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"-->
+  <!--    auth-domain="polymerfire-test.firebaseapp.com"-->
+  <!--    database-url="https://polymerfire-test.firebaseio.com">-->
+  <!--</firebase-app>-->
+
+  <firebase-app
+      name="test"
+      auth-domain="polymerfire-test-c9e51.firebaseapp.com"
+      database-url="https://polymerfire-test-c9e51.firebaseio.com"
+      api-key="AIzaSyAMbEOHMvYil6Cq8-oPnEahgeDqdQnSvBk"
+      storage-bucket="polymerfire-test-c9e51.appspot.com">
+  </firebase-app>
+
+  <test-fixture id="BasicStorage">
+    <template>
+      <x-firebase-database app-name="test"></x-firebase-database>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="PathedStorage">
+    <template>
+      <x-firebase-database app-name="test" path="/foo"></x-firebase-database>
+    </template>
+  </test-fixture>
+
+  <script>
+    HTMLImports.whenReady(function() {
+      Polymer({
+        is: 'x-firebase-database',
+
+        behaviors: [
+          Polymer.FirebaseStorageBehavior
+        ]
+      });
+    });
+
+    suite('FirebaseStorageBehavior', function() {
+      var storageElement;
+
+      suite('with a configured app', function() {
+        setup(function() {
+          storageElement = fixture('BasicStorage');
+        });
+
+        test('has a storage instance', function() {
+          expect(storageElement.storage).to.be.ok;
+        });
+
+        test('does not have a ref by default', function() {
+          expect(storageElement.ref).to.not.be.ok;
+        });
+
+        suite('and a path', function() {
+          setup(function() {
+            storageElement = fixture('PathedStorage');
+          });
+
+          test('has a ref instance', function() {
+            expect(storageElement.ref).to.be.ok;
+          });
+        });
+      });
+    });
+  </script>
+</body>
