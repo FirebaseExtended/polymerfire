@@ -62,11 +62,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         });
 
         test('has a database instance', function() {
-          expect(databaseElement.db).to.be.okay;
+          expect(databaseElement.db).to.be.ok;
         });
 
         test('does not have a ref by default', function() {
-          expect(databaseElement.ref).to.not.be.okay;
+          expect(databaseElement.ref).to.not.be.ok;
         });
 
         suite('and a path', function() {
@@ -75,7 +75,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           });
 
           test('has a ref instance', function() {
-            expect(databaseElement.ref).to.be.okay;
+            expect(databaseElement.ref).to.be.ok;
           });
         });
       });
