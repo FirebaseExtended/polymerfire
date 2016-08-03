@@ -107,7 +107,19 @@ defined as the default provider.
             readOnly: true,
             value: null,
             notify: true
+          },
+
+          /**
+           * When true, login status can be determined by checking `user` property.
+           */
+          statusKnown: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            readOnly: true,
+            reflectToAttribute: true
           }
+
         },
 
         /**
@@ -256,6 +268,7 @@ defined as the default provider.
         },
 
         __authChanged: function(auth, oldAuth) {
+          this._setStatusKnown(false);
           if (oldAuth !== auth && this._unsubscribe) {
             this._unsubscribe();
             this._unsubscribe = null;
@@ -264,6 +277,7 @@ defined as the default provider.
           if (this.auth) {
             this._unsubscribe = this.auth.onAuthStateChanged(function(user) {
               this._setUser(user);
+              this._setStatusKnown(true);
             }.bind(this), function(err) {
               this.fire('error', err);
             }.bind(this));
