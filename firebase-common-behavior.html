@@ -52,6 +52,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }
 
         this.appName = app ? app.name : '';
+      },
+
+      __onError: function(err) {
+        this.fire('error', err);
       }
     };
 
