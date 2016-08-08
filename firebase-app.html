@@ -15,7 +15,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       /**
        * The firebase-app element is used for initializing and configuring your
-       * connection to firebase.
+       * connection to firebase. It is permanently initialized once attached and
+       * should not be dynamically bound.
        */
       Polymer({
         is: 'firebase-app',
