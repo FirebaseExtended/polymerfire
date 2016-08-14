@@ -24,7 +24,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         ref: {
           type: Object,
-          computed: '__computeRef(db, path)'
+          computed: '__computeRef(db, path, disabled)'
         },
 
         /**
@@ -34,6 +34,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           type: String,
           observer: '__pathChanged',
           value: null
+        },
+
+        /**
+         * When true, Firebase listeners won't be activated. This can be useful
+         * in situations where elements are loaded into the DOM before they're
+         * ready to be activated (e.g. navigation, initialization scenarios).
+         */
+        disabled: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -65,7 +75,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         if (db == null ||
             path == null ||
-            path.split('/').slice(1).indexOf('') >= 0) {
+            !this.__pathReady(path) ||
+            this.disabled) {
           return null;
         }
 
@@ -73,11 +84,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __pathChanged: function(path, oldPath) {
-        if (oldPath != null) {
+        if (oldPath != null && !this.disabled && this.__pathReady(path)) {
           this.syncToMemory(function() {
             this.data = this.zeroValue;
           });
         }
+      },
+
+      __pathReady: function(path) {
+        return path && path.split('/').slice(1).indexOf('') < 0;
       },
 
       __onlineChanged: function(online) {

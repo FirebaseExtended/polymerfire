@@ -159,7 +159,7 @@ Polymer({
         },
 
         get isNew() {
-          return !this.path;
+          return this.disabled || !this.__pathReady(this.path);
         },
 
         get zeroValue() {
