@@ -70,7 +70,7 @@ Polymer({
            */
           query: {
             type: Object,
-            computed: '__computeQuery(ref, orderByChild, limitToFirst, limitToLast, startAt, endAt, equalTo)',
+            computed: '__computeQuery(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo)',
             observer: '__queryChanged'
           },
 
