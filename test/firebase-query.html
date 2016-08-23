@@ -204,6 +204,30 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         });
       });
 
+      suite('equalTo query', function() {
+        var query;
+
+        setup(function() {
+          query = fixture('BasicQuery');
+          query.path = root + '/equalTo';
+          return query.transactionsComplete;
+        });
+
+        test('should allow an equalTo query with a `false` value', function() {
+          query.orderByChild = 'thing';
+          query.equalTo = false;
+
+          return setFirebaseValue(query.path, {
+            a: {thing: true},
+            b: {thing: false},
+            c: {thing: false}
+          }).then(function() {
+            expect(query.data[0].$key).to.be.eql('b');
+            expect(query.data.length).to.be.eql(2);
+          });
+        });
+      });
+
       suite('coordinating with dom-repeat', function() {
         var query;
         var domRepeat;
