@@ -74,33 +74,36 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         expect(originalElement.statusKnown).to.be.equal(false);
 
         originalElement.signInWithEmailAndPassword(email, 'polyfiretestdomain')
-                .then(function (user) {
-                  //Verify the sign in results
-                  expect(user.uid).to.be.ok;
-                  expect(originalElement.statusKnown).to.be.equal(true);
-                  expect(user.email).to.be.equal(email);
+            .then(function (user) {
+          //Verify the sign in results
+          expect(user.uid).to.be.ok;
+          expect(originalElement.statusKnown).to.be.equal(true);
+          expect(user.email).to.be.equal(email);
 
-                  //Create another firebase element
-                  var dynamicAuth = document.createElement("firebase-auth");
+          //Create another firebase element
+          var dynamicAuth = document.createElement("firebase-auth");
+          // observers will not be attached until ready. Ready not called until
+          // attached to dom.
+          dynamicAuth.ready();
 
-                  //Verify the initial state:  statusKnown = false and user is null
-                  dynamicAuth.appName='test';
-                  expect(dynamicAuth.user).to.be.equal(null);
-                  expect(dynamicAuth.statusKnown).to.be.equal(false);
+          //Verify the initial state:  statusKnown = false and user is null
+          dynamicAuth.appName='test';
+          expect(dynamicAuth.user).to.be.equal(null);
+          expect(dynamicAuth.statusKnown).to.be.equal(false);
 
-                  //Wait for the status-known event to be thrown (set in
-                  dynamicAuth.addEventListener('status-known-changed', function(event) {
-                    if (event.detail.value) {
-                      //Verify the final state:  statusKnown = false and user is null
-                      expect(dynamicAuth.statusKnown).to.be.equal(true);
-                      expect(dynamicAuth.user.uid).to.be.ok;
-                      expect(dynamicAuth.user.email).to.be.equal(email);
-                      done();
-                    } else {
-                      expect(dynamicAuth.statusKnown).to.be.equal(false);
-                    }
-                  });
-                });
+          //Wait for the status-known event to be thrown (set in
+          dynamicAuth.addEventListener('status-known-changed', function(event) {
+            if (event.detail.value) {
+              //Verify the final state:  statusKnown = false and user is null
+              expect(dynamicAuth.statusKnown).to.be.equal(true);
+              expect(dynamicAuth.user.uid).to.be.ok;
+              expect(dynamicAuth.user.email).to.be.equal(email);
+              done();
+            } else {
+              expect(dynamicAuth.statusKnown).to.be.equal(false);
+            }
+          });
+        });
       });
 
 
