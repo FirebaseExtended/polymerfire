@@ -44,6 +44,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   </template>
 </test-fixture>
 
+<test-fixture id="DynamicAuth">
+  <template>
+    <firebase-auth
+            app-name="test">
+    </firebase-auth>
+  </template>
+</test-fixture>
+
 <script>
   suite('firebase-auth', function() {
     var authElement;
@@ -81,13 +89,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           expect(user.email).to.be.equal(email);
 
           //Create another firebase element
-          var dynamicAuth = document.createElement("firebase-auth");
-          // observers will not be attached until ready. Ready not called until
-          // attached to dom.
-          dynamicAuth.ready();
+          var dynamicAuth = fixture("DynamicAuth");
 
           //Verify the initial state:  statusKnown = false and user is null
-          dynamicAuth.appName='test';
           expect(dynamicAuth.user).to.be.equal(null);
           expect(dynamicAuth.statusKnown).to.be.equal(false);
 
