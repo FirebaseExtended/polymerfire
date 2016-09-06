@@ -42,6 +42,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </template>
   </test-fixture>
 
+  <test-fixture id="TwoQueries">
+    <template>
+      <firebase-query app-name="test"></firebase-query>
+      <firebase-query app-name="test"></firebase-query>
+    </template>
+  </test-fixture>
+
   <script>
     function expectFirebasePathValueToEql(path, value) {
       return getFirebaseValue(path).then(function(fbValue) {
@@ -224,6 +231,51 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }).then(function() {
             expect(query.data[0].$key).to.be.eql('b');
             expect(query.data.length).to.be.eql(2);
+          });
+        });
+      });
+
+      suite('instance isolation', function() {
+        var queryOne;
+        var queryTwo;
+        var path;
+
+        setup(function() {
+          var queries = fixture('TwoQueries');
+
+          path = root + '/common';
+
+          queryOne = queries[0];
+          queryTwo = queries[1];
+
+          queryOne.path = path;
+          queryTwo.path = path;
+
+          return pushFirebaseValue(path, {
+            value: 'initial'
+          });
+        });
+
+        teardown(function() {
+          return clearFirebaseValue(path);
+        });
+
+        test('queries have the same initial value', function() {
+          expect(queryOne.data.length).to.be.equal(1);
+          expect(queryTwo.data.length).to.be.equal(1);
+          expect(queryOne.data[0].value).to.be.equal(queryTwo.data[0].value);
+        });
+
+        suite('removing one instance from the DOM', function() {
+          test('preserves listeners on the remaining instance', function() {
+            queryOne.parentNode.removeChild(queryOne);
+
+            return pushFirebaseValue(path, {
+              value: 'new'
+            }).then(function() {
+              expect(queryOne.data.length).to.be.equal(0);
+              expect(queryTwo.data.length).to.be.equal(2);
+            });
           });
         });
       });
