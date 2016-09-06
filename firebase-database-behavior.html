@@ -69,10 +69,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __computeRef: function(db, path) {
-        if (this.ref) {
-          this.ref.off();
-        }
-
         if (db == null ||
             path == null ||
             !this.__pathReady(path) ||
