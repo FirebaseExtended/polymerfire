@@ -34,14 +34,17 @@ JavaScript sign-in calls can then be made to the `firebase-auth` object to
 attempt authentication, e.g.:
 
 ```javascript
-this.$.signInWithPopup()
-    .then(function(response) {// successful authentication response here})
+this.$.auth.signInWithPopup()
+    .then(function(response) {// optionally handle a successful login})
     .catch(function(error) {// unsuccessful authentication response here});
 ```
 
 This popup sign-in will then attempt to sign in using Google as an OAuth
 provider since there was no provider argument specified and since `"google"` was
 defined as the default provider.
+
+The `user` property will automatically be populated if an active session is
+available, so handling the resolved promise of sign-in methods is optional.
 -->
 <dom-module id="firebase-auth">
   <script>
@@ -134,7 +137,7 @@ defined as the default provider.
 
           return this._handleSignIn(this.auth.signInAnonymously());
         },
-        
+
         /**
          * Authenticates a Firebase client using a custom JSON Web Token.
          *
