@@ -51,6 +51,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         '__onlineChanged(online)'
       ],
 
+      /**
+       * Remove all data at the current query location.
+       *
+       * **Note:** This will remove *all* data at the path of this
+       * query, regardless of whether it is visible given the current
+       * query parameters.
+       */
+      remove() {
+        return this.ref.remove();
+      },
+
       _setFirebaseValue: function(path, value) {
         this._log('Setting Firebase value at', path, 'to', value)
         var key = value && value.$key;
