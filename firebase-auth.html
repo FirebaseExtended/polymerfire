@@ -45,6 +45,12 @@ defined as the default provider.
 
 The `user` property will automatically be populated if an active session is
 available, so handling the resolved promise of sign-in methods is optional.
+
+It's important to note that if you're using a Service Worker you should let
+urls that contain `/__auth/` go through to the network, rather than have the
+Service Worker attempt to serve something from the cache. This url pattern is
+used by the Firebase OAuth service so intercepting it will cause the OAuth
+window to hang and fail.
 -->
 <dom-module id="firebase-auth">
   <script>
