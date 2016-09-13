@@ -18,9 +18,9 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "git@github.com:PolymerLabs/alacarte.git#master",
+    "polymer": "polymer/polymer#2.0-preview",
     "firebase": ">= 3.5.1 < 4.0",
-    "app-storage": "git@github.com:notwaldorf/app-storage.git#2.0-preview"
+    "app-storage": "PolymerElements/app-storage#2.0-preview"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0",
@@ -29,8 +29,8 @@
     "test-fixture": "PolymerElements/test-fixture#custom-elements-v1"
   },
   "resolutions": {
-    "polymer": "master",
-    "webcomponentsjs": "v1-polymer-edits",
+    "polymer": "2.0-preview",
+    "webcomponentsjs": "v1",
     "test-fixture": "custom-elements-v1"
   }
 }
