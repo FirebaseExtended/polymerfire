@@ -49,8 +49,11 @@ attempt authentication, e.g.:
 
 ```javascript
 this.$.auth.signInWithPopup()
-    .then(function(response) {// successful authentication response here})
-    .catch(function(error) {// unsuccessful authentication response here});
+    .then(function(response){
+           // successful authentication response here"
+        }, function(error){
+           // unsuccessful authentication response here
+     });
 ```
 
 This popup sign-in will then attempt to sign in using Google as an OAuth
