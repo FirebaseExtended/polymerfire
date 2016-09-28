@@ -15,11 +15,30 @@
         database-url="https://polymerfire-test.firebaseio.com"
         storage-bucket="polymerfire-test.appspot.com"
         messaging-sender-id="630461474709"></firebase-app>
-      <firebase-messaging id="messaging"></firebase-messaging>
+      <firebase-messaging id="messaging"
+        active="{{active}}"
+        token="{{token}}"
+        status-known="{{statusKnown}}"
+        last-message="{{lastMessage}}">
+      </firebase-messaging>
+
+      <div hidden$="[[!statusKnown]]">
+        <button hidden$="[[active]]" on-click="requestMessaging">Request Notifications Permission</button>
+        <table hidden$="[[!active]]" border="1" cellpadding="8">
+          <tr><th>Token</th><td>[[token]]</td></tr>
+          <tr><th>Last Message:</th><td><pre>[[json(lastMessage)]]</pre></td></tr>
+        </table>
+      </div>
     </template>
     <script>
       var app = document.getElementById('app');
+      app.requestMessaging = function() {
+        return app.$.messaging.requestPermission();
+      }
 
+      app.json = function(val) {
+        return JSON.stringify(val || null, null, 2);
+      }
 
     </script>
   </body>
