@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>firebase-messaging demo</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="import" href="../firebase-app.html">
+    <link rel="import" href="../firebase-messaging.html">
+  </head>
+  <body>
+    <template is="dom-bind" id="app">
+      <firebase-app
+        api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+        auth-domain="polymerfire-test.firebaseapp.com",
+        database-url="https://polymerfire-test.firebaseio.com"
+        storage-bucket="polymerfire-test.appspot.com"
+        messaging-sender-id="630461474709"></firebase-app>
+      <firebase-messaging id="messaging"></firebase-messaging>
+    </template>
+    <script>
+      var app = document.getElementById('app');
+
+
+    </script>
+  </body>
+</html>

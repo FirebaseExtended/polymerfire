@@ -1,0 +1,127 @@
+<link rel="import" href="firebase.html">
+<link rel="import" href="firebase-common-behavior.html">
+
+<dom-module id="firebase-messaging">
+  <script>
+    (function() {
+      var stateMap = {};
+
+      function applyAll(app, method) {
+        var args = Array.prototype.slice.call(arguments, 2);
+        stateMap[app.name].instances.forEach(function(el) {
+          el[method].apply(el, args);
+        });
+      }
+
+      function refreshToken(app) {
+        console.log('[DEBUG] refreshToken', app.name);
+        var state = stateMap[app.name];
+
+        app.messaging().getToken().then(function(token) {
+          console.log('[DEBUG] Token Refreshed:', token);
+          applyAll(app, '_setToken', token);
+          applyAll(app, '_setStatusKnown', true);
+          return token;
+        }, function(err) {
+          applyAll(app, '_setToken', null);
+          applyAll(app, '_setStatusKnown', true);
+          applyAll(app, 'fire', 'error', err);
+          throw err;
+        });
+      }
+
+      function activateMessaging(el, app) {
+        console.log('[DEBUG] activateMessaging', el, app.name);
+        var name = app.name;
+
+        stateMap[name] = stateMap[name] || {messaging: app.messaging()};
+        var state = stateMap[name];
+
+        state.instances = state.instances || [];
+        if (state.instances.indexOf(el) < 0) {
+          state.instances.push(el);
+        }
+
+        if (!state.listener) {
+          state.listener = app.messaging().onMessage(function(message) {
+            state.instances.forEach(function(el) {
+              el._setLastMessage(message);
+              el.fire('message', {message: message});
+            });
+          });
+        }
+
+        return refreshToken(app);
+      }
+
+      Polymer({
+        is: 'firebase-messaging',
+
+        behaviors: [
+          Polymer.FirebaseCommonBehavior,
+        ],
+
+        properties: {
+          token: {
+            type: String,
+            value: null,
+            notify: true,
+            readOnly: true,
+          },
+          active: {
+            type: Boolean,
+            notify: true,
+            computed: '_computeActive(statusKnown, token)',
+          },
+          statusKnown: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            readOnly: true,
+          },
+          lastMessage: {
+            type: Object,
+            value: null,
+            notify: true,
+            readOnly: true,
+          },
+        },
+
+        observers: [
+          '_bootstrapApp(app)'
+        ],
+
+        requestPermission: function() {
+          if (!this.messaging) {
+            throw new Error('firebase-messaging: No app configured!');
+          }
+
+          return this.messaging.requestPermission().then(function() {
+            return refreshToken(this.app);
+          }.bind(this));
+        },
+
+        _computeActive: function(statusKnown, token) {
+          return !!(statusKnown && token);
+        },
+
+        _bootstrapApp(app) {
+          this.messaging = app.messaging();
+          this.statusKnown = false;
+          this.active = false;
+          this.token = null;
+          if (app) {
+            activateMessaging(this, app);
+          } else {
+            this.messaging = null;
+            this.statusKnown = false;
+            this.active = false;
+            this.token = null;
+            return;
+          }
+        }
+      });
+    })();
+
+  </script>
+</dom-module>
