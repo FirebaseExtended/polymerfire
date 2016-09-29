@@ -1,6 +1,6 @@
 {
   "name": "polymerfire",
-  "version": "0.10.3",
+  "version": "2.0.0",
   "authors": [
     "Firebase"
   ],
@@ -25,12 +25,26 @@
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0",
     "web-component-tester": "^4.0.0",
-    "note-app-elements": "polymerlabs/note-app-elements",
+    "note-app-elements": "polymerlabs/note-app-elements#2.0-preview",
     "test-fixture": "PolymerElements/test-fixture#custom-elements-v1"
   },
   "resolutions": {
     "polymer": "2.0-preview",
     "webcomponentsjs": "v1",
-    "test-fixture": "custom-elements-v1"
+    "test-fixture": "custom-elements-v1",
+    "paper-styles": "2.0-preview",
+    "paper-button": "2.0-preview",
+    "iron-icon": "2.0-preview",
+    "iron-flex-layout": "2.0-preview",
+    "iron-icons": "2.0-preview",
+    "iron-iconset-svg": "2.0-preview",
+    "paper-material": "2.0-preview",
+    "paper-behaviors": "2.0-preview",
+    "iron-behaviors": "2.0-preview",
+    "iron-meta": "2.0-preview",
+    "iron-validatable-behavior": "2.0-preview",
+    "iron-checked-element-behavior": "2.0-preview",
+    "paper-ripple": "2.0-preview",
+    "iron-a11y-keys-behavior": "2.0-preview"
   }
 }
