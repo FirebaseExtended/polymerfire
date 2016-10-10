@@ -45,6 +45,15 @@ defined as the default provider.
 
 The `user` property will automatically be populated if an active session is
 available, so handling the resolved promise of sign-in methods is optional.
+
+It's important to note that if you're using a Service Worker, and hosting on
+Firebase, you should let urls that contain `/__/` go through to the network,
+rather than have the Service Worker attempt to serve something from the cache.
+The `__` namespace is reserved by Firebase and intercepting it will cause the
+OAuth sign-in flow to break.
+
+If you are self-deploying your app to some non-Firebase domain, this shouldn't
+be a problem.
 -->
 <dom-module id="firebase-auth">
   <script>
