@@ -16,6 +16,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 a query, a request for a filtered, ordered, immutable set of Firebase data. The
 results of this Firebase query are then synchronized into the `data` parameter.
 
+If the child nodes of the query are objects (most cases), `data` will be an array
+of those objects with an extra `$key` field added to represent the key. If the
+child nodes are non-object leaf values, `data` will be an array of objects of
+the structure `{$key: key, $val: val}`.
+
 Example usage:
 ```html
 <firebase-query
@@ -65,7 +70,7 @@ Polymer({
            */
           query: {
             type: Object,
-            computed: '__computeQuery(ref, orderByChild, limitToFirst, limitToLast, startAt, endAt, equalTo)',
+            computed: '__computeQuery(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo)',
             observer: '__queryChanged'
           },
 
