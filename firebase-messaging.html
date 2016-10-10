@@ -195,7 +195,7 @@ you can actually send push messsages:
           this.active = false;
           this.token = null;
           if (this.app) {
-
+            this.messaging = this.app.messaging();
             activateMessaging(this, this.app);
           } else {
             this.messaging = null;
