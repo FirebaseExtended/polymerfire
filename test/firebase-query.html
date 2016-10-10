@@ -219,6 +219,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             expect(query.data[1].$val).to.be.eql(2);
           });
         });
+
+        test('should persist changes to leaf $val back to db', function() {
+          return setFirebaseValue(query.path, {a: 1, b: 2, c: 3}).then(function() {
+            expect(query.data[1].$val).to.be.eql(2);
+            query.set('data.1.$val', 22);
+            return query.transactionsComplete;
+          }).then(function() {
+            return expectFirebasePathValueToEql(query.path + '/' + query.data[1].$key, query.data[1].$val);
+          });
+        });
       });
 
       suite('coordinating with dom-repeat', function() {

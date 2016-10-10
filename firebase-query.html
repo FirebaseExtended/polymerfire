@@ -222,6 +222,8 @@ Polymer({
         setStoredValue: function(storagePath, value) {
           if (storagePath === this.path || /\$key$/.test(storagePath)) {
             return Promise.resolve();
+          } else if (/\/\$val$/.test(storagePath)) {
+            return this._setFirebaseValue(storagePath.replace(/\/\$val$/, ''), value);
           } else {
             return this._setFirebaseValue(storagePath, value);
           }
@@ -298,15 +300,9 @@ Polymer({
         __onFirebaseChildAdded: function(snapshot) {
           var value = snapshot.val();
           var key = snapshot.key;
-          var leaf = typeof value !== 'object';
-
           this._log('Firebase child_added:', key, value);
 
-          if (leaf) {
-            value = {$key: key, $val: value};
-          } else {
-            value.$key = key;
-          }
+          value = this.__decoratedValue(value, key);
 
           this.__map[key] = value;
           this.push('data', value);
@@ -337,14 +333,7 @@ Polymer({
           if (prev) {
             this.async(function() {
               var index = this.__indexFromKey(key);
-              var value = snapshot.val();
-              var leaf = typeof value !== 'object';
-
-              if (leaf) {
-                value = {$key: key, $val: value};
-              } else {
-                value.$key = key;
-              }
+              var value = this.__decoratedValue(snapshot.val(), key);
 
               this.__map[key] = value;
 
@@ -378,14 +367,7 @@ Polymer({
 
           if (value) {
             var index = this.__indexFromKey(key);
-            value = snapshot.val();
-            var leaf = typeof value !== 'object';
-
-            if (leaf) {
-              value = {$key: key, $val: value};
-            } else {
-              value.$key = key;
-            }
+            value = this.__decoratedValue(snapshot.val(), key);
 
             this.__map[key] = value;
 
@@ -396,6 +378,17 @@ Polymer({
               });
             });
           }
+        },
+
+        __decoratedValue: function(value, key) {
+          var leaf = typeof value !== 'object';
+
+          if (leaf) {
+            value = {$key: key, $val: value};
+          } else {
+            value.$key = key;
+          }
+          return value;
         }
       });
     })();
