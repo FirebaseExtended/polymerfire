@@ -2,8 +2,8 @@
 var window = self;
 
 importScripts(
-  'https://www.gstatic.com/firebasejs/staging/3.5.0/firebase-app.js',
-  'https://www.gstatic.com/firebasejs/staging/3.5.0/firebase-messaging.js'
+  '../../firebase/firebase-app.js',
+  '../../firebase/firebase-messaging.js'
 );
 
 firebase.initializeApp({

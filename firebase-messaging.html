@@ -42,6 +42,18 @@ you can actually send push messsages:
 <firebase-document path="/users/[[user.uid]]/token" value="[[token]]"></firebase-document>
 ```
 
+You'll also need a [Web App Manifest](https://developer.mozilla.org/en-US/docs/Web/Manifest)
+for your site. It must contain the following:
+
+```json
+{
+  "gcm_sender_id": "103953800507"
+}
+```
+
+**Note:** You must use the **exact line specified above**. Do *not* change the sender
+id to your project's individual sender id.
+
 Finally, Firebase Cloud Messaging requires a service worker to handle push messages.
 The easiest way is using a service worker called `firebase-messaging-sw.js` in your
 app's root directory. See [the FCM docs](https://firebase.google.com/docs/cloud-messaging/js/receive#handle_messages_when_your_web_app_is_in_the_foreground)
