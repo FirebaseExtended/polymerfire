@@ -232,7 +232,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       });
 
       suite('querying against leaf node collections', function() {
-        query.path = root + '/leafNodes';
+        var query;
+
+        setup(function() {
+          query = fixture('BasicQuery');
+          query.path = root + '/leafNodes';
           return query.transactionsComplete;
         });
 
