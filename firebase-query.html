@@ -308,13 +308,13 @@ Polymer({
         },
 
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
-          var value = snapshot.val();
           var key = snapshot.key;
+          var value = snapshot.val();
           var previousChildIndex = this.__indexFromKey(previousChildKey);
 
           this._log('Firebase child_added:', key, value);
 
-          value = this.__decoratedValue(value, key);
+          value = this.__snapshotToValue(snapshot);
 
           this.__map[key] = value;
           this.splice('data', previousChildIndex + 1, 0, value);
@@ -345,7 +345,7 @@ Polymer({
           if (prev) {
             this.async(function() {
               var index = this.__indexFromKey(key);
-              var value = this.__decoratedValue(snapshot.val(), key);
+              var value = this.__snapshotToValue(snapshot);
 
               this.__map[key] = value;
 
@@ -379,7 +379,7 @@ Polymer({
 
           if (value) {
             var index = this.__indexFromKey(key);
-            value = this.__decoratedValue(snapshot.val(), key);
+            value = this.__snapshotToValue(snapshot);
 
             this.__map[key] = value;
 
@@ -392,7 +392,10 @@ Polymer({
           }
         },
 
-        __decoratedValue: function(value, key) {
+        __snapshotToValue: function(snapshot) {
+          var key = snapshot.key;
+          var value = snapshot.val();
+
           var leaf = typeof value !== 'object';
 
           if (leaf) {
