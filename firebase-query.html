@@ -69,7 +69,7 @@ Polymer({
            */
           query: {
             type: Object,
-            computed: '__computeQuery(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo)',
+            computed: '__computeQuery(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo, equalToNull)',
             observer: '__queryChanged'
           },
 
@@ -127,7 +127,11 @@ Polymer({
             type: Object,
             value: null
           },
-
+          equalToNull: {
+            type: Boolean,
+            reflectToAttribute: true,
+            value: false
+          },
           /**
            * The maximum number of nodes to include in the query.
            *
@@ -240,7 +244,7 @@ Polymer({
           }
         },
 
-        __computeQuery: function(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo) {
+        __computeQuery: function(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo, equalToNull) {
           if (ref == null) {
             return null;
           }
@@ -269,7 +273,7 @@ Polymer({
             query = query.endAt(endAt);
           }
 
-          if (equalTo !== null) {
+          if (equalTo !== null || equalToNull) {
             query = query.equalTo(equalTo);
           }
 
@@ -375,7 +379,7 @@ Polymer({
           var targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) : 0;
 
           this._log('Firebase child_moved:', key, value,
-              'to index', targetIndex);
+                  'to index', targetIndex);
 
           if (value) {
             var index = this.__indexFromKey(key);
