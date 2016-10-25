@@ -15,6 +15,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 a query, a request for a filtered, ordered, immutable set of Firebase data. The
 results of this Firebase query are then synchronized into the `data` parameter.
 
+If the child nodes of the query are objects (most cases), `data` will be an array
+of those objects with an extra `$key` field added to represent the key. If the
+child nodes are non-object leaf values, `data` will be an array of objects of
+the structure `{$key: key, $val: val}`.
+
 Example usage:
 ```html
 <firebase-query
@@ -64,7 +69,7 @@ Polymer({
            */
           query: {
             type: Object,
-            computed: '__computeQuery(ref, orderByChild, limitToFirst, limitToLast, startAt, endAt, equalTo)',
+            computed: '__computeQuery(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo)',
             observer: '__queryChanged'
           },
 
@@ -77,6 +82,15 @@ Polymer({
           orderByChild: {
             type: String,
             value: ''
+          },
+
+          /**
+           * Order this query by values. This is only applicable to leaf node queries
+           * against data structures such as `{a: 1, b: 2, c: 3}`.
+           */
+          orderByValue: {
+            type: Boolean,
+            value: false
           },
 
           /**
@@ -212,6 +226,8 @@ Polymer({
         setStoredValue: function(storagePath, value) {
           if (storagePath === this.path || /\$key$/.test(storagePath)) {
             return Promise.resolve();
+          } else if (/\/\$val$/.test(storagePath)) {
+            return this._setFirebaseValue(storagePath.replace(/\/\$val$/, ''), value);
           } else {
             return this._setFirebaseValue(storagePath, value);
           }
@@ -224,7 +240,7 @@ Polymer({
           }
         },
 
-        __computeQuery: function(ref, orderByChild, limitToFirst, limitToLast, startAt, endAt, equalTo) {
+        __computeQuery: function(ref, orderByChild, orderByValue, limitToFirst, limitToLast, startAt, endAt, equalTo) {
           if (ref == null) {
             return null;
           }
@@ -233,6 +249,8 @@ Polymer({
 
           if (orderByChild) {
             query = ref.orderByChild(orderByChild);
+          } else if (orderByValue) {
+            query = ref.orderByValue();
           } else {
             query = ref.orderByKey();
           }
@@ -290,13 +308,13 @@ Polymer({
         },
 
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
-          var value = snapshot.val();
           var key = snapshot.key;
+          var value = snapshot.val();
           var previousChildIndex = this.__indexFromKey(previousChildKey);
 
           this._log('Firebase child_added:', key, value);
 
-          value.$key = key;
+          value = this.__snapshotToValue(snapshot);
 
           this.__map[key] = value;
           this.splice('data', previousChildIndex + 1, 0, value);
@@ -327,8 +345,8 @@ Polymer({
           if (prev) {
             this.async(function() {
               var index = this.__indexFromKey(key);
-              var value = snapshot.val();
-              value.$key = key;
+              var value = this.__snapshotToValue(snapshot);
+
               this.__map[key] = value;
 
               this.syncToMemory(function() {
@@ -361,8 +379,8 @@ Polymer({
 
           if (value) {
             var index = this.__indexFromKey(key);
-            value = snapshot.val();
-            value.$key = key;
+            value = this.__snapshotToValue(snapshot);
+
             this.__map[key] = value;
 
             this.async(function() {
@@ -372,6 +390,20 @@ Polymer({
               });
             });
           }
+        },
+
+        __snapshotToValue: function(snapshot) {
+          var key = snapshot.key;
+          var value = snapshot.val();
+
+          var leaf = typeof value !== 'object';
+
+          if (leaf) {
+            value = {$key: key, $val: value};
+          } else {
+            value.$key = key;
+          }
+          return value;
         }
       });
     })();

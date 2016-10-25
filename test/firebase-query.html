@@ -231,6 +231,33 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         });
       });
 
+      suite('querying against leaf node collections', function() {
+        var query;
+
+        setup(function() {
+          query = fixture('BasicQuery');
+          query.path = root + '/leafNodes';
+          return query.transactionsComplete;
+        });
+
+        test('should set leaf value as $val on the resulting object', function() {
+          return setFirebaseValue(query.path, {a: 1, b: 2, c: 3}).then(function() {
+            expect(query.data[1].$key).to.be.eql('b');
+            expect(query.data[1].$val).to.be.eql(2);
+          });
+        });
+
+        test('should persist changes to leaf $val back to db', function() {
+          return setFirebaseValue(query.path, {a: 1, b: 2, c: 3}).then(function() {
+            expect(query.data[1].$val).to.be.eql(2);
+            query.set('data.1.$val', 22);
+            return query.transactionsComplete;
+          }).then(function() {
+            return expectFirebasePathValueToEql(query.path + '/' + query.data[1].$key, query.data[1].$val);
+          });
+        });
+      });
+
       suite('equalTo query', function() {
         var query;
 

@@ -54,10 +54,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       _setFirebaseValue: function(path, value) {
         this._log('Setting Firebase value at', path, 'to', value)
         var key = value && value.$key;
+        var leaf = value && value.hasOwnProperty('$val');
         if (key) {
           value.$key = null;
         }
-        var result = this.db.ref(path).set(value);
+        var result = this.db.ref(path).set(leaf ? value.$val : value);
         if (key) {
           value.$key = key;
         }
