@@ -7,8 +7,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="firebase.html">
 <link rel="import" href="firebase-common-behavior.html">
+<link rel="import" href="firebase-auth-script.html">
 
 <!--
 `firebase-auth` is a wrapper around the Firebase authentication API. It notifies
@@ -34,14 +34,26 @@ JavaScript sign-in calls can then be made to the `firebase-auth` object to
 attempt authentication, e.g.:
 
 ```javascript
-this.$.signInWithPopup()
-    .then(function(response) {// successful authentication response here})
+this.$.auth.signInWithPopup()
+    .then(function(response) {// optionally handle a successful login})
     .catch(function(error) {// unsuccessful authentication response here});
 ```
 
 This popup sign-in will then attempt to sign in using Google as an OAuth
 provider since there was no provider argument specified and since `"google"` was
 defined as the default provider.
+
+The `user` property will automatically be populated if an active session is
+available, so handling the resolved promise of sign-in methods is optional.
+
+It's important to note that if you're using a Service Worker, and hosting on
+Firebase, you should let urls that contain `/__/` go through to the network,
+rather than have the Service Worker attempt to serve something from the cache.
+The `__` namespace is reserved by Firebase and intercepting it will cause the
+OAuth sign-in flow to break.
+
+If you are self-deploying your app to some non-Firebase domain, this shouldn't
+be a problem.
 -->
 <dom-module id="firebase-auth">
   <script>
@@ -134,7 +146,7 @@ defined as the default provider.
 
           return this._handleSignIn(this.auth.signInAnonymously());
         },
-        
+
         /**
          * Authenticates a Firebase client using a custom JSON Web Token.
          *

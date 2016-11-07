@@ -1,0 +1,110 @@
+<!doctype html>
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+  <head>
+    <title>firebase-messaging demo</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../firebase-messaging.html">
+    <style>
+      body { font-family: Roboto, sans-serif; padding: 0; margin: 0 }
+
+      h1 {
+        font-size: 18px;
+        font-weight: 500;
+        background: #03a9f4;
+        color: white;
+        padding: 16px;
+        margin: 0;
+        box-shadow: 0 0 2px rgba(0,0,0,0.3);
+      }
+
+      #table { border: 1px solid #ddd; border-collapse: collapse; }
+      #table td, #table th { padding: 8px; border-bottom: 1px solid #ddd;}
+      #table th { text-align: right; vertical-align: top; background: #eee; border-right: 1px solid #ddd; }
+
+      button {
+        padding: 16px;
+        font-size: 18px;
+        background: #03a9f4;
+        color: white;
+        font-weight: bold;
+        font-family: Roboto, sans-serif;
+        border: 0;
+        border-radius: 3px;
+        cursor: pointer;
+      }
+
+      main {
+        padding: 32px;
+      }
+
+      p {
+        margin: 32px 32px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      firebase.initializeApp({
+        messagingSenderId: '153517668099'
+      });
+
+      window.addEventListener('WebComponentsReady', function() {
+        if (navigator.serviceWorker) {
+          navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(sw) {
+            app.$.messaging.activate(sw);
+          });
+        }
+      });
+    </script>
+    <h1>firebase-messaging demo</h1>
+    <p>This demo will allow you to request notification permissions and obtain an instance token.
+    To actually test receipt of push messages, you will need to clone the demo and modify the
+    <code>messagingSenderId</code> in this file and in <code>firebase-messaging-sw.js</code>
+    in this directory.</p>
+    <template is="dom-bind" id="app">
+      <firebase-messaging id="messaging"
+        active="{{active}}"
+        token="{{token}}"
+        status-known="{{statusKnown}}"
+        last-message="{{lastMessage}}"
+        on-message="logit"
+        custom-sw>
+      </firebase-messaging>
+      <main>
+        <div hidden$="[[!statusKnown]]">
+          <button hidden$="[[active]]" on-click="requestMessaging">Request Notifications Permission</button>
+          <table id="table" hidden$="[[!active]]">
+            <tr><th>Token</th><td>[[token]]</td></tr>
+            <tr><th>Last&nbsp;Message</th><td><pre>[[json(lastMessage)]]</pre></td></tr>
+          </table>
+
+          <h3>Message Log</h3>
+          <pre id="log" hidden$="[[!active]]"></pre>
+        </div>
+      </main>
+    </template>
+    <script>
+      var app = document.getElementById('app');
+      app.requestMessaging = function() {
+        return app.$.messaging.requestPermission();
+      }
+
+      app.json = function(val) {
+        return JSON.stringify(val || null, null, 2);
+      }
+
+      app.logit = function(e) {
+        app.$.log.innerHTML = JSON.stringify(e.detail.message) + "\n" + app.$.log.innerHTML;
+      }
+    </script>
+  </body>
+</html>

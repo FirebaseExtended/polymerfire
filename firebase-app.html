@@ -7,7 +7,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 -->
 
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="firebase.html">
+<link rel="import" href="firebase-app-script.html">
 <dom-module id="firebase-app">
   <script>
     (function() {
@@ -81,23 +81,33 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           },
 
           /**
+           * The Firebase Cloud Messaging Sender ID for your project. You can find
+           * this in the Firebase Console under "Web Setup".
+           */
+          messagingSenderId: {
+            type: String,
+            value: null
+          },
+
+          /**
            * The Firebase app object constructed from the other fields of
            * this element.
            */
           app: {
             type: Object,
             notify: true,
-            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket)'
+            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId)'
           }
         },
 
-        __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket) {
+        __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId) {
           if (apiKey && authDomain && databaseUrl) {
             var init = [{
               apiKey: apiKey,
               authDomain: authDomain,
               databaseURL: databaseUrl,
-              storageBucket: storageBucket
+              storageBucket: storageBucket,
+              messagingSenderId: messagingSenderId
             }];
 
             if (name) {
