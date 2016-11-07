@@ -236,7 +236,7 @@ call `.activate()` on the element once you've
           return !!(statusKnown && token);
         },
 
-        _bootstrapApp(app, customSw) {
+        _bootstrapApp: function(app, customSw) {
           if (app && !customSw) {
             this.activate();
           }
