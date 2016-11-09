@@ -24,7 +24,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         ref: {
           type: Object,
-          computed: '__computeRef(db, path, disabled)'
+          computed: '__computeRef(db, path, disabled)',
+          observer: '__refChanged'
         },
 
         /**
@@ -78,6 +79,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }
 
         return db.ref(path);
+      },
+
+      /**
+       * Override this method if needed.
+       * e.g. to detach or attach listeners.
+       */
+      __refChanged: function(ref, oldRef){
+        return;
       },
 
       __pathChanged: function(path, oldPath) {
