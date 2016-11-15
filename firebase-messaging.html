@@ -185,6 +185,17 @@ call `.activate()` on the element once you've
           customSw: {
             type: Boolean,
             value: false
+          },
+          /**
+           * True if the Push API is supported in the user's browser.
+           */
+          pushSupported: {
+            type: Boolean,
+            value: function() {
+              return ('serviceWorker' in navigator && 'PushManager' in window);
+            },
+            notify: true,
+            readOnly: true
           }
         },
 
