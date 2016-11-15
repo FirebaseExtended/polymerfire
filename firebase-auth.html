@@ -223,6 +223,16 @@ be a problem.
         },
 
         /**
+         * Sends a password reset email to the given email address.
+         *
+         * @param  {!String} email Email address corresponding to the user account.
+         * @return {Promise} Promise that handles success and failure.
+         */
+        sendPasswordResetEmail: function(email) {
+          return this._handleSignIn(this.auth.sendPasswordResetEmail(email));
+        },
+        
+        /**
          * Unauthenticates a Firebase client.
          *
          * @return {Promise} Promise that handles success and failure.
