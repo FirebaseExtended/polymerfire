@@ -45,6 +45,7 @@
     "iron-validatable-behavior": "2.0-preview",
     "iron-checked-element-behavior": "2.0-preview",
     "paper-ripple": "2.0-preview",
-    "iron-a11y-keys-behavior": "2.0-preview"
+    "iron-a11y-keys-behavior": "2.0-preview",
+    "promise-polyfill": "2.0-preview"
   }
 }
