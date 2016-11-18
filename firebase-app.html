@@ -121,6 +121,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             }
 
             firebase.initializeApp.apply(firebase, init);
+            this.fire('firebase-app-initialized');
           } else {
             return null;
           }
