@@ -32,9 +32,11 @@ workflows.
 Example Usage:
 
 ```html
-<firebase-app auth-domain="polymerfire-test.firebaseapp.com"
+<firebase-app
+  auth-domain="polymerfire-test.firebaseapp.com"
   database-url="https://polymerfire-test.firebaseio.com/"
-  api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g">
+  api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+  storage-url="polymerfire-test.appspot.com">
 </firebase-app>
 <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError">
 </firebase-auth>
@@ -120,5 +122,3 @@ Polymer({
 });
 </script>
 ```
-
-
