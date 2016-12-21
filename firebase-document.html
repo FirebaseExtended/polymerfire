@@ -39,6 +39,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     ],
 
     attached: function() {
+      this.__firstSync = true;
       this.__refChanged(this.ref, this.ref);
     },
 
@@ -192,7 +193,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             this._log('Updating data from Firebase value:', value);
             
             // set the value if this.data does not exist or value is primitive or if firebase value obj contain less keys than this.data (https://github.com/Polymer/polymer/issues/2565)
-            if (!this.data || typeof value !== 'object' || ( Object.keys(value).length <  Object.keys(this.data).length)) {
+            if (this.__firstSync || !this.data || typeof value !== 'object' || ( Object.keys(value).length <  Object.keys(this.data).length)) {
+              delete this.__firstSync;
               return this.set('data', value);
             }
 
