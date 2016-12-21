@@ -186,11 +186,22 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         value = this.zeroValue;
       }
 
-      if (!this.new) {
+      if (!this.isNew) {
         this.async(function() {
           this.syncToMemory(function() {
             this._log('Updating data from Firebase value:', value);
-            this.set('data', value);
+            
+            // set the value if this.data does not exist or value is primitive or if firebase value obj contain less keys than this.data (https://github.com/Polymer/polymer/issues/2565)
+            if (!this.data || typeof value !== 'object' || ( Object.keys(value).length <  Object.keys(this.data).length)) {
+              return this.set('data', value);
+            }
+
+            // now, we loop over keys
+            for (var prop in value) {
+              if(value[prop] !== this.data[prop]) {
+                this.set(['data', prop], value[prop]);
+              }
+            }
           });
         });
       }
