@@ -184,6 +184,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       if (value == null) {
         value = this.zeroValue;
+        this.exists = false;
+      } else {
+        this.exists = true;
       }
 
       if (!this.new) {
