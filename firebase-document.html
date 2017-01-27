@@ -181,12 +181,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
     __onFirebaseValue: function(snapshot) {
       var value = snapshot.val();
+      var exists;
 
       if (value == null) {
         value = this.zeroValue;
-        this.exists = false;
+        exists = false;
       } else {
-        this.exists = true;
+        exists = true;
       }
 
       if (!this.new) {
@@ -194,6 +195,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           this.syncToMemory(function() {
             this._log('Updating data from Firebase value:', value);
             this.set('data', value);
+            this.exists = exists;
           });
         });
       }
