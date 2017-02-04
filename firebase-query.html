@@ -276,6 +276,21 @@ Polymer({
           return query;
         },
 
+        /**
+         * `@override`
+         */
+
+        __pathChanged: function(path, oldPath) {
+          // we only need to reset the data if the path is null (will also trigged when this element initiates)
+          // When path changes and is not null, it triggers a ref change (via __computeRef(db,path)), which then triggers a __queryChanged setting data to zeroValue
+
+          if (path == null ) {
+            this.syncToMemory(function() {
+              this.data = this.zeroValue;
+            });
+          }
+        },
+
         __queryChanged: function(query, oldQuery) {
           if (oldQuery) {
             oldQuery.off('child_added', this.__onFirebaseChildAdded, this);
