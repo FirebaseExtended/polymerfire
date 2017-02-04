@@ -90,9 +90,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __pathChanged: function(path, oldPath) {
-        if (oldPath != null && !this.disabled && this.__pathReady(path)) {
+        if (!this.disabled && !this.valueIsEmpty(this.data)) {
           this.syncToMemory(function() {
             this.data = this.zeroValue;
+            this.__needSetData = true;
           });
         }
       },
