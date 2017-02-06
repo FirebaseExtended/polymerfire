@@ -195,7 +195,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           this.syncToMemory(function() {
             this._log('Updating data from Firebase value:', value);
             this.set('data', value);
-            this.exists = exists;
+            this._setStatusKnown(true);
+            this._setExists(exists);
           });
         });
       }
