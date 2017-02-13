@@ -335,10 +335,10 @@ Polymer({
             this.async(function() {
               this.syncToMemory(function() {
                 this.splice('data', this.__indexFromKey(key), 1);
-                if (this.data.length === 0) {
-                  this._setExists(false);
-                }
               });
+              if (this.data.length === 0) {
+                this._setExists(false);
+              }
             });
           }
         },
