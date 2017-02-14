@@ -49,7 +49,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       p {
         margin: 32px 32px 0;
       }
-
     </style>
   </head>
   <body>
@@ -61,24 +60,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       window.addEventListener('WebComponentsReady', function() {
         if (navigator.serviceWorker) {
           navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(sw) {
-<<<<<<< HEAD
-            firebase.messaging().useServiceWorker(sw);
-            app.$.messaging.activate();
-=======
             app.$.messaging.activate(sw);
->>>>>>> upstream/master
           });
         }
       });
     </script>
     <h1>firebase-messaging demo</h1>
-<<<<<<< HEAD
-=======
     <p>This demo will allow you to request notification permissions and obtain an instance token.
     To actually test receipt of push messages, you will need to clone the demo and modify the
     <code>messagingSenderId</code> in this file and in <code>firebase-messaging-sw.js</code>
     in this directory.</p>
->>>>>>> upstream/master
     <template is="dom-bind" id="app">
       <firebase-messaging id="messaging"
         active="{{active}}"
