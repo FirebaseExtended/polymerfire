@@ -8,7 +8,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="firebase-database-behavior.html">
-<link rel="import" href="firebase.html">
 <script>
   'use strict';
 
@@ -40,6 +39,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     ],
 
     attached: function() {
+      this.__needSetData = true;
       this.__refChanged(this.ref, this.ref);
     },
 
@@ -49,15 +49,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }
     },
 
-    observers: [
-      '__refChanged(ref)'
-    ],
-
     /**
      * @override
      */
     get isNew() {
-      return !this.path;
+      return this.disabled || !this.__pathReady(this.path);
     },
 
     /**
@@ -163,7 +159,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             resolve(this.zeroValue);
           }
           resolve(value);
-        }, this);
+        }, this.__onError, this);
       }.bind(this));
     },
 
@@ -180,7 +176,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }
 
       if (ref) {
-        ref.on('value', this.__onFirebaseValue, this);
+        ref.on('value', this.__onFirebaseValue, this.__onError, this);
       }
     },
 
@@ -189,13 +185,30 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
       if (value == null) {
         value = this.zeroValue;
+        this.__needSetData = true;
       }
 
-      if (!this.new) {
+      if (!this.isNew) {
         this.async(function() {
           this.syncToMemory(function() {
             this._log('Updating data from Firebase value:', value);
-            this.set('data', value);
+            
+            // set the value if: 
+            // it is the first time we run this (or the path has changed and we are back with zeroValue)
+            // or if  this.data does not exist 
+            // or value is primitive 
+            // or if firebase value obj contain less keys than this.data (https://github.com/Polymer/polymer/issues/2565)
+            if (this.__needSetData || !this.data || typeof value !== 'object' || ( Object.keys(value).length <  Object.keys(this.data).length)) {
+              this.__needSetData = false;
+              return this.set('data', value);
+            }
+
+            // now, we loop over keys
+            for (var prop in value) {
+              if(value[prop] !== this.data[prop]) {
+                this.set(['data', prop], value[prop]);
+              }
+            }
           });
         });
       }
