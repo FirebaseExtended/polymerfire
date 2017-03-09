@@ -289,6 +289,14 @@ Polymer({
           }
 
           if (query) {
+            if(this._onOnce){ // remove handlers before adding again. Otherwise we get data multiplying
+              query.off('child_added', this.__onFirebaseChildAdded, this);
+              query.off('child_removed', this.__onFirebaseChildRemoved, this);
+              query.off('child_changed', this.__onFirebaseChildChanged, this);
+              query.off('child_moved', this.__onFirebaseChildMoved, this);
+            }
+
+            this._onOnce = true;            
             query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
