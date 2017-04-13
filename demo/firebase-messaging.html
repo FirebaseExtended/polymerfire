@@ -61,8 +61,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         if (navigator.serviceWorker) {
           navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(sw) {
             var app = document.getElementById('app');
-            // polymer 2.0 compatibility
-            app = app.$ ? app : app.parentNode;
+
+            // Polymer 2.0 compat
+            if (Polymer.Element) {
+              app = app.parentNode;
+            }
+
             app.$.messaging.activate(sw);
           });
         }
@@ -99,6 +103,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </dom-bind>
     <script>
       var app = document.getElementById('app');
+
+      // Polymer 2.0 compat
+      if (Polymer.Element) {
+        app = app.parentNode;
+      }
+
       app.requestMessaging = function() {
         return this.$.messaging.requestPermission();
       }
@@ -110,13 +120,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       app.logit = function(e) {
         this.$.log.innerHTML = JSON.stringify(e.detail.message) + "\n" + app.$.log.innerHTML;
       }
-
-      // polymer 2.0 compatibility
-      var domBind = app.parentNode;
-
-      domBind.requestMessaging = app.requestMessaging;
-      domBind.json = app.json;
-      domBind.logit = app.logit;
     </script>
   </body>
 </html>
