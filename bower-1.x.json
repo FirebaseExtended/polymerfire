@@ -26,7 +26,6 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0",
     "note-app-elements": "polymerlabs/note-app-elements",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "test-fixture": "polymerelements/test-fixture#^1.0.0",
     "web-component-tester": "^4.0.0"
   },
   "variants": {
@@ -39,7 +38,6 @@
       "devDependencies": {
         "iron-component-page": "PolymerElements/iron-component-page#^1.0",
         "note-app-elements": "polymerlabs/note-app-elements",
-        "test-fixture": "polymerelements/test-fixture#^1.0.0",
         "web-component-tester": "^4.0.0",
         "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
       }
