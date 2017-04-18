@@ -167,8 +167,34 @@ Polymer({
           this.__queryChanged(null, this.query);
         },
 
+        /**
+         * Returns the data of the child with the specified key.
+         *
+         * **Note:** Will return `null` for any child that is not
+         * matched **by the current query parameters**.
+         */
         child: function(key) {
-          return this.__map[key];
+          return this.__map[key] || null;
+        },
+
+        /**
+         * Push a new item onto the path of this query.
+         *
+         * **Note:** If the data pushed does not match current query
+         * parameters, it will not appear in `data`.
+         */
+        push(data) {
+          return this.ref.push(data);
+        },
+
+        /**
+         * Remove a child by its specified key.
+         *
+         * **Note:** The child matching the specified key will be
+         * removed whether or not it is visible in the current query.
+         */
+        removeChild(key) {
+          return this.ref.child(key).remove();
         },
 
         get isNew() {
