@@ -44,7 +44,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           value: []
         },
 
-        autoUpload: {
+        auto: {
           type: Boolean,
           value: false
         },
@@ -61,7 +61,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       observers: [
-        '__filesChanged(files, autoUpload)'
+        '__filesChanged(files, auto)'
       ],
 
       _updateUploadedFiles: function(j, snapshot) {
@@ -136,8 +136,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }
       },
 
-      __filesChanged: function(files, autoUpload) {
-        if (autoUpload) {
+      __filesChanged: function(files, auto) {
+        console.log(files, auto)
+        if (auto) {
           this._putMultipleFirebaseFiles(null, files);
         }
       }

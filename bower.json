@@ -25,6 +25,8 @@
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0",
     "web-component-tester": "^4.0.0",
-    "note-app-elements": "polymerlabs/note-app-elements"
+    "note-app-elements": "polymerlabs/note-app-elements",
+    "paper-progress": "PolymerElements/paper-progress#^1.0.12",
+    "paper-toast": "PolymerElements/paper-toast#^1.3.1"
   }
 }

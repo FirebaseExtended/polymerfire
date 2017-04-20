@@ -11,40 +11,40 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 <link rel="import" href="../../paper-toast/paper-toast.html">
 <link rel="import" href="../polymerfire.html">
 
-<dom-module id="firebase-storage-demo">
+<dom-module id="firebase-storage-multiupload-demo">
   <template>
     <firebase-app
-      auth-domain="polymerfire-test-c9e51.firebaseapp.com"
-      database-url="https://polymerfire-test-c9e51.firebaseio.com"
-      api-key="AIzaSyAMbEOHMvYil6Cq8-oPnEahgeDqdQnSvBk"
-      storage-bucket="polymerfire-test-c9e51.appspot.com"></firebase-app>
-    <firebase-auth id="auth" user="{{user}}" provider="google" on-error="showError"></firebase-auth>
+      auth-domain="polymerfire-test-6abc0.firebaseapp.com"
+      database-url="https://polymerfire-test-6abc0.firebaseio.com"
+      api-key="AIzaSyBxZI1BAgX9obocHQw_yhmHV9BIOpaNWZo"
+      storage-bucket="polymerfire-test-6abc0.appspot.com"></firebase-app>
+    <firebase-auth id="auth" user="{{user}}" provider="google" on-error="catchError"></firebase-auth>
 
-    <button on-tap="signIn">Sign In</button>
+    <button on-tap="signIn">Sign In</button><br/>
 
     <template is="dom-if" if="{{user}}">
-      <firebase-storage
+      <firebase-storage-multiupload
         id="fs"
         path="/users/{{user.uid}}/files"
         files="[[files]]"
         uploaded-files="{{uploadedFiles}}"
         on-error="catchError"
-        auto-upload>
-      </firebase-storage>
+        auto>
+      </firebase-storage-multiupload>
 
-      <firebase-storage
+      <firebase-storage-multiupload
         id="fs2"
         path="/users/{{user.uid}}/file"
         files="[[file]]"
         uploaded-files="{{uploadedFile}}"
         on-error="catchError"
         >
-      </firebase-storage>
+      </firebase-storage-multiupload>
 
-      <firebase-storage
+      <firebase-storage-multiupload
         id="fsd"
         on-error="catchError">
-      </firebase-storage>
+      </firebase-storage-multiupload>
 
       <input id="file-uploader" type="file" on-change="onFileUpload" multiple /> <br/>
       <input id="file-uploader2" type="file" on-change="onFileUpload2" />
@@ -93,7 +93,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       'use strict';
 
       Polymer({
-        is: 'firebase-storage-demo',
+        is: 'firebase-storage-multiupload-demo',
 
         properties: {
           user: Object,
@@ -153,6 +153,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         onFileUpload(e) {
           this.files = e.target.files;
+          console.log(this.files)
         },
 
         onFileUpload2(e) {
