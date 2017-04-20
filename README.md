@@ -14,15 +14,30 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 [![Build status](https://travis-ci.org/firebase/polymerfire.svg?branch=master)](https://travis-ci.org/firebase/polymerfire)
 
+## Loading Polymerfire
 
-##&lt;firebase-app&gt;
+The Firebase SDK can be loaded modularly (e.g. I can only load Auth and Database but not Storage or Messaging), but **all features must be loaded before the SDK is initialized** (lazy loading is not supported). A good way to handle this is to import `<firebase-app>` as well as any scripts you need for specific features:
+
+```html
+<link rel="import" href="bower_components/polymerfire/firebase-app.html">
+<link rel="import" href="bower_components/polymerfire/firebase-auth-script.html">
+<link rel="import" href="bower_components/polymerfire/firebase-database-script.html">
+<link rel="import" href="bower_components/polymerfire/firebase-storage-script.html">
+<link rel="import" href="bower_components/polymerfire/firebase-messaging-script.html">
+
+<firebase-app
+  database-url="..." storage-bucket="..." api-key="..." messaging-sender-id="..." auth-domain="...">
+</firebase-app>
+```
+
+## &lt;firebase-app&gt;
 
 The firebase-app element is used for initializing and configuring your
 connection to firebase.
 
 
 
-##&lt;firebase-auth&gt;
+## &lt;firebase-auth&gt;
 
 `firebase-auth` is a wrapper around the Firebase authentication API. It notifies
 successful authentication, provides user information, and handles different
@@ -62,7 +77,7 @@ defined as the default provider.
 
 
 
-##&lt;firebase-document&gt;
+## &lt;firebase-document&gt;
 
 The firebase-document element is an easy way to interact with a firebase
 location as an object and expose it to the Polymer databinding system.
@@ -87,7 +102,7 @@ app.
 
 
 
-##&lt;firebase-query&gt;
+## &lt;firebase-query&gt;
 
 `firebase-query` combines the given properties into query options that generate
 a query, a request for a filtered, ordered, immutable set of Firebase data. The
