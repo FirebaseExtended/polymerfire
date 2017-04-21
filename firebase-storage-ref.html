@@ -47,6 +47,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         metadata: {
           type: Object,
           notify: true
+        },
+        task: {
+          type: Object,
+          notify: true
         }
       },
 
@@ -124,6 +128,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       */
       put: function(file, metadata) {
         return this.__put(null, file, metadata);
+      },
+
+      /**
+      * @override
+      */
+      putString: function(data, format, metadata) {
+        return this.__put(null, data, format, metadata);
       },
 
       /**

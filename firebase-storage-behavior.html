@@ -56,6 +56,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         return path ? this.ref.child(path).delete() : this.ref.delete();
       },
 
+      __putString: function(path, data, format, metadata) {
+        this._log('Putting Firebase file at', path ? this.path + '/' + path : this.path);
+        if (data) {
+          var ref = path ? this.storage.ref().child(path) : this.ref;
+          return ref.putString(data, format, metadata)
+        }
+        return path ? this.ref.child(path).delete() : this.ref.delete();
+      },
+
       __computeStorage: function(app) {
         return app ? app.storage() : null;
       },
