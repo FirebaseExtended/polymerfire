@@ -49,16 +49,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }
     },
 
-    /**
-     * Getter for the new property
-     */
+
     get isNew() {
       return this.disabled || !this.__pathReady(this.path);
     },
 
-    /**
-     * Getter for the zero value.
-     */
+
     get zeroValue() {
       return {};
     },
@@ -77,7 +73,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      */
     saveValue: function(parentPath, key) {
       return new Promise(function(resolve, reject) {
-        var path = '';
+        var path = null;
 
         if (!this.app) {
           reject(new Error('No app configured!'));
@@ -102,26 +98,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }.bind(this));
     },
 
-    /**
-     *
-     */
     reset: function() {
       this.path = null;
       return Promise.resolve();
     },
 
-    /**
-     *
-     */
     destroy: function() {
       return this._setFirebaseValue(this.path, null).then(function() {
         return this.reset();
       }.bind(this));
     },
 
-    /**
-     *
-     */
     memoryPathToStoragePath: function(path) {
       var storagePath = this.path;
 
@@ -132,9 +119,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return storagePath;
     },
 
-    /**
-     *
-     */
     storagePathToMemoryPath: function(storagePath) {
       var path = 'data';
 
@@ -148,9 +132,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return path;
     },
 
-    /**
-     *
-     */
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
         this.db.ref(path).once('value', function(snapshot) {
@@ -163,9 +144,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }.bind(this));
     },
 
-    /**
-     *
-     */
     setStoredValue: function(path, value) {
       return this._setFirebaseValue(path, value);
     },

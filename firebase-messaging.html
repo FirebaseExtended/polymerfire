@@ -67,7 +67,7 @@ call `.activate()` on the element once you've
   <script>
     (function() {
       var stateMap = {};
-      
+
       /**
        *
        * @param {Object} app
@@ -137,10 +137,11 @@ call `.activate()` on the element once you've
            * The current registration token for this session. Save this
            * somewhere server-accessible so that you can target push messages
            * to this device.
+           * @type {String}
            */
           token: {
             type: String,
-            value: "",
+            value: null,
             notify: true,
             readOnly: true,
           },
@@ -228,12 +229,12 @@ call `.activate()` on the element once you've
          * must be called after initialization to start listening for push
          * messages.
          *
-         * @param {ServiceWorkerRegistration} swreg the custom service worker registration with which to activate
+         * @param {ServiceWorkerRegistration=}  swreg the custom service worker registration with which to activate
          */
         activate: function(swreg) {
           this.statusKnown = false;
           this.active = false;
-          this.token = "";
+          this.token = null;
           if (this.app) {
             this.messaging = this.app.messaging();
             if (swreg) {
@@ -244,7 +245,7 @@ call `.activate()` on the element once you've
             this.messaging = null;
             this.statusKnown = false;
             this.active = false;
-            this.token = "";
+            this.token = null;
             return;
           }
         },
@@ -255,7 +256,7 @@ call `.activate()` on the element once you've
 
         _bootstrapApp: function(app, customSw) {
           if (app && !customSw) {
-            this.activate(null);
+            this.activate();
           }
         },
       });
