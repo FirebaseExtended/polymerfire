@@ -18,13 +18,13 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "polymer/polymer#^2.0.0-rc.3",
+    "polymer": "Polymer/polymer#^2.0.0-rc.3",
     "firebase": ">= 3.5.1 < 4.0",
     "app-storage": "PolymerElements/app-storage#2.0-preview"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#2.0-preview",
-    "note-app-elements": "polymerlabs/note-app-elements#2.0-preview",
+    "note-app-elements": "PolymerLabs/note-app-elements#2.0-preview",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0-rc.4",
     "web-component-tester": "Polymer/web-component-tester#^6.0.0-prerelease.6"
   },
@@ -37,7 +37,7 @@
       },
       "devDependencies": {
         "iron-component-page": "PolymerElements/iron-component-page#^1.0",
-        "note-app-elements": "polymerlabs/note-app-elements",
+        "note-app-elements": "PolymerLabs/note-app-elements",
         "web-component-tester": "^4.0.0",
         "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
       }
