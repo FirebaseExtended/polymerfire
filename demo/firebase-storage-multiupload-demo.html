@@ -144,7 +144,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         deleteFile(e) {
-          this.$$('#ref-' + e.target.value).destroy().then(function(d) {
+          this.$$('#ref-' + e.target.value).delete().then(function(d) {
             console.log(d)
           })
         },

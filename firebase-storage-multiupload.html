@@ -53,11 +53,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         auto: {
           type: Boolean,
           value: false
-        },
-
-        forceUnique: {
-          type: Boolean,
-          value: false
         }
       },
 
@@ -131,7 +126,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         files = files && typeof files === 'object' && files.name ? [files] : files;
         if (files && files.length > 0) {
           for (var i = 0; i < files.length; i++) {
-            var uploadTask = this._putFirebaseFile(path, files[i], this.metadata ? this.metadata : files[i].metadata);
+            var uploadTask = this.__put(path, files[i], this.metadata ? this.metadata : files[i].metadata);
             uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, function(snapshot) {}, function(error) {
               this.fire('error', error, { bubble: false});
             }.bind(this));

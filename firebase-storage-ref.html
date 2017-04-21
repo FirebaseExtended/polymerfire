@@ -113,10 +113,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       /**
       * @override
       */
-      destroy: function() {
-        return this._putFirebaseFile().then(function() {
+      delete: function() {
+        return this.__put().then(function() {
           return this.reset();
         }.bind(this));
+      },
+
+      /**
+      * @override
+      */
+      put: function(file, metadata) {
+        return this.__put(null, file, metadata);
       },
 
       /**
