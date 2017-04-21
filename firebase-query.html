@@ -180,7 +180,7 @@ Polymer({
         },
 
         /**
-         * @override
+         *
          */
         memoryPathToStoragePath: function(path) {
           var storagePath = this.path;
@@ -200,7 +200,7 @@ Polymer({
         },
 
         /**
-         * @override
+         *
          */
         storagePathToMemoryPath: function(storagePath) {
           var path = 'data';
@@ -221,7 +221,7 @@ Polymer({
         },
 
         /**
-         * @override
+         *
          */
         setStoredValue: function(storagePath, value) {
           if (storagePath === this.path || /\$key$/.test(storagePath)) {
@@ -277,7 +277,7 @@ Polymer({
         },
 
         /**
-         * `@override`
+         * 
          */
 
         __pathChanged: function(path, oldPath) {

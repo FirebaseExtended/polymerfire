@@ -67,8 +67,14 @@ call `.activate()` on the element once you've
   <script>
     (function() {
       var stateMap = {};
-
-      function applyAll(app, method) {
+      
+      /**
+       *
+       * @param {Object} app
+       * @param {string} method
+       * @param {...*} var_args
+      */
+      function applyAll(app, method, var_args) {
         var args = Array.prototype.slice.call(arguments, 2);
         stateMap[app.name].instances.forEach(function(el) {
           el[method].apply(el, args);
@@ -134,7 +140,7 @@ call `.activate()` on the element once you've
            */
           token: {
             type: String,
-            value: null,
+            value: "",
             notify: true,
             readOnly: true,
           },
@@ -227,7 +233,7 @@ call `.activate()` on the element once you've
         activate: function(swreg) {
           this.statusKnown = false;
           this.active = false;
-          this.token = null;
+          this.token = "";
           if (this.app) {
             this.messaging = this.app.messaging();
             if (swreg) {
@@ -238,7 +244,7 @@ call `.activate()` on the element once you've
             this.messaging = null;
             this.statusKnown = false;
             this.active = false;
-            this.token = null;
+            this.token = "";
             return;
           }
         },
@@ -249,7 +255,7 @@ call `.activate()` on the element once you've
 
         _bootstrapApp: function(app, customSw) {
           if (app && !customSw) {
-            this.activate();
+            this.activate(null);
           }
         },
       });
