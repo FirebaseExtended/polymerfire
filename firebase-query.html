@@ -179,9 +179,6 @@ Polymer({
           return [];
         },
 
-        /**
-         * @override
-         */
         memoryPathToStoragePath: function(path) {
           var storagePath = this.path;
 
@@ -199,9 +196,6 @@ Polymer({
           return storagePath;
         },
 
-        /**
-         * @override
-         */
         storagePathToMemoryPath: function(storagePath) {
           var path = 'data';
 
@@ -220,9 +214,6 @@ Polymer({
           return path;
         },
 
-        /**
-         * @override
-         */
         setStoredValue: function(storagePath, value) {
           if (storagePath === this.path || /\$key$/.test(storagePath)) {
             return Promise.resolve();
@@ -276,15 +267,11 @@ Polymer({
           return query;
         },
 
-        /**
-         * `@override`
-         */
-
         __pathChanged: function(path, oldPath) {
           // we only need to reset the data if the path is null (will also trigged when this element initiates)
           // When path changes and is not null, it triggers a ref change (via __computeRef(db,path)), which then triggers a __queryChanged setting data to zeroValue
 
-          if (path == null ) {
+          if (path == null) {
             this.syncToMemory(function() {
               this.data = this.zeroValue;
             });

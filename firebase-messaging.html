@@ -68,7 +68,13 @@ call `.activate()` on the element once you've
     (function() {
       var stateMap = {};
 
-      function applyAll(app, method) {
+      /**
+       *
+       * @param {Object} app
+       * @param {string} method
+       * @param {...*} var_args
+      */
+      function applyAll(app, method, var_args) {
         var args = Array.prototype.slice.call(arguments, 2);
         stateMap[app.name].instances.forEach(function(el) {
           el[method].apply(el, args);
@@ -131,6 +137,7 @@ call `.activate()` on the element once you've
            * The current registration token for this session. Save this
            * somewhere server-accessible so that you can target push messages
            * to this device.
+           * @type {String}
            */
           token: {
             type: String,
@@ -222,7 +229,7 @@ call `.activate()` on the element once you've
          * must be called after initialization to start listening for push
          * messages.
          *
-         * @param {ServiceWorkerRegistration} swreg the custom service worker registration with which to activate
+         * @param {ServiceWorkerRegistration=}  swreg the custom service worker registration with which to activate
          */
         activate: function(swreg) {
           this.statusKnown = false;
