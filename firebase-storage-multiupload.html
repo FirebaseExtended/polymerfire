@@ -39,6 +39,28 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     Polymer({
       is: 'firebase-storage-multiupload',
 
+      properties: {
+        files: {
+          type: Array
+        },
+
+        uploadTasks: {
+          type: Array,
+          notify: true,
+          value: []
+        },
+
+        auto: {
+          type: Boolean,
+          value: false
+        },
+
+        forceUnique: {
+          type: Boolean,
+          value: false
+        }
+      },
+
       behaviors: [
         Polymer.FirebaseStorageBehavior
       ],
@@ -56,6 +78,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       get zeroValue() {
         return [];
       },
+
+      observers: [
+        '__filesChanged(files, auto)'
+      ],
 
       /**
       * Update the path and write this.files to that new location.
@@ -87,42 +113,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       /**
       * @override
       */
-      cancel: function(i) {
-        return new Promise(function(resolve, reject){
-          console.log(i)
-          var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
-          resolve(this.tasks[x].cancel());
-        }.bind(this));
-      },
-
-      /**
-      * @override
-      */
-      resume: function(i) {
-
-        return new Promise(function(resolve, reject){
-          var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
-          resolve(this.tasks[x].resume());
-        }.bind(this));
-      },
-
-      /**
-      * @override
-      */
-      pause: function(i) {
-        return new Promise(function(resolve, reject){
-          var x = isNaN(parseInt(i, 10)) ? 0 : parseInt(i, 10);
-          resolve(this.tasks[x].pause());
-        }.bind(this));
-      },
-
-      /**
-      * @override
-      */
       reset: function() {
         this.path = null;
-        this.files = this.zeroValue;
-        this.uploadedFiles = this.zeroValue;
+        this.clearTasks();
         return Promise.resolve();
       },
 
@@ -130,60 +123,34 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       * @override
       */
       clearTasks: function() {
-        this.files = this.zeroValue;
-        this.uploadedFiles = this.zeroValue;
+        this.uploadTasks = this.zeroValue;
       },
 
-      /**
-      * @override
-      */
-      destroy: function() {
-        return this._putFirebaseFile().then(function() {
-          return this.reset();
-        }.bind(this));
-      },
-
-      /**
-      * @override
-      */
-      getDownloadUrl: function(path) {
-        if (path) {
-          return this.storage.ref(path).getDownloadURL();
+      _putMultipleFirebaseFiles: function(path, files) {
+        this._log('Putting Multiple Firebase files at',  path ? this.path + '/' + path : this.path);
+        files = files && typeof files === 'object' && files.name ? [files] : files;
+        if (files && files.length > 0) {
+          for (var i = 0; i < files.length; i++) {
+            var uploadTask = this._putFirebaseFile(path, files[i], this.metadata ? this.metadata : files[i].metadata);
+            uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, function(snapshot) {}, function(error) {
+              this.fire('error', error, { bubble: false});
+            }.bind(this));
+            this.push('uploadTasks', uploadTask);
+          }
         }
-        return this.storage.ref.getDownloadURL();
       },
 
-      /**
-      * @override
-      */
-      setPathFromUrl: function(url) {
-        if (url) {
-          this.path = this.getPathFromUrl(url);
-          return new Promise.resolve();
+      __filesChanged: function(files, auto) {
+        if (auto) {
+          this._putMultipleFirebaseFiles(null, files);
         }
-        return new Promise.resolve();
       },
 
-      /**
-      * @override
-      */
-      getPathFromUrl: function(url) {
-        return url ? this.storage.refFromURL(url) : null;
+      __pathChanged: function(path, oldPath) {
+        if (oldPath != null) {
+          this.clearTasks();
+        }
       },
-
-      /**
-      * @override
-      */
-      getMetadata: function() {
-        return this.storage.ref.getMetadata();
-      },
-
-      /**
-      * @override
-      */
-      setMetadata: function(metadata) {
-        return this.storage.ref.updateMetadata(metadata);
-      }
     });
   })()
 

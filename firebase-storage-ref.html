@@ -1,0 +1,160 @@
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase-storage-behavior.html">
+<script>
+  (function(){
+    'use strict';
+
+    /**
+    * The firebase-storage element is an easy way to interact with a firebase
+    * storage as an object and expose it to the Polymer databinding system.
+    *
+    * For example:
+    *
+    *     <firebase-storage-multiupload
+    *       path="/users/{{userId}}/files/{{filepath}}"
+    *       files="[[fileArray]]"
+    *       upload-tasks="{{uploadTasks}}">
+    *     </firebase-storage-multiupload>
+    *
+    * This fetches the `fileArray` object, which is usually an array of Files,
+    * or a FileList, which are then automatically uploaded to
+    * `/users/${userId}/files/${filepath}` and then creates an array of upload
+    * tasks that are exposed through the Polymer databinding system via the
+    * `uploadTasks`. Changes to `fileArray` will likewise create a new set of
+    * uploads, which creates a new set of tasks, which are appended to the
+    * `uploadTasks`.
+    *
+    * `<firebase-storage>` needs some information about how to talk to Firebase.
+    * Set this configuration by adding a `<firebase-app>` element anywhere in your
+    * app.
+    */
+    Polymer({
+      is: 'firebase-storage-ref',
+
+      properties: {
+        downloadUrl: {
+          type: String,
+          notify: true
+        },
+        metadata: {
+          type: Object,
+          notify: true
+        }
+      },
+
+      behaviors: [
+        Polymer.FirebaseStorageBehavior
+      ],
+
+      /**
+      * @override
+      */
+      get isNew() {
+        return !this.path;
+      },
+
+      /**
+      * @override
+      */
+      get zeroValue() {
+        return [];
+      },
+
+      __pathChanged: function(path) {
+        this.getDownloadURL(path).then(function(downloadUrl) {
+          this.downloadUrl = downloadUrl;
+        }.bind(this)).catch(function(error) {
+          this.fire('error', error, { bubble: false});
+        }.bind(this));
+
+        this.getMetadata(path).then(function(metadata) {
+          this.metadata = metadata;
+        }.bind(this)).catch(function(error) {
+          this.fire('error', error, { bubble: false});
+        }.bind(this));
+
+      },
+
+
+      /**
+      * @override
+      */
+      reset: function() {
+        this.path = null;
+        return Promise.resolve();
+      },
+
+      /**
+      * @override
+      */
+      setPathFromUrl: function(url) {
+        if (url) {
+          this.path = this.getPathFromUrl(url);
+          return new Promise.resolve();
+        }
+        return new Promise.resolve();
+      },
+
+      /**
+      * @override
+      */
+      getPathFromUrl: function(url) {
+        return url ? this.storage.refFromURL(url) : null;
+      },
+
+      /**
+      * @override
+      */
+      destroy: function() {
+        return this._putFirebaseFile().then(function() {
+          return this.reset();
+        }.bind(this));
+      },
+
+      /**
+      * @override
+      */
+      getDownloadURL: function(path) {
+        if (path) {
+          return this.storage.ref(path).getDownloadURL();
+        } else if (this.ref) {
+          return this.ref.getDownloadURL();
+        }
+        return new Promise(function(resolve, reject) {resolve();});
+      },
+
+      /**
+      * @override
+      */
+      getMetadata: function(path) {
+        if (path) {
+          return this.storage.ref(path).getMetadata();
+        } else if (this.ref) {
+          return this.ref.getMetadata();
+        }
+        return new Promise(function(resolve, reject) {resolve();});
+      },
+
+      /**
+      * @override
+      */
+      setMetadata: function(metadata, path) {
+        if (path) {
+          return this.storage.ref(path).updateMetadata(metadata);
+        } else if (this.ref) {
+          return this.ref.updateMetadata(metadata);
+        }
+        return new Promise(function(resolve, reject) {resolve();});
+      }
+    });
+  })()
+
+</script>

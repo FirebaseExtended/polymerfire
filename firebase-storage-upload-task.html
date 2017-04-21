@@ -1,0 +1,139 @@
+<!--
+@license
+Copyright 2016 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="firebase-storage-behavior.html">
+<script>
+  (function(){
+    'use strict';
+
+    /**
+    * The firebase-storage element is an easy way to interact with a firebase
+    * storage as an object and expose it to the Polymer databinding system.
+    *
+    * For example:
+    *
+    *     <firebase-storage-multiupload
+    *       path="/users/{{userId}}/files/{{filepath}}"
+    *       files="[[fileArray]]"
+    *       upload-tasks="{{uploadTasks}}">
+    *     </firebase-storage-multiupload>
+    *
+    * This fetches the `fileArray` object, which is usually an array of Files,
+    * or a FileList, which are then automatically uploaded to
+    * `/users/${userId}/files/${filepath}` and then creates an array of upload
+    * tasks that are exposed through the Polymer databinding system via the
+    * `uploadTasks`. Changes to `fileArray` will likewise create a new set of
+    * uploads, which creates a new set of tasks, which are appended to the
+    * `uploadTasks`.
+    *
+    * `<firebase-storage>` needs some information about how to talk to Firebase.
+    * Set this configuration by adding a `<firebase-app>` element anywhere in your
+    * app.
+    */
+    Polymer({
+      is: 'firebase-storage-upload-task',
+
+      properties: {
+        task: {
+          type: Object,
+          value: null,
+          observer: '_taskChanged'
+        },
+        bytesTransferred: {
+          type: Number,
+          notify: true
+        },
+        totalBytes: {
+          type: Number,
+          notify: true
+        },
+        state: {
+          type: Object,
+          notify: true
+        },
+        downloadUrl: {
+          type: String,
+          notify: true
+        },
+        metadata: {
+          type: Object,
+          notify: true
+        },
+        path: {
+          type: String,
+          notify: true
+        },
+        snapshot: {
+          type: Object,
+          notify: true
+        }
+      },
+
+      behaviors: [
+        Polymer.FirebaseStorageBehavior
+      ],
+
+      /**
+      * @override
+      */
+      get zeroValue() {
+        return [];
+      },
+
+      _updateProperties: function(snapshot) {
+        this.state = snapshot.state;
+        this.totalBytes = snapshot.totalBytes;
+        this.bytesTransferred = snapshot.bytesTransferred;
+        this.downloadUrl = snapshot.downloadURL;
+        this.metadata = snapshot.metadata;
+        this.path = snapshot.ref.fullPath;
+        this.snapshot = snapshot;
+      },
+
+      _taskChanged: function(task) {
+        this._updateProperties(task.snapshot);
+        task.on(firebase.storage.TaskEvent.STATE_CHANGED,
+          this._updateProperties.bind(this), function(error) {
+            this._updateProperties(task.snapshot)
+            this.fire('error', error, { bubble: false});
+          }.bind(this), function() {
+            this._updateProperties(task.snapshot)
+          }.bind(this));
+      },
+
+      /**
+      * @override
+      */
+      cancel: function() {
+        return this.task ? this.task.cancel() : new Promise(function(resolve, reject) {
+          reject('No task included')
+        });
+      },
+
+      /**
+      * @override
+      */
+      resume: function() {
+        return this.task ? this.task.resume() : new Promise(function(resolve, reject) {
+          reject('No task included')
+        });
+      },
+
+      /**
+      * @override
+      */
+      pause: function() {
+        return this.task ? this.task.pause() : new Promise(function(resolve, reject) {
+          reject('No task included')
+        });
+      }
+    });
+  })()
+
+</script>

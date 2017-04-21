@@ -27,62 +27,70 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         id="fs"
         path="/users/{{user.uid}}/files"
         files="[[files]]"
-        uploaded-files="{{uploadedFiles}}"
+        upload-tasks="{{uploadedFiles}}"
         on-error="catchError"
+        force-unique
         auto>
       </firebase-storage-multiupload>
 
-      <firebase-storage-multiupload
-        id="fs2"
-        path="/users/{{user.uid}}/file"
-        files="[[file]]"
-        uploaded-files="{{uploadedFile}}"
-        on-error="catchError"
-        >
-      </firebase-storage-multiupload>
-
-      <firebase-storage-multiupload
-        id="fsd"
-        on-error="catchError">
-      </firebase-storage-multiupload>
-
       <input id="file-uploader" type="file" on-change="onFileUpload" multiple /> <br/>
-      <input id="file-uploader2" type="file" on-change="onFileUpload2" />
-
-      <template is="dom-repeat" items="{{uploadedFile}}">
-        {{item.bytesTransferred}}<br/>
-        <template is="dom-if" if="{{item.downloadURL}}">
-          <a href="{{item.downloadURL}}">
-            {{item.downloadURL}}
-          </a><br/>
-          <button on-tap="deleteFile" value="{{item.ref.fullPath}}">Delete</button>
-        </template>
-        <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
-        {{item.ref.fullPath}} <br/>
-        {{item.state}} <br/>
-        {{item.metadata.contentType}} <br/>
-        <button on-tap="cancel" value="{{index}}">Cancel</button><br/>
-        <button on-tap="resume" value="{{index}}">resume</button><br/>
-        <button on-tap="pause" value="{{index}}">pause</button><br/>
-        <br/>
-      </template>
       <hr/>
-      <template is="dom-repeat" items="{{uploadedFiles}}">
-        {{item.bytesTransferred}}<br/>
-        <template is="dom-if" if="{{item.downloadURL}}">
-          <a href="{{item.downloadURL}}">
-            {{item.downloadURL}}
-          </a><br/>
-          <button on-tap="deleteFile" value="{{item.ref.fullPath}}">Delete</button>
-        </template>
-        <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
-        {{item.ref.fullPath}} <br/>
-        {{item.state}} <br/>
-        {{item.metadata.contentType}} <br/>
-        <button on-tap="cancel" value="{{index}}">Cancel</button><br/>
-        <button on-tap="resume" value="{{index}}">resume</button><br/>
-        <button on-tap="pause" value="{{index}}">pause</button><br/>
-        <br/>
+      <template is="dom-repeat" items="[[uploadedFiles]]">
+        <div style="padding: 20px">
+          <firebase-storage-upload-task
+              task="[[item]]"
+              id="task-[[index]]"
+              bytes-transferred="{{item.bytesTransferred}}"
+              total-bytes="{{item.totalBytes}}"
+              state="{{item.state}}"
+              download-url="{{item.downloadUrl}}"
+              metadata="{{item.metadata}}"
+              path="{{item.path}}"></firebase-storage-upload-task>
+
+
+
+          path from snapshot: {{item.snapshot.ref.fullPath}} <br/>
+          path from upload-task: {{item.path}} <br/>
+          state: {{item.state}} <br/>
+          metadata-contentType: {{item.metadata.contentType}} <br/>
+          <br/>
+
+          <template is="dom-if" if="[[!isEqual(item.state, 'success')]]">
+            <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
+          </template>
+
+          <br/>
+
+
+          <template is="dom-if" if="{{isEqual(item.state, 'success')}}">
+
+            <firebase-storage-ref
+              path="{{item.path}}"
+              id="ref-[[index]]"
+              metadata="{{item.refMetadata}}"
+              download-url="{{item.refDownloadUrl}}"></firebase-storage-ref>
+
+            <a href="{{item.refDownloadUrl}}">
+              {{item.refDownloadUrl}}
+            </a><br/>
+            <button on-tap="download" value="{{index}}">Download</button>
+            <button on-tap="deleteFile" value="{{index}}">Delete</button>
+          </template>
+
+          <template is="dom-if" if="[[!isEqual(item.state, 'success')]]">
+
+
+            <template is="dom-if" if="[[isEqual(item.state, 'running')]]">
+              <button on-tap="cancel" value="{{index}}">Cancel</button>
+              <button on-tap="pause" value="{{index}}">pause</button>
+            </template>
+
+            <template is="dom-if" if="[[isEqual(item.state, 'paused')]]">
+              <button on-tap="resume" value="{{index}}">resume</button>
+            </template>
+          </template>
+          <br/>
+        </div>
       </template>
     </template>
     <paper-toast id="toaster"></paper-toast>
@@ -118,30 +126,42 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         cancel(e) {
-          this.$$('#fs').cancel(e.target.value);
+          this.$$('#task-' + e.target.value).cancel();
         },
 
         resume(e) {
-          this.$$('#fs').resume(e.target.value);
+          this.$$('#task-' + e.target.value).resume();
         },
 
         pause(e) {
-          this.$$('#fs').pause(e.target.value);
+          this.$$('#task-' + e.target.value).pause();
+        },
+
+        download(e) {
+          this.$$('#ref-' + e.target.value).getDownloadURL().then(function(d) {
+            console.log(d)
+          })
         },
 
         deleteFile(e) {
-          this.$$('#fsd').path = e.target.value;
-          this.$$('#fsd').destroy().then(function(x){
-            this.$$('#toaster').show({
-              text: 'Successfully deleted ' + e.target.value
-            });
-          }.bind(this)).catch(function(error){
-            console.log(error);
-            this.$$('#toaster').show({
-              text: error.message
-            });
+          this.$$('#ref-' + e.target.value).destroy().then(function(d) {
+            console.log(d)
           })
         },
+
+        // deleteFile(e) {
+        //   this.$$('#fsd').path = e.target.value;
+        //   this.$$('#fsd').destroy().then(function(x){
+        //     this.$$('#toaster').show({
+        //       text: 'Successfully deleted ' + e.target.value
+        //     });
+        //   }.bind(this)).catch(function(error){
+        //     console.log(error);
+        //     this.$$('#toaster').show({
+        //       text: error.message
+        //     });
+        //   })
+        // },
 
         _uploadTasksChanged(uploadTasks) {
           console.log(uploadTasks);
@@ -163,6 +183,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         isImage(c) {
           return c && c.indexOf('image') === 0;
+        },
+
+        isEqual(a, b) {
+          return a === b;
         },
 
         signIn: function() {
