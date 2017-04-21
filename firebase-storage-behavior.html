@@ -46,7 +46,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         return [];
       },
 
-      _putFirebaseFile: function(path, file, metadata) {
+      __put: function(path, file, metadata) {
         this._log('Putting Firebase file at', path ? this.path + '/' + path : this.path);
         if (file) {
           var newFilename = this.forceUnique ? Date.now().toString() + '-' + file.name : file.name;
