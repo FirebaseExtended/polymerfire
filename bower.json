@@ -18,7 +18,7 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "polymer/polymer#2.0.0-rc.3",
+    "polymer": "polymer/polymer#^2.0.0-rc.3",
     "firebase": ">= 3.5.1 < 4.0",
     "app-storage": "PolymerElements/app-storage#2.0-preview"
   },
