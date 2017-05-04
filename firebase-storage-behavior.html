@@ -16,19 +16,26 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     /** @polymerBehavior Polymer.FirebaseStorageBehavior */
     Polymer.FirebaseStorageBehaviorImpl = {
       properties: {
+        /**
+          * Firebase storage instance
+          *
+          */
         storage : {
           type: Object,
           computed: '__computeStorage(app)'
         },
 
-
+        /**
+          * Firebase storage ref instance
+          *
+          */
         ref: {
           type: Object,
           computed: '__computeRef(storage, path)'
         },
 
         /**
-         * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
+         * Path to a Firebase storage root or endpoint. N.B. `path` is case sensitive.
          */
         path: {
           type: String,
@@ -36,6 +43,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           value: null
         },
 
+        /**
+          * Forces every upload to be a unique file by adding a date of upload at the start of the file.
+          *
+          */
         forceUnique: {
           type: Boolean,
           value: false

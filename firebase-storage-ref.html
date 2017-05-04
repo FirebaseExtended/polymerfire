@@ -13,24 +13,21 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     'use strict';
 
     /**
-    * The firebase-storage element is an easy way to interact with a firebase
+    * The firebase-storage-ref element is an easy way to interact with a firebase
     * storage as an object and expose it to the Polymer databinding system.
     *
     * For example:
     *
-    *     <firebase-storage-multiupload
-    *       path="/users/{{userId}}/files/{{filepath}}"
-    *       files="[[fileArray]]"
-    *       upload-tasks="{{uploadTasks}}">
-    *     </firebase-storage-multiupload>
+    *     <firebase-storage-ref
+    *       path="{{path}}"
+    *       metadata="{{metadata}}"
+    *       download-url="{{downloadUrl}}">
+    *     </firebase-storage-ref>
     *
-    * This fetches the `fileArray` object, which is usually an array of Files,
-    * or a FileList, which are then automatically uploaded to
-    * `/users/${userId}/files/${filepath}` and then creates an array of upload
-    * tasks that are exposed through the Polymer databinding system via the
-    * `uploadTasks`. Changes to `fileArray` will likewise create a new set of
-    * uploads, which creates a new set of tasks, which are appended to the
-    * `uploadTasks`.
+    * This fetches file associated within the `path` attribute from the firebase storage
+    * and produces the metadata and the download url associated with it.
+    * It also exposes several firebase storage methods to manipulate and get
+    * additional data from it.
     *
     * `<firebase-storage>` needs some information about how to talk to Firebase.
     * Set this configuration by adding a `<firebase-app>` element anywhere in your
@@ -40,14 +37,25 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       is: 'firebase-storage-ref',
 
       properties: {
+        /**
+          * The url of the file for download
+          */
         downloadUrl: {
           type: String,
           notify: true
         },
+
+        /**
+          * The metadata of the file
+          */
         metadata: {
           type: Object,
           notify: true
         },
+
+        /**
+          * The upload task of the file when you use the put method.
+          */
         uploadTask: {
           type: Object,
           notify: true
@@ -89,7 +97,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
 
       /**
-      * @override
+      *  Resets this element's path
       */
       reset: function() {
         this.path = null;
@@ -97,7 +105,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Sets the path from url
       */
       setPathFromUrl: function(url) {
         if (url) {
@@ -108,14 +116,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Get's the path from url
       */
       getPathFromUrl: function(url) {
         return url ? this.storage.refFromURL(url) : null;
       },
 
       /**
-      * @override
+      *  Deletes the file associated in the firebase storage path
       */
       delete: function() {
         return this.__put().then(function() {
@@ -124,7 +132,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Stores a new single file inside this path
       */
       put: function(file, metadata) {
         this.uploadTask = this.__put(null, file, metadata);
@@ -132,7 +140,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Stores a string in a given format
       */
       putString: function(data, format, metadata) {
         this.uploadTask = this.__put(null, data, format, metadata);
@@ -140,7 +148,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Get the download url of the file
       */
       getDownloadURL: function(path) {
         if (path) {
@@ -152,7 +160,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Get the metadata of the file
       */
       getMetadata: function(path) {
         if (path) {
@@ -164,7 +172,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Sets the metadata of the file
       */
       setMetadata: function(metadata, path) {
         if (path) {

@@ -13,24 +13,25 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     'use strict';
 
     /**
-    * The firebase-storage element is an easy way to interact with a firebase
-    * storage as an object and expose it to the Polymer databinding system.
+    * The firebase-storage-upload-task element is an easy way to track upload tasks made
+    * by the firebase-storage-multiupload or the firebase-storage-ref
     *
     * For example:
     *
-    *     <firebase-storage-multiupload
-    *       path="/users/{{userId}}/files/{{filepath}}"
-    *       files="[[fileArray]]"
-    *       upload-tasks="{{uploadTasks}}">
-    *     </firebase-storage-multiupload>
+    *     <file-storage-upload-task
+    *       task="[[task]]"
+    *       bytes-transferred="{{bytesTransferred}}"
+    *       total-bytes="{{totalBytes}}"
+    *       state="{{state}}"
+    *       download-url="{{downloadUrl}}"
+    *       metadata="{{metadata}}"
+    *       path="{{path}}"></file-storage-upload-task>
     *
-    * This fetches the `fileArray` object, which is usually an array of Files,
-    * or a FileList, which are then automatically uploaded to
-    * `/users/${userId}/files/${filepath}` and then creates an array of upload
-    * tasks that are exposed through the Polymer databinding system via the
-    * `uploadTasks`. Changes to `fileArray` will likewise create a new set of
-    * uploads, which creates a new set of tasks, which are appended to the
-    * `uploadTasks`.
+    * It has to get the upload task from either the firebase-storage-multiupload or firebase-storage-ref
+    * and produces data like bytes-transferred, total-bytes, states, etc...
+    *
+    * You can also use this element to cancel, pause, and resume a task.
+    *
     *
     * `<firebase-storage>` needs some information about how to talk to Firebase.
     * Set this configuration by adding a `<firebase-app>` element anywhere in your
@@ -40,35 +41,66 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       is: 'firebase-storage-upload-task',
 
       properties: {
+        /**
+        *  The upload task that is being tracked
+        */
         task: {
           type: Object,
           value: null,
           observer: '_taskChanged'
         },
+
+        /**
+        *  Number of bytes transferred
+        */
         bytesTransferred: {
           type: Number,
           notify: true
         },
+
+        /**
+        *  Total number of bytes of the file
+        */
         totalBytes: {
           type: Number,
           notify: true
         },
+
+        /**
+        *  The upload task's state
+        */
         state: {
           type: Object,
           notify: true
         },
+
+        /**
+        *  The download url of the file
+        */
         downloadUrl: {
           type: String,
           notify: true
         },
+
+        /**
+        *  The metadata of the file
+        */
         metadata: {
           type: Object,
           notify: true
         },
+
+        /**
+        *  The firebase storage path of the file
+        */
         path: {
           type: String,
           notify: true
         },
+
+        /**
+        *  The current snapshot of the task
+        */
         snapshot: {
           type: Object,
           notify: true
@@ -108,7 +140,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Cancels the upload
       */
       cancel: function() {
         return this.task ? this.task.cancel() : new Promise(function(resolve, reject) {
@@ -117,7 +149,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Resumes a paused upload
       */
       resume: function() {
         return this.task ? this.task.resume() : new Promise(function(resolve, reject) {
@@ -126,7 +158,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       /**
-      * @override
+      *  Pauses the upload
       */
       pause: function() {
         return this.task ? this.task.pause() : new Promise(function(resolve, reject) {
