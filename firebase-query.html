@@ -293,18 +293,11 @@ Polymer({
           }
 
           if (query) {
-            /* The 'value' event doesn't order the data, so we have to
-             * revert to the slow path if ordering is requested
-             */
-            if (this.orderByChild || this.orderByValue) {
-              query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
-            } else {
-              /* Don't use query.once() as we need to be able to cancel
-               * the callback if the query changes
-               */
-              query.on('value', this.__onFirebaseValue, this.__onError, this);
-            }
 
+            /* Don't use query.once() as we need to be able to cancel
+              * the callback if the query changes
+              */
+            query.on('value', this.__onFirebaseValue, this.__onError, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
             query.on('child_moved', this.__onFirebaseChildMoved, this.__onError, this);
@@ -326,19 +319,12 @@ Polymer({
           this.query.off('value', this.__onFirebaseValue, this);
 
           if (snapshot.hasChildren()) {
-            var items = snapshot.val();
-            var keys = Object.keys(items);
-            var data = [];
-
-            for (var i = 0, len = keys.length; i < len; i++) {
-              var key = keys[i];
-              var value = this.__valueWithKey(key, items[key]);
-
-              this._log('Firebase value added:', key, value);
-
+            snapshot.forEach(function(childSnapshot) {
+              var key = childSnapshot.key;
+              var value = this.__valueWithKey(key, childSnapshot.val())
               this.__map[key] = value;
-              data.push(value);
-            }
+              this.push('data', value)
+            }.bind(this))
 
             this.set('data', data);
           }
