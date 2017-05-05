@@ -319,11 +319,12 @@ Polymer({
           this.query.off('value', this.__onFirebaseValue, this);
 
           if (snapshot.hasChildren()) {
+            var data = [];
             snapshot.forEach(function(childSnapshot) {
               var key = childSnapshot.key;
               var value = this.__valueWithKey(key, childSnapshot.val())
               this.__map[key] = value;
-              this.push('data', value)
+              data.push(value)
             }.bind(this))
 
             this.set('data', data);
