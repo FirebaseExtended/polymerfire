@@ -10,6 +10,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 <link rel="import" href="firebase-common-behavior.html">
 <link rel="import" href="firebase-database-script.html">
 <script>
+
 (function() {
   'use strict';
 
@@ -25,6 +26,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         type: Object,
         computed: '__computeRef(db, path, disabled)',
         observer: '__refChanged'
+
       },
 
       /**
