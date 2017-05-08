@@ -293,11 +293,16 @@ Polymer({
           }
 
           if (query) {
+            /* We want the value callback to batch load the initial data,
+             * then let child_added take over for subsequent changes.
+             */
+            this.__initialLoadDone = false;
 
             /* Don't use query.once() as we need to be able to cancel
               * the callback if the query changes
               */
             query.on('value', this.__onFirebaseValue, this.__onError, this);
+            query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
             query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
             query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
             query.on('child_moved', this.__onFirebaseChildMoved, this.__onError, this);
@@ -316,8 +321,6 @@ Polymer({
         },
 
         __onFirebaseValue: function(snapshot) {
-          this.query.off('value', this.__onFirebaseValue, this);
-
           if (snapshot.hasChildren()) {
             var data = [];
             snapshot.forEach(function(childSnapshot) {
@@ -330,14 +333,15 @@ Polymer({
             this.set('data', data);
           }
 
-          /* Now start listening for changes */
-          this.query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
+          /* Now let child_added deal with subsequent changes */
+          this.query.off('value', this.__onFirebaseValue, this);
+          this.__initialLoadDone = true;
         },
 
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
           var key = snapshot.key;
 
-          if (!this.__map[key]) {
+          if (this.__initialLoadDone) {
             var value = snapshot.val();
             var previousChildIndex = this.__indexFromKey(previousChildKey);
 
