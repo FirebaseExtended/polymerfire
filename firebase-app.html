@@ -8,6 +8,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="firebase-app-script.html">
+<!-- TODO(cdata): Remove all of the imports below this line when it is possible
+     to lazy load Firebase scripts alongside Custom Elements v1 upgrade order -->
+<link rel="import" href="firebase-database-script.html">
+<link rel="import" href="firebase-auth-script.html">
+<link rel="import" href="firebase-storage-script.html">
+<link rel="import" href="firebase-messaging-script.html">
 <dom-module id="firebase-app">
   <script>
     (function() {
@@ -116,6 +122,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             }
 
             firebase.initializeApp.apply(firebase, init);
+            this.fire('firebase-app-initialized');
           } else {
             return null;
           }

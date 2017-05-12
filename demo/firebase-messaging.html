@@ -60,6 +60,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       window.addEventListener('WebComponentsReady', function() {
         if (navigator.serviceWorker) {
           navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(sw) {
+            var app = document.getElementById('app');
+
+            // Polymer 2.0 compat
+            if (Polymer.Element) {
+              app = app.parentNode;
+            }
+
             app.$.messaging.activate(sw);
           });
         }
@@ -70,32 +77,40 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     To actually test receipt of push messages, you will need to clone the demo and modify the
     <code>messagingSenderId</code> in this file and in <code>firebase-messaging-sw.js</code>
     in this directory.</p>
-    <template is="dom-bind" id="app">
-      <firebase-messaging id="messaging"
-        active="{{active}}"
-        token="{{token}}"
-        status-known="{{statusKnown}}"
-        last-message="{{lastMessage}}"
-        on-message="logit"
-        custom-sw>
-      </firebase-messaging>
-      <main>
-        <div hidden$="[[!statusKnown]]">
-          <button hidden$="[[active]]" on-click="requestMessaging">Request Notifications Permission</button>
-          <table id="table" hidden$="[[!active]]">
-            <tr><th>Token</th><td>[[token]]</td></tr>
-            <tr><th>Last&nbsp;Message</th><td><pre>[[json(lastMessage)]]</pre></td></tr>
-          </table>
+    <dom-bind>
+      <template is="dom-bind" id="app">
+        <firebase-messaging id="messaging"
+          active="{{active}}"
+          token="{{token}}"
+          status-known="{{statusKnown}}"
+          last-message="{{lastMessage}}"
+          on-message="logit"
+          custom-sw>
+        </firebase-messaging>
+        <main>
+          <div hidden$="[[!statusKnown]]">
+            <button hidden$="[[active]]" on-click="requestMessaging">Request Notifications Permission</button>
+            <table id="table" hidden$="[[!active]]">
+              <tr><th>Token</th><td>[[token]]</td></tr>
+              <tr><th>Last&nbsp;Message</th><td><pre>[[json(lastMessage)]]</pre></td></tr>
+            </table>
 
-          <h3>Message Log</h3>
-          <pre id="log" hidden$="[[!active]]"></pre>
-        </div>
-      </main>
-    </template>
+            <h3>Message Log</h3>
+            <pre id="log" hidden$="[[!active]]"></pre>
+          </div>
+        </main>
+      </template>
+    </dom-bind>
     <script>
       var app = document.getElementById('app');
+
+      // Polymer 2.0 compat
+      if (Polymer.Element) {
+        app = app.parentNode;
+      }
+
       app.requestMessaging = function() {
-        return app.$.messaging.requestPermission();
+        return this.$.messaging.requestPermission();
       }
 
       app.json = function(val) {
@@ -103,7 +118,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }
 
       app.logit = function(e) {
-        app.$.log.innerHTML = JSON.stringify(e.detail.message) + "\n" + app.$.log.innerHTML;
+        this.$.log.innerHTML = JSON.stringify(e.detail.message) + "\n" + app.$.log.innerHTML;
       }
     </script>
   </body>
