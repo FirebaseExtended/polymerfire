@@ -49,16 +49,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }
     },
 
-    /**
-     * @override
-     */
+
     get isNew() {
       return this.disabled || !this.__pathReady(this.path);
     },
 
-    /**
-     * @override
-     */
+
     get zeroValue() {
       return {};
     },
@@ -73,11 +69,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
      *     not given, a random key will be generated and used.
      * @return {Promise} A promise that resolves once this.data has been
      *     written to the new path.
-     * @override
+     *
      */
     saveValue: function(parentPath, key) {
       return new Promise(function(resolve, reject) {
-        var path;
+        var path = null;
 
         if (!this.app) {
           reject(new Error('No app configured!'));
@@ -102,26 +98,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }.bind(this));
     },
 
-    /**
-     * @override
-     */
     reset: function() {
       this.path = null;
       return Promise.resolve();
     },
 
-    /**
-     * @override
-     */
     destroy: function() {
       return this._setFirebaseValue(this.path, null).then(function() {
         return this.reset();
       }.bind(this));
     },
 
-    /**
-     * @override
-     */
     memoryPathToStoragePath: function(path) {
       var storagePath = this.path;
 
@@ -132,9 +119,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return storagePath;
     },
 
-    /**
-     * @override
-     */
     storagePathToMemoryPath: function(storagePath) {
       var path = 'data';
 
@@ -148,9 +132,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       return path;
     },
 
-    /**
-     * @override
-     */
     getStoredValue: function(path) {
       return new Promise(function(resolve, reject) {
         this.db.ref(path).once('value', function(snapshot) {
@@ -163,9 +144,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       }.bind(this));
     },
 
-    /**
-     * @override
-     */
     setStoredValue: function(path, value) {
       return this._setFirebaseValue(path, value);
     },

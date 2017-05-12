@@ -30,11 +30,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         /**
          * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
+         * @type {string|null}
          */
         path: {
           type: String,
-          observer: '__pathChanged',
-          value: null
+          value: null,
+          observer: '__pathChanged'
         },
 
         /**
@@ -52,6 +53,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         '__onlineChanged(online)'
       ],
 
+      /**
+       * Set the firebase value.
+       * @return {!firebase.Promise<void>}
+       */
       _setFirebaseValue: function(path, value) {
         this._log('Setting Firebase value at', path, 'to', value)
         var key = value && value.$key;
