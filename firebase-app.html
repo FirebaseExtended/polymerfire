@@ -121,7 +121,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           if (auto) {
             var fetchData = fetch('/__/firebase/init.json')
               .then(response => {
-                return response.json();
+                return response.blob();
               // firebase.initializeApp(response.json());
             }).catch(error => {
               console.error(error);
