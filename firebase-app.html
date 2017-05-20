@@ -113,11 +113,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           app: {
             type: Object,
             notify: true,
-            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId)'
+            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto)'
           }
         },
 
-        __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId) {
+        __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto) {
           if (auto) {
             var init = fetch('/__/firebase/init.json').then(response => {
               console.log(init);
