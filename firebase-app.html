@@ -123,23 +123,22 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               .then(response => {
                 return response.json()
                   .then(json => {
-                    apiKey = json.apiKey,
-                    authDomain = json.authDomain,
-                    databaseUrl = json.databaseURL,
-                    storageBucket = json.storageBucket,
-                    messagingSenderId = json.messagingSenderId,
-                    this.$.fire('firebase-auto-complete');
+                    apiKey = json.apiKey;
+                    authDomain = json.authDomain;
+                    databaseUrl = json.databaseURL;
+                    storageBucket = json.storageBucket;
+                    messagingSenderId = json.messagingSenderId;
                   })
               }).catch(error => {
                 console.error(error);
               });
           }
 
-          console.log(await apiKey);
-          console.log(await authDomain);
-          console.log(await databaseUrl);
+          console.log(apiKey);
+          console.log(authDomain);
+          console.log(databaseUrl);
 
-          await if (apiKey && authDomain && databaseUrl) {
+          if (apiKey && authDomain && databaseUrl) {
             var init = [{
               apiKey: apiKey,
               authDomain: authDomain,
