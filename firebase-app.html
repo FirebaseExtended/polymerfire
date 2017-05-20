@@ -124,14 +124,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               .then(response => {
                 return response.json()
                   .then(json => {
-                    init = [{
-                      apiKey: json.apiKey,
-                      authDomain: json.authDomain,
-                      databaseURL: json.databaseURL,
-                      storageBucket: json.storageBucket,
-                      messagingSenderId: json.messagingSenderId,
-                    }]
+                    this.apiKey = json.apiKey,
+                    this.authDomain = json.authDomain,
+                    this.databaseURL = json.databaseURL,
+                    this.storageBucket = json.storageBucket,
+                    this.messagingSenderId = json.messagingSenderId,
                   });
+                  console.log(this.authDomain + ' = ' + json.authDomain);
               }).catch(error => {
                 console.error(error);
               });
