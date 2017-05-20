@@ -117,6 +117,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }
         },
 
+
+
         __computeApp: function (name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto) {
           if (auto) {
             fetch('/__/firebase/init.json').then(response => {
@@ -127,13 +129,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               this.databaseUrl = json.databaseURL;
               this.storageBucket = json.storageBucket;
               this.messagingSenderId = json.messagingSenderId;
-            }).then(wait => {
-              return;
             }).catch(error => {
               console.error(error);
             });
           }
 
+          // TODO: Remove logs
           console.log(apiKey);
           console.log(authDomain);
           console.log(databaseUrl);
