@@ -96,6 +96,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           },
 
           /**
+          * Set Auto to true to automatically fetch configurations automatically from the
+          * Firebase restricted URL.
+          **/
+          auto: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true,
+          },
+
+          /**
            * The Firebase app object constructed from the other fields of
            * this element.
            * @type {firebase.app.App}
@@ -108,6 +118,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId) {
+          if (auto) {
+            var init = fetch('/__/firebase/init.json').then(response => {
+              console.log(init);
+              // firebase.initializeApp(response.json());
+            }).catch(error => {
+              console.error(error);
+            });
+          }
+
           if (apiKey && authDomain && databaseUrl) {
             var init = [{
               apiKey: apiKey,
