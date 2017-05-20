@@ -128,14 +128,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
                     databaseUrl = json.databaseURL,
                     storageBucket = json.storageBucket,
                     messagingSenderId = json.messagingSenderId,
-                    fire('firebase-auto-complete');
+                    this.$.fire('firebase-auto-complete');
                   })
               }).catch(error => {
                 console.error(error);
               });
           }
 
-          document.addEventListener('firebase-auto-complete', function(e) {
+          this.$.addEventListener('firebase-auto-complete', function(e) {
             console.log(apiKey);
             console.log(authDomain);
             console.log(databaseUrl);
