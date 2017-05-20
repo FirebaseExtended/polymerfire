@@ -127,8 +127,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               this.databaseUrl = json.databaseURL;
               this.storageBucket = json.storageBucket;
               this.messagingSenderId = json.messagingSenderId;
-              var isFirebase = await response.status != 404;
-              console.log(isFirebase);
+            }).then(wait => {
+              return;
             }).catch(error => {
               console.error(error);
             });
