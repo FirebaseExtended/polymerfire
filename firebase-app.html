@@ -135,33 +135,31 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               });
           }
 
-          document.addEventListener('firebase-auto-complete', function(e) {
-            console.log(apiKey);
-            console.log(authDomain);
-            console.log(databaseUrl);
+          console.log(await apiKey);
+          console.log(await authDomain);
+          console.log(await databaseUrl);
 
-            if (apiKey && authDomain && databaseUrl) {
-              var init = [{
-                apiKey: apiKey,
-                authDomain: authDomain,
-                databaseURL: databaseUrl,
-                storageBucket: storageBucket,
-                messagingSenderId: messagingSenderId
-              }];
+          await if (apiKey && authDomain && databaseUrl) {
+            var init = [{
+              apiKey: apiKey,
+              authDomain: authDomain,
+              databaseURL: databaseUrl,
+              storageBucket: storageBucket,
+              messagingSenderId: messagingSenderId
+            }];
 
-              if (name) {
-                init.push(name);
-              }
-
-              firebase.initializeApp.apply(firebase, init);
-              this.fire('firebase-app-initialized');
-
-            } else {
-              return null;
+            if (name) {
+              init.push(name);
             }
 
-            return firebase.app(name);
-          })
+            firebase.initializeApp.apply(firebase, init);
+            this.fire('firebase-app-initialized');
+
+          } else {
+            return null;
+          }
+
+          return firebase.app(name);
         }
       });
     })();
