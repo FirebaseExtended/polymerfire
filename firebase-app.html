@@ -119,13 +119,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto) {
           if (auto) {
-            var init = fetch('/__/firebase/init.json');
-            //   .then(response => {
-            //   firebase.initializeApp(response.json());
-            // }).catch(error => {
-            //   console.error(error);
-            // });
-            console.log(init);
+            fetch('/__/firebase/init.json')
+              .then(response => {
+                console.log(response.json());
+              // firebase.initializeApp(response.json());
+            }).catch(error => {
+              console.error(error);
+            });
           }
 
           if (apiKey && authDomain && databaseUrl) {
