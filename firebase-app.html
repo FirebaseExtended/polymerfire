@@ -118,7 +118,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         __computeApp: function (name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto) {
-          var init = [];
           if (auto) {
             fetch('/__/firebase/init.json')
               .then(response => {
@@ -142,7 +141,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             console.log(databaseUrl);
 
             if (apiKey && authDomain && databaseUrl) {
-              init = [{
+              var init = [{
                 apiKey: apiKey,
                 authDomain: authDomain,
                 databaseURL: databaseUrl,
