@@ -119,23 +119,19 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
         __computeApp: function (name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto) {
           if (auto) {
-            fetch('/__/firebase/init.json')
-              .then(response => {
-                return response.json()
-                  .then(json => {
-                    apiKey = json.apiKey;
-                    authDomain = json.authDomain;
-                    databaseUrl = json.databaseURL;
-                    storageBucket = json.storageBucket;
-                    messagingSenderId = json.messagingSenderId;
-                    document.querySelector('firebase-app').fire('firebase-auto-complete');
-                  })
-              }).catch(error => {
-                console.error(error);
-              });
+            fetch('/__/firebase/init.json').then(response => {
+              return response.json()
+            }).then(json => {
+              apiKey = json.apiKey;
+              authDomain = json.authDomain;
+              databaseUrl = json.databaseURL;
+              storageBucket = json.storageBucket;
+              messagingSenderId = json.messagingSenderId;
+            }).catch(error => {
+              console.error(error);
+            });
           }
 
-document.querySelector('firebase-app').addEventListener('firebase-auto-complete') {
           console.log(apiKey);
           console.log(authDomain);
           console.log(databaseUrl);
@@ -161,7 +157,6 @@ document.querySelector('firebase-app').addEventListener('firebase-auto-complete'
           }
 
           return firebase.app(name);
-}
         }
       });
     })();
