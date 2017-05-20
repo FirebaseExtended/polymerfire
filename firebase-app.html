@@ -128,12 +128,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
                     databaseUrl = json.databaseURL;
                     storageBucket = json.storageBucket;
                     messagingSenderId = json.messagingSenderId;
+                    document.querySelector('firebase-app').fire('firebase-auto-complete');
                   })
               }).catch(error => {
                 console.error(error);
               });
           }
 
+document.querySelector('firebase-app').addEventListener('firebase-auto-complete') {
           console.log(apiKey);
           console.log(authDomain);
           console.log(databaseUrl);
@@ -159,6 +161,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }
 
           return firebase.app(name);
+}
         }
       });
     })();
