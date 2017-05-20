@@ -129,38 +129,40 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
                     databaseUrl = json.databaseURL,
                     storageBucket = json.storageBucket,
                     messagingSenderId = json.messagingSenderId,
-                    console.log(authDomain + ' = ' + json.authDomain);
+                    this.fire('firebase-auto-complete')
                   })
               }).catch(error => {
                 console.error(error);
               });
           }
 
-          console.log(apiKey);
-          console.log(authDomain);
-          console.log(databaseUrl)
+          document.addEventListener('firebase-auto-complete', function(e) {
+            console.log(apiKey);
+            console.log(authDomain);
+            console.log(databaseUrl);
 
-          if (apiKey && authDomain && databaseUrl) {
-            init = [{
-              apiKey: apiKey,
-              authDomain: authDomain,
-              databaseURL: databaseUrl,
-              storageBucket: storageBucket,
-              messagingSenderId: messagingSenderId
-            }];
+            if (apiKey && authDomain && databaseUrl) {
+              init = [{
+                apiKey: apiKey,
+                authDomain: authDomain,
+                databaseURL: databaseUrl,
+                storageBucket: storageBucket,
+                messagingSenderId: messagingSenderId
+              }];
 
-            if (name) {
-              init.push(name);
+              if (name) {
+                init.push(name);
+              }
+
+              firebase.initializeApp.apply(firebase, init);
+              this.fire('firebase-app-initialized');
+
+            } else {
+              return null;
             }
 
-            firebase.initializeApp.apply(firebase, init);
-            this.fire('firebase-app-initialized');
-
-          } else {
-            return null;
-          }
-
-          return firebase.app(name);
+            return firebase.app(name);
+          })
         }
       });
     })();
