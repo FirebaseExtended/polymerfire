@@ -140,6 +140,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         download(e) {
           this.$$('#ref-' + e.target.value).getDownloadURL().then(function(d) {
             console.log(d)
+            window.open(d, '_blank')
           })
         },
 
