@@ -54,6 +54,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         /**
+         * The gs url string of this object in the form `gs://<bucket>/<path>/<to>/<object>
+         */
+        string: {
+          type: String,
+          notify: true
+        },
+
+        /**
           * The upload task of the file when you use the put method.
           */
         uploadTask: {
@@ -93,6 +101,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }.bind(this)).catch(function(error) {
             this.fire('error', error, { bubble: false});
           }.bind(this));
+
+          this.string = this.toString();
         }
       },
 
@@ -170,6 +180,18 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           return this.ref.getMetadata();
         }
         return new Promise(function(resolve, reject) {resolve();});
+      },
+
+      /**
+       * Returns a gs:// URL for this object in the form gs://<bucket>/<path>/<to>/<object>
+       */
+
+      toString: function(path) {
+        if (path) {
+          return this.storage.ref(path).toString();
+        } else if (this.ref) {
+          return this.ref.toString();
+        }
       },
 
       /**
