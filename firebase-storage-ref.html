@@ -81,18 +81,19 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __pathChanged: function(path) {
-        this.getDownloadURL(path).then(function(downloadUrl) {
-          this.downloadUrl = downloadUrl;
-        }.bind(this)).catch(function(error) {
-          this.fire('error', error, { bubble: false});
-        }.bind(this));
+        if (this.storage) {
+          this.getDownloadURL(path).then(function(downloadUrl) {
+            this.downloadUrl = downloadUrl;
+          }.bind(this)).catch(function(error) {
+            this.fire('error', error, { bubble: false});
+          }.bind(this));
 
-        this.getMetadata(path).then(function(metadata) {
-          this.metadata = metadata;
-        }.bind(this)).catch(function(error) {
-          this.fire('error', error, { bubble: false});
-        }.bind(this));
-
+          this.getMetadata(path).then(function(metadata) {
+            this.metadata = metadata;
+          }.bind(this)).catch(function(error) {
+            this.fire('error', error, { bubble: false});
+          }.bind(this));
+        }
       },
 
 
