@@ -21,7 +21,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     *     <firebase-storage-ref
     *       path="{{path}}"
     *       metadata="{{metadata}}"
-    *       string="{{gsUri}}"
+    *       storage-uri="{{gsUri}}"
     *       download-url="{{downloadUrl}}">
     *     </firebase-storage-ref>
     *
@@ -57,7 +57,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         /**
          * The Cloud Storage URI string of this object in the form `gs://<bucket>/<path>/<to>/<object>`
          */
-        string: {
+        storageUri: {
           type: String,
           notify: true
         },
