@@ -48,6 +48,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }
         } catch (e) {
           // appropriate app hasn't been initialized yet
+          var self = this;
+          window.addEventListener('firebase-app-initialized',
+              function onFirebaseAppInitialized(event) {
+                window.removeEventListener(
+                    'firebase-app-initialized', onFirebaseAppInitialized);
+                self.__appNameChanged(self.appName);
+              });
         }
       },
 

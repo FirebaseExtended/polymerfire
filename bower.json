@@ -1,6 +1,6 @@
 {
   "name": "polymerfire",
-  "version": "0.11.2",
+  "version": "2.0.0",
   "authors": [
     "Firebase"
   ],
@@ -18,9 +18,9 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.2",
+    "polymer": "polymer/polymer#1.9 - 2",
     "firebase": ">= 3.5.1 < 4.0",
-    "app-storage": "polymerelements/app-storage#^1.0.0"
+    "app-storage": "PolymerElements/app-storage#1 - 2"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#1 - 2",

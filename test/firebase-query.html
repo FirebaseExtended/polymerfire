@@ -33,12 +33,24 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </template>
   </test-fixture>
 
-  <test-fixture id="DomRepeatQuery">
-    <template is="dom-template">
-      <firebase-query app-name="test" path="/list" data="{{data}}"></firebase-query>
-      <template is="dom-repeat" items="[[data]]">
+  <dom-module id="dom-repeat-query">
+    <template>
+      <firebase-query id="query" app-name="test" path="/list" data="{{data}}"></firebase-query>
+      <template id="domRepeat" is="dom-repeat" items="[[data]]">
         <div>[[item.val]]</div>
       </template>
+    </template>
+    </template>
+    <script>
+      Polymer({
+        is: 'dom-repeat-query'
+      });
+    </script>
+  </dom-module>
+
+  <test-fixture id="DomRepeatQuery">
+    <template>
+      <dom-repeat-query></dom-repeat-query>
     </template>
   </test-fixture>
 
@@ -332,17 +344,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         var domRepeat;
 
         setup(function() {
-          var elements = fixture('DomRepeatQuery', {
-            data: []
-          });
-          // NOTE(cdata): This works around a bug in `dom-template`. Track
-          // polymerelements/test-fixture#31 and remove this when that has been
-          // resolved:
-          var tmpl = document.querySelector('#DomRepeatQuery').fixtureTemplates[0];
-          tmpl._parentProps = {};
+          var elements = fixture('DomRepeatQuery');
+          elements.data = [];
 
-          domRepeat = elements[1];
-          query = elements[0];
+          domRepeat = elements.$.domRepeat;
+          query = elements.$.query;
           query.path = root + '/list';
           return query.transactionsComplete;
         });
@@ -353,7 +359,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             return setFirebaseValue(
                 query.path + '/' + query.data[0].$key + '/val', object.val + 1);
           }).then(function() {
-            expect(domRepeat._instances[0].item).to.be.eql(query.data[0]);
+            var instances = domRepeat._instances || domRepeat.__instances;
+            expect(instances[0].item).to.be.eql(query.data[0]);
           });
         });
       });
