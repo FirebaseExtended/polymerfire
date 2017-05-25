@@ -51,6 +51,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
           path from snapshot: {{item.snapshot.ref.fullPath}} <br/>
           path from upload-task: {{item.path}} <br/>
+          storage uri: {{gsUri}} <br/>
           state: {{item.state}} <br/>
           metadata-contentType: {{item.metadata.contentType}} <br/>
           <br/>
@@ -66,6 +67,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
             <firebase-storage-ref
               path="{{item.path}}"
+              storage-uri="{{gsUri}}"
               id="ref-[[index]]"
               metadata="{{item.refMetadata}}"
               download-url="{{item.refDownloadUrl}}"></firebase-storage-ref>
