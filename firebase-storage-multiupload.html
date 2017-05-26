@@ -35,8 +35,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     * You can then use `<firebase-storage-upload-task>` to cancel, pause or resume the upload.
     * There are two ways to do this. You can encapsulate `firebase-storage-upload-task` in another
     * element to have a local scope of the upload task's state:
+    *
     * ```
-    *   //file-uploader
+    *   file-uploader
     *
     *     <firebase-storage-multiupload
     *       path="/users/{{userId}}/files/{{filepath}}"
@@ -49,7 +50,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     *     </template>
     *
     *
-    *   // file-task
+    *   file-task
     *
     *     <file-storage-upload-task
     *       task="[[item]]""
