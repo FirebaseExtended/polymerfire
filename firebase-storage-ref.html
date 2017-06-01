@@ -187,7 +187,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
        * Returns a gs:// URL for this object in the form gs://<bucket>/<path>/<to>/<object>
        */
 
-      toString: function(path) {
+      toGsString: function(path) {
         if (path) {
           return this.storage.ref(path).toString();
         } else if (this.ref) {
