@@ -142,30 +142,24 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       ],
 
       /**
-      * Update the path and write this.files to that new location.
+      * Upload files, update the path and write this.files to that new location.
       *
       * Important note: `this.path` is updated asynchronously.
-      *
+      * 
+      * @param {Array} Array of Files to be uploaded
       * @param {string} path of the new firebase location to write to.
       * @return {Promise} A promise that resolves once this.files has been
       *     written to the new path.
       * @override
       */
-      upload: function(path) {
-        return new Promise(function(resolve, reject) {
-          if (!this.app) {
-            reject(new Error('No app configured!'));
-          }
-          if (path) {
-            resolve(this._putMultipleFirebaseFiles(path, this.files));
-          } else if (this.path) {
-            resolve(this._putMultipleFirebaseFiles(null, this.files));
-          } else {
-            resolve(this._putMultipleFirebaseFiles('/', this.files));
-          }
-
-          this.path = path ? this.path + '/' + path : this.path;
-        }.bind(this));
+      upload: function(files, path) {
+        if (!this.app) {
+          this.fire('error', new Error('No app configured!'))
+        }
+        this._putMultipleFirebaseFiles(path || this.path, files && files.length ? files : this.files);
+        if (path) {
+          this.path = path;
+        }
       },
 
       /**
@@ -201,8 +195,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       },
 
       __filesChanged: function(files, auto) {
-        if (auto) {
-          this._putMultipleFirebaseFiles(null, files);
+        if (auto && files && files.length) {
+          this.upload(files)
         }
       },
 
