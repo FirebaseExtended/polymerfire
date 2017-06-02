@@ -74,6 +74,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       behaviors: [
         Polymer.FirebaseStorageBehavior
       ],
+      
+      
+      observers: [
+        '__pathChanged(path, storage)'
+      ],
 
       /**
       * @override
@@ -88,7 +93,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       get zeroValue() {
         return [];
       },
-
+      
       __pathChanged: function(path) {
         if (this.storage) {
           this.getDownloadURL(path).then(function(downloadUrl) {
@@ -102,8 +107,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           }.bind(this)).catch(function(error) {
             this.fire('error', error, { bubble: false});
           }.bind(this));
-
-          this.storageUri = this.toString();
+          
+          this.storageUri = this.toGsString(path);
         }
       },
 
