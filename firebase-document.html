@@ -160,10 +160,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
     __onFirebaseValue: function(snapshot) {
       var value = snapshot.val();
+      var exists;
 
       if (value == null) {
         value = this.zeroValue;
-        this.__needSetData = true;
+         this.__needSetData = true;
+        exists = false;
+      } else {
+        exists = true;
       }
 
       if (!this.isNew) {
@@ -188,6 +192,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
               }
             }
           });
+          this._setStatusKnown(true);
+          this._setExists(exists);
         });
       }
     }

@@ -5,126 +5,146 @@ Use of this source code is governed by a BSD-style
 license that can be found in the LICENSE file or at
 https://github.com/firebase/polymerfire/blob/master/LICENSE
 -->
-
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../app-storage/app-storage-behavior.html">
 <link rel="import" href="firebase-common-behavior.html">
 <link rel="import" href="firebase-database-script.html">
 <script>
-  (function() {
-    'use strict';
 
-    /** @polymerBehavior Polymer.FirebaseDatabaseBehavior */
-    Polymer.FirebaseDatabaseBehaviorImpl = {
-      properties: {
-        db: {
-          type: Object,
-          computed: '__computeDb(app)'
-        },
+(function() {
+  'use strict';
 
-        ref: {
-          type: Object,
-          computed: '__computeRef(db, path, disabled)',
-          observer: '__refChanged'
-        },
-
-        /**
-         * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
-         * @type {string|null}
-         */
-        path: {
-          type: String,
-          value: null,
-          observer: '__pathChanged'
-        },
-
-        /**
-         * When true, Firebase listeners won't be activated. This can be useful
-         * in situations where elements are loaded into the DOM before they're
-         * ready to be activated (e.g. navigation, initialization scenarios).
-         */
-        disabled: {
-          type: Boolean,
-          value: false
-        }
+  /** @polymerBehavior Polymer.FirebaseDatabaseBehavior */
+  Polymer.FirebaseDatabaseBehaviorImpl = {
+    properties: {
+      db: {
+        type: Object,
+        computed: '__computeDb(app)'
       },
 
-      observers: [
-        '__onlineChanged(online)'
-      ],
+      ref: {
+        type: Object,
+        computed: '__computeRef(db, path, disabled)',
+        observer: '__refChanged'
 
-      /**
-       * Set the firebase value.
-       * @return {!firebase.Promise<void>}
-       */
-      _setFirebaseValue: function(path, value) {
-        this._log('Setting Firebase value at', path, 'to', value)
-        var key = value && value.$key;
-        var leaf = value && value.hasOwnProperty('$val');
-        if (key) {
-          value.$key = null;
-        }
-        var result = this.db.ref(path).set(leaf ? value.$val : value);
-        if (key) {
-          value.$key = key;
-        }
-        return result;
-      },
-
-      __computeDb: function(app) {
-        return app ? app.database() : null;
-      },
-
-      __computeRef: function(db, path) {
-        if (db == null ||
-            path == null ||
-            !this.__pathReady(path) ||
-            this.disabled) {
-          return null;
-        }
-
-        return db.ref(path);
       },
 
       /**
-       * Override this method if needed.
-       * e.g. to detach or attach listeners.
+       * Path to a Firebase root or endpoint. N.B. `path` is case sensitive.
        */
-      __refChanged: function(ref, oldRef){
-        return;
+      path: {
+        type: String,
+        observer: '__pathChanged',
+        value: null
       },
 
-      __pathChanged: function(path, oldPath) {
-        if (!this.disabled && !this.valueIsEmpty(this.data)) {
-          this.syncToMemory(function() {
-            this.data = this.zeroValue;
-            this.__needSetData = true;
-          });
-        }
+      /**
+       * When true, Firebase listeners won't be activated. This can be useful
+       * in situations where elements are loaded into the DOM before they're
+       * ready to be activated (e.g. navigation, initialization scenarios).
+       */
+      disabled: {
+        type: Boolean,
+        value: false
       },
 
-      __pathReady: function(path) {
-        return path && path.split('/').slice(1).indexOf('') < 0;
+      /**
+       * `exists` is set to `true` when the data actually exists for the specified path; `false` otherwise. 
+       * This property is set only after `statusKnown` is true.
+       */
+      exists: {
+        type: Boolean,
+        notify: true,
+        readOnly: true,
+        reflectToAttribute: true
       },
 
-      __onlineChanged: function(online) {
-        if (!this.ref) {
-          return;
-        }
-
-        if (online) {
-          this.db.goOnline();
-        } else {
-          this.db.goOffline();
-        }
+      /**
+       * `statusKnown` is set true when we have received answer from firebase - which will allow us to determine if data exists at database level. 
+       */
+      statusKnown: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        readOnly: true,
+        reflectToAttribute: true
       }
-    };
+    },
 
-    /** @polymerBehavior */
-    Polymer.FirebaseDatabaseBehavior = [
-      Polymer.AppStorageBehavior,
-      Polymer.FirebaseCommonBehavior,
-      Polymer.FirebaseDatabaseBehaviorImpl
-    ];
-  })();
+    observers: [
+      '__onlineChanged(online)'
+    ],
+
+    _setFirebaseValue: function(path, value) {
+      this._log('Setting Firebase value at', path, 'to', value)
+      var key = value && value.$key;
+      var leaf = value && value.hasOwnProperty('$val');
+      if (key) {
+        value.$key = null;
+      }
+      var result = this.db.ref(path).set(leaf ? value.$val : value);
+      if (key) {
+        value.$key = key;
+      }
+      return result;
+    },
+
+    __computeDb: function(app) {
+      return app ? app.database() : null;
+    },
+
+    __computeRef: function(db, path) {
+      if (db == null ||
+        path == null ||
+        !this.__pathReady(path) ||
+        this.disabled) {
+        return null;
+      }
+      return db.ref(path);
+    },
+
+    /**
+     * Override this method if needed.
+     * e.g. to detach or attach listeners.
+     */
+    __refChanged: function(ref, oldRef) {
+      return;
+    },
+
+    __pathChanged: function(path, oldPath) {
+      this._setStatusKnown(false);
+      this._setExists(true);
+
+      if (oldPath != null && !this.disabled && this.__pathReady(path)) {
+        this.syncToMemory(function() {
+          this.data = this.zeroValue;
+          this.__needSetData = true;
+        });
+      }
+    },
+
+    __pathReady: function(path) {
+      return path && path.split('/').slice(1).indexOf('') < 0;
+    },
+
+    __onlineChanged: function(online) {
+      if (!this.ref) {
+        return;
+      }
+
+      if (online) {
+        this.db.goOnline();
+      } else {
+        this.db.goOffline();
+      }
+    }
+  };
+
+  /** @polymerBehavior */
+  Polymer.FirebaseDatabaseBehavior = [
+    Polymer.AppStorageBehavior,
+    Polymer.FirebaseCommonBehavior,
+    Polymer.FirebaseDatabaseBehaviorImpl
+  ];
+})();
 </script>
