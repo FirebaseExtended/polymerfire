@@ -96,6 +96,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           },
 
           /**
+          * Set Auto to true to automatically fetch configurations automatically from the
+          * Firebase restricted URL.
+          **/
+          auto: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true,
+          },
+
+          /**
            * The Firebase app object constructed from the other fields of
            * this element.
            * @type {firebase.app.App}
@@ -103,11 +113,32 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           app: {
             type: Object,
             notify: true,
-            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId)'
+            computed: '__computeApp(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto)'
           }
         },
 
-        __computeApp: function(name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId) {
+
+
+        __computeApp: function (name, apiKey, authDomain, databaseUrl, storageBucket, messagingSenderId, auto) {
+          if (auto) {
+            fetch('/__/firebase/init.json').then(response => {
+              return response.json()
+            }).then(json => {
+              this.apiKey = json.apiKey;
+              this.authDomain = json.authDomain;
+              this.databaseUrl = json.databaseURL;
+              this.storageBucket = json.storageBucket;
+              this.messagingSenderId = json.messagingSenderId;
+            }).catch(error => {
+              console.error(error);
+            });
+          }
+
+          // TODO: Remove logs
+          console.log(apiKey);
+          console.log(authDomain);
+          console.log(databaseUrl);
+
           if (apiKey && authDomain && databaseUrl) {
             var init = [{
               apiKey: apiKey,
@@ -123,6 +154,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 
             firebase.initializeApp.apply(firebase, init);
             this.fire('firebase-app-initialized');
+
           } else {
             return null;
           }
