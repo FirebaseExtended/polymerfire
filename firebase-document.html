@@ -83,6 +83,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           path = parentPath + '/' + key;
           resolve(this._setFirebaseValue(path, this.data));
         } else {
+          if(this.readOnly){
+            reject('This is unexpected condition.');
+            return;
+          }
+
           path = firebase.database(this.app).ref(parentPath)
               .push(this.data, function(error) {
                 if (error) {

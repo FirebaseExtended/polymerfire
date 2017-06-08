@@ -46,6 +46,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         disabled: {
           type: Boolean,
           value: false
+        },
+        
+        /**
+         * When true, Local data will not be synced with Firebase Database. 
+         * but Changes in Firebase will be synced with local data.
+         * Note: Be careful while setting this to true, because once this field is set to true,
+         * data in local property and firebase both will be different.
+         */
+        readOnly:{
+            type: Boolean,
+            value: false  
         }
       },
 
@@ -58,6 +69,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
        * @return {!firebase.Promise<void>}
        */
       _setFirebaseValue: function(path, value) {
+          
+        if(this.readOnly){
+            return;
+        }
+
         this._log('Setting Firebase value at', path, 'to', value)
         var key = value && value.$key;
         var leaf = value && value.hasOwnProperty('$val');
