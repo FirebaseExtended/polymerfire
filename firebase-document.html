@@ -189,7 +189,15 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             // now, we loop over keys
             for (var prop in value) {
               if(value[prop] !== this.data[prop]) {
-                this.set(['data', prop], value[prop]);
+                if(window._ && window._.isObject(value[prop])) {
+                  //Set complex value only if both objects have different value
+                  if(!_.isEqual(value[prop], this.data[prop])) {
+                      this.set(['data', prop], value[prop]);
+                  }
+                }else {
+                  //Set premitives value
+                  this.set(['data', prop], value[prop]);
+                }
               }
             }
           });
