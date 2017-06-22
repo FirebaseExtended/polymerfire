@@ -11,90 +11,102 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 <link rel="import" href="../../paper-toast/paper-toast.html">
 <link rel="import" href="../polymerfire.html">
 
-<dom-module id="firebase-storage-multiupload-demo">
+<dom-module id="firebase-storage-multiupload">
   <template>
     <firebase-app
       auth-domain="polymerfire-test-6abc0.firebaseapp.com"
       database-url="https://polymerfire-test-6abc0.firebaseio.com"
       api-key="AIzaSyBxZI1BAgX9obocHQw_yhmHV9BIOpaNWZo"
-      storage-bucket="polymerfire-test-6abc0.appspot.com"></firebase-app>
-    <firebase-auth id="auth" user="{{user}}" provider="google" on-error="catchError"></firebase-auth>
+      storage-bucket="polymerfire-test-6abc0.appspot.com">
+    </firebase-app>
 
-    <button on-tap="signIn">Sign In</button><br/>
+    <firebase-auth
+      id="auth"
+      user="{{user}}"
+      provider="google"
+      on-error="catchError">
+    </firebase-auth>
+
+    <button on-tap="signIn">Sign In</button> <br>
 
     <template is="dom-if" if="{{user}}">
       <firebase-storage-multiupload
         id="fs"
         path="/users/{{user.uid}}/files"
-        files="[[files]]"
         upload-tasks="{{uploadedFiles}}"
         on-error="catchError"
-        force-unique
-        auto>
+        force-unique>
       </firebase-storage-multiupload>
 
-      <input id="file-uploader" type="file" on-change="onFileUpload" multiple /> <br/>
-      <hr/>
+      <input id="file-uploader" type="file" multiple /> <br>
+
+      <button on-tap="upload">Upload</button> <br>
+
+      <hr>
+
       <template is="dom-repeat" items="[[uploadedFiles]]">
         <div style="padding: 20px">
           <firebase-storage-upload-task
-              task="[[item]]"
-              id="task-[[index]]"
-              bytes-transferred="{{item.bytesTransferred}}"
-              total-bytes="{{item.totalBytes}}"
-              state="{{item.state}}"
-              download-url="{{item.downloadUrl}}"
-              metadata="{{item.metadata}}"
-              path="{{item.path}}"></firebase-storage-upload-task>
+            task="[[item]]"
+            id="task-[[index]]"
+            bytes-transferred="{{item.bytesTransferred}}"
+            total-bytes="{{item.totalBytes}}"
+            state="{{item.state}}"
+            download-url="{{item.downloadUrl}}"
+            metadata="{{item.metadata}}"
+            path="{{item.path}}">
+          </firebase-storage-upload-task>
 
+          path from snapshot: [[item.snapshot.ref.fullPath]] <br>
+          path from upload-task: [[item.path]] <br>
+          storage uri: [[gsUri]] <br>
+          state: [[item.state]] <br>
+          metadata-contentType: [[item.metadata.contentType]] <br>
 
-
-          path from snapshot: [[item.snapshot.ref.fullPath]] <br/>
-          path from upload-task: [[item.path]] <br/>
-          storage uri: [[gsUri]] <br/>
-          state: [[item.state]] <br/>
-          metadata-contentType: [[item.metadata.contentType]] <br/>
-          <br/>
+          <br>
 
           <template is="dom-if" if="[[!isEqual(item.state, 'success')]]">
-            <paper-progress value="{{item.bytesTransferred}}" min="0" max="{{item.totalBytes}}"></paper-progress>
+            <paper-progress
+              value="{{item.bytesTransferred}}"
+              min="0"
+              max="{{item.totalBytes}}">
+            </paper-progress>
           </template>
 
-          <br/>
-
+          <br>
 
           <template is="dom-if" if="{{isEqual(item.state, 'success')}}">
-
             <firebase-storage-ref
               path="{{item.path}}"
               storage-uri="{{gsUri}}"
               id="ref-[[index]]"
               metadata="{{item.refMetadata}}"
-              download-url="{{item.refDownloadUrl}}"></firebase-storage-ref>
+              download-url="{{item.refDownloadUrl}}">
+            </firebase-storage-ref>
 
-            <a href="{{item.refDownloadUrl}}">
-              {{item.refDownloadUrl}}
-            </a><br/>
+            <a href="{{item.refDownloadUrl}}">{{item.refDownloadUrl}}</a> <br>
+
             <button on-tap="download" value="{{index}}">Download</button>
+
             <button on-tap="deleteFile" value="{{index}}">Delete</button>
           </template>
 
           <template is="dom-if" if="[[!isEqual(item.state, 'success')]]">
-
-
             <template is="dom-if" if="[[isEqual(item.state, 'running')]]">
               <button on-tap="cancel" value="{{index}}">Cancel</button>
-              <button on-tap="pause" value="{{index}}">pause</button>
+              <button on-tap="pause" value="{{index}}">Pause</button>
             </template>
 
             <template is="dom-if" if="[[isEqual(item.state, 'paused')]]">
-              <button on-tap="resume" value="{{index}}">resume</button>
+              <button on-tap="resume" value="{{index}}">Resume</button>
             </template>
           </template>
-          <br/>
+
+          <br>
         </div>
       </template>
     </template>
+
     <paper-toast id="toaster"></paper-toast>
   </template>
 
@@ -103,19 +115,16 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       'use strict';
 
       Polymer({
-        is: 'firebase-storage-multiupload-demo',
+        is: 'firebase-storage-multiupload',
 
         properties: {
           user: Object,
-          files: {
-            type: Array,
-            notify: true,
-            value: [],
-          },
+
           uploadTasks: {
             type: Array,
             observer: '_uploadTasksChanged'
           },
+
           uploadedFiles: {
             type: Array,
           }
@@ -152,20 +161,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           })
         },
 
-        // deleteFile(e) {
-        //   this.$$('#fsd').path = e.target.value;
-        //   this.$$('#fsd').destroy().then(function(x){
-        //     this.$$('#toaster').show({
-        //       text: 'Successfully deleted ' + e.target.value
-        //     });
-        //   }.bind(this)).catch(function(error){
-        //     console.log(error);
-        //     this.$$('#toaster').show({
-        //       text: error.message
-        //     });
-        //   })
-        // },
-
         _uploadTasksChanged(uploadTasks) {
           console.log(uploadTasks);
         },
@@ -174,22 +169,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           console.log(uploadedFiles);
         },
 
-        onFileUpload(e) {
-          this.files = e.target.files;
-          console.log(this.files)
-        },
-
-        onFileUpload2(e) {
-          this.file = e.target.files[0];
-          this.$$('#fs2').upload();
-        },
-
-        isImage(c) {
-          return c && c.indexOf('image') === 0;
-        },
-
         isEqual(a, b) {
           return a === b;
+        },
+        
+        upload() {
+          this.$$('#fs').upload(this.$$('#file-uploader').files)
         },
 
         signIn: function() {
