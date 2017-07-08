@@ -61,8 +61,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         this._log('Putting Firebase file at', path ? this.path + '/' + path : this.path);
         if (file) {
           var newFilename = this.forceUnique ? Date.now().toString() + '-' + file.name : file.name;
-          var newPath = path ? path + '/' +  newFilename: newFilename;
-          return this.ref.child(newPath).put(file, metadata);
+          return path ? this.ref.root.child(path + '/' + newFilename).put(file, metadata) : this.ref.child(newFilename).put(file, metadata);
         }
         return path ? this.ref.child(path).delete() : this.ref.delete();
       },
@@ -71,7 +70,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         this._log('Putting Firebase file at', path ? this.path + '/' + path : this.path);
         if (data) {
           var ref = path ? this.storage.ref().child(path) : this.ref;
-          return ref.putString(data, format, metadata)
+          return ref.putString(data, format, metadata);
         }
         return path ? this.ref.child(path).delete() : this.ref.delete();
       },
