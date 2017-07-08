@@ -368,7 +368,7 @@ Polymer({
                   }
                   for (var property in prev) {
                     if(!value.hasOwnProperty(property)) {
-                      this.set(['data', index, property], undefined);
+                      this.set(['data', index, property], null);
                     }
                   }
                 } else {
