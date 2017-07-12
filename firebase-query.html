@@ -415,7 +415,7 @@ Polymer({
         __onFirebaseChildMoved: function(snapshot, previousChildKey) {
           var key = snapshot.key;
           var value = this.__map[key];
-          var targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) : 0;
+          var targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) + 1 : 0;
 
           this._log('Firebase child_moved:', key, value,
               'to index', targetIndex);
