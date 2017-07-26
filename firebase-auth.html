@@ -239,7 +239,7 @@ be a problem.
          * @return {Promise} Promise that handles success and failure.
          */
         signInWithPhoneNumber: function(phoneNumber) {
-          var appVerifier = new firebase.auth.RecaptchaVerifier(this.$$('#recaptcha-container'));
+          var appVerifier = new firebase.auth.RecaptchaVerifier(document.getElementById('recaptcha-container'));
           return this._handleSignIn(firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
             .then(function(confirmationResult) {
               window.confirmationResult = confirmationResult;
