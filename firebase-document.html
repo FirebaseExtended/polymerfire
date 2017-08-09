@@ -37,6 +37,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     behaviors: [
       Polymer.FirebaseDatabaseBehavior
     ],
+    
+    properties: {
+      data: {
+        type: Object,
+        notify: true,
+      },
+    },
 
     attached: function() {
       this.__needSetData = true;
