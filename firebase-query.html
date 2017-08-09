@@ -64,6 +64,14 @@ Polymer({
 
         properties: {
           /**
+           * The data returned from the query to firebase.
+           */
+          data: {
+            type: Array,
+            notify: true,
+          },
+
+          /**
            * [`firebase.database.Query`](https://firebase.google.com/docs/reference/js/firebase.database.Query#property)
            * object computed by the following parameters.
            */
