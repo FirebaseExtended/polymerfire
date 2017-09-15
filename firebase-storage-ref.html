@@ -160,7 +160,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
       *  Stores a string in a given format
       */
       putString: function(data, format, metadata) {
-        this.uploadTask = this.__put(null, data, format, metadata);
+        this.uploadTask = this.__putString(null, data, format, metadata);
         return this.uploadTask;
       },
 
