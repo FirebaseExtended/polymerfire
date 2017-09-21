@@ -353,7 +353,8 @@ Polymer({
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
           var key = snapshot.key;
 
-          if (this.__map[key]) return
+          // check if the key-value pair already exists
+          if (this.__indexFromKey(key) < 0) return
 
           var value = snapshot.val();
           var previousChildIndex = this.__indexFromKey(previousChildKey);
@@ -377,7 +378,11 @@ Polymer({
             this.__map[key] = null;
             this.async(function() {
               this.syncToMemory(function() {
-                this.splice('data', this.__indexFromKey(key), 1);
+                // this only catches already deleted keys (which will return -1)
+                // at least it will not delete the last element from the array (this.splice('data', -1, 1))
+                if (this.__indexFromKey(key) >= 0) {
+                  this.splice('data', this.__indexFromKey(key), 1);
+                }
               });
             });
           }
