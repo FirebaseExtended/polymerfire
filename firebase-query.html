@@ -354,7 +354,7 @@ Polymer({
           var key = snapshot.key;
 
           // check if the key-value pair already exists
-          if (this.__indexFromKey(key) < 0) return
+          if (this.__indexFromKey(key) >= 0) return
 
           var value = snapshot.val();
           var previousChildIndex = this.__indexFromKey(previousChildKey);
