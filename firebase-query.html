@@ -295,11 +295,10 @@ Polymer({
           // this allows us to just call the addition of event listeners only once.
           // __queryChanged is being called thrice when firebase-query is created
           // 1 - 2. query property computed (null, undefined)
-          // 3. when attached is called (this.query, this.query) -> this is where we add stuff
+          // 3. when attached is called (this.query, this.query)
+          // need help to fix this so that this function is only called once
 
-          // hopefully if reference changed, this still fire
-
-          if (query && oldQuery) {
+          if (query) {
             if(this._onOnce){ // remove handlers before adding again. Otherwise we get data multiplying
               query.off('child_added', this.__onFirebaseChildAdded, this);
               query.off('child_removed', this.__onFirebaseChildRemoved, this);
@@ -308,34 +307,11 @@ Polymer({
             }
 
             this._onOnce = true;
+            this._query = query
 
             // does the on-value first
-            query.once('value')
-              .then(function(snapshot) {
-                if (snapshot.hasChildren()) {
-                  var data = [];
-                  snapshot.forEach(function(childSnapshot) {
-                    var key = childSnapshot.key;
-                    var value = this.__valueWithKey(key, childSnapshot.val())
-
-                    this.__map[key] = value;
-                    data.push(value)
-                  }.bind(this))
-
-                  this.set('data', data);
-                }
-              }.bind(this))
-
-              // catches the error above but still sets the listeners below
-              .catch(this.__onError.bind(this))
-
-              // here comes the per child event listeners
-              .then(function() {
-                query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
-                query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
-                query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
-                query.on('child_moved', this.__onFirebaseChildMoved, this.__onError, this);
-              }.bind(this))
+            query.off('value', this.__onFirebaseValue, this)
+            query.on('value', this.__onFirebaseValue, this.__onError, this)
           }
         },
 
@@ -348,6 +324,36 @@ Polymer({
             }
           }
           return -1;
+        },
+
+        __onFirebaseValue: function(snapshot) {
+          if (snapshot.hasChildren()) {
+            var data = [];
+            snapshot.forEach(function(childSnapshot) {
+              var key = childSnapshot.key;
+              var value = this.__valueWithKey(key, childSnapshot.val())
+
+              this.__map[key] = value;
+              data.push(value)
+            }.bind(this))
+
+            this.set('data', data);
+          }
+
+          const query = this.query
+
+          query.off('value', this.__onFirebaseValue, this)
+
+          // ensures that all events are called once
+          query.off('child_added', this.__onFirebaseChildAdded, this);
+          query.off('child_removed', this.__onFirebaseChildRemoved, this);
+          query.off('child_changed', this.__onFirebaseChildChanged, this);
+          query.off('child_moved', this.__onFirebaseChildMoved, this);
+
+          query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
+          query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
+          query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
+          query.on('child_moved', this.__onFirebaseChildMoved, this.__onError, this);
         },
 
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
