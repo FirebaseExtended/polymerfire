@@ -292,6 +292,12 @@ Polymer({
             });
           }
 
+          // this allows us to just call the addition of event listeners only once.
+          // __queryChanged is being called thrice when firebase-query is created
+          // 1 - 2. query property computed (null, undefined)
+          // 3. when attached is called (this.query, this.query)
+          // need help to fix this so that this function is only called once
+
           if (query) {
             if(this._onOnce){ // remove handlers before adding again. Otherwise we get data multiplying
               query.off('child_added', this.__onFirebaseChildAdded, this);
@@ -300,21 +306,12 @@ Polymer({
               query.off('child_moved', this.__onFirebaseChildMoved, this);
             }
 
-            this._onOnce = true;            
+            this._onOnce = true;
+            this._query = query
 
-            /* We want the value callback to batch load the initial data,
-             * then let child_added take over for subsequent changes.
-             */
-            this.__initialLoadDone = false;
-
-            /* Don't use query.once() as we need to be able to cancel
-              * the callback if the query changes
-              */
-            query.on('value', this.__onFirebaseValue, this.__onError, this);
-            query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
-            query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
-            query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
-            query.on('child_moved', this.__onFirebaseChildMoved, this.__onError, this);
+            // does the on-value first
+            query.off('value', this.__onFirebaseValue, this)
+            query.on('value', this.__onFirebaseValue, this.__onError, this)
           }
         },
 
@@ -335,6 +332,7 @@ Polymer({
             snapshot.forEach(function(childSnapshot) {
               var key = childSnapshot.key;
               var value = this.__valueWithKey(key, childSnapshot.val())
+
               this.__map[key] = value;
               data.push(value)
             }.bind(this))
@@ -342,28 +340,41 @@ Polymer({
             this.set('data', data);
           }
 
-          /* Now let child_added deal with subsequent changes */
-          this.query.off('value', this.__onFirebaseValue, this);
-          this.__initialLoadDone = true;
+          const query = this.query
+
+          query.off('value', this.__onFirebaseValue, this)
+
+          // ensures that all events are called once
+          query.off('child_added', this.__onFirebaseChildAdded, this);
+          query.off('child_removed', this.__onFirebaseChildRemoved, this);
+          query.off('child_changed', this.__onFirebaseChildChanged, this);
+          query.off('child_moved', this.__onFirebaseChildMoved, this);
+
+          query.on('child_added', this.__onFirebaseChildAdded, this.__onError, this);
+          query.on('child_removed', this.__onFirebaseChildRemoved, this.__onError, this);
+          query.on('child_changed', this.__onFirebaseChildChanged, this.__onError, this);
+          query.on('child_moved', this.__onFirebaseChildMoved, this.__onError, this);
         },
 
         __onFirebaseChildAdded: function(snapshot, previousChildKey) {
           var key = snapshot.key;
 
-          if (this.__initialLoadDone) {
-            var value = snapshot.val();
-            var previousChildIndex = this.__indexFromKey(previousChildKey);
+          // check if the key-value pair already exists
+          if (this.__indexFromKey(key) >= 0) return
 
-            this._log('Firebase child_added:', key, value);
+          var value = snapshot.val();
+          var previousChildIndex = this.__indexFromKey(previousChildKey);
 
-            value = this.__snapshotToValue(snapshot);
+          this._log('Firebase child_added:', key, value);
 
-            this.__map[key] = value;
-            this.splice('data', previousChildIndex + 1, 0, value);
-          }
+          value = this.__snapshotToValue(snapshot);
+
+          this.__map[key] = value;
+          this.splice('data', previousChildIndex + 1, 0, value);
         },
 
         __onFirebaseChildRemoved: function(snapshot) {
+
           var key = snapshot.key;
           var value = this.__map[key];
 
@@ -373,7 +384,11 @@ Polymer({
             this.__map[key] = null;
             this.async(function() {
               this.syncToMemory(function() {
-                this.splice('data', this.__indexFromKey(key), 1);
+                // this only catches already deleted keys (which will return -1)
+                // at least it will not delete the last element from the array (this.splice('data', -1, 1))
+                if (this.__indexFromKey(key) >= 0) {
+                  this.splice('data', this.__indexFromKey(key), 1);
+                }
               });
             });
           }
