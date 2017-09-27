@@ -52,14 +52,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     *
     *   file-task
     *
-    *     <file-storage-upload-task
+    *     <firebase-storage-upload-task
     *       task="[[item]]""
     *       bytes-transferred="{{bytesTransferred}}"
     *       total-bytes="{{totalBytes}}"
     *       state="{{state}}"
     *       download-url="{{downloadUrl}}"
     *       metadata="{{metadata}}"
-    *       path="{{path}}"></file-storage-upload-task>
+    *       path="{{path}}"></firebase-storage-upload-task>
     *
     * ```
     *
@@ -73,14 +73,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     *     </firebase-storage-multiupload>
     *
     *     <template is="dom-repeat" items="[[uploadTasks]]">
-    *       <file-storage-upload-task
+    *       <firebase-storage-upload-task
     *         task="[[item]]""
     *         bytes-transferred="{{item.bytesTransferred}}"
     *         total-bytes="{{item.totalBytes}}"
     *         state="{{item.state}}"
     *         download-url="{{item.downloadUrl}}"
     *         metadata="{{item.metadata}}"
-    *         path="{{item.path}}"></file-storage-upload-task>
+    *         path="{{item.path}}"></firebase-storage-upload-task>
     *     </template>
     * ```
     *

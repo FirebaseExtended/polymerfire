@@ -50,6 +50,14 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         forceUnique: {
           type: Boolean,
           value: false
+        },
+
+        /**
+         * When true, will perform detailed logging.
+         */
+        log: {
+          type: Boolean,
+          value: false
         }
       },
 
@@ -88,7 +96,17 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         return storage.ref(path);
       },
 
-      __pathChanged: function(path) {}
+      __pathChanged: function(path) {},
+
+      /**
+       * A wrapper around `console.log`.
+       */
+      _log: function() {
+        if (this.log) {
+          console.log.apply(console, arguments);
+        }
+      }
+
     };
 
     /** @polymerBehavior */
