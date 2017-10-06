@@ -35,7 +35,8 @@ Example Usage:
   database-url="https://polymerfire-test.firebaseio.com/"
   api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
   storage-bucket="polymerfire-test.appspot.com"
-  messaging-sender-id="544817973908">
+  messaging-sender-id="544817973908"
+  project-id="polymerfire-test">
 </firebase-app>
 <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError">
 </firebase-auth>
