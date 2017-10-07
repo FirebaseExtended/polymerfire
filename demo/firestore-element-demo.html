@@ -1,0 +1,27 @@
+<link rel="import" href="../firestore-element.html">
+
+<dom-module id="user-list">
+  <template>
+    <ul>
+    <dom-repeat items="[[users]]"><template>
+      <li>[[item.name]]</li>
+    </template></dom-repeat>
+    </ul>
+  </template>
+</dom-module>
+
+<script>
+  class UserList extends Polymer.FirestoreElement(Polymer.Element) {
+    static get is() { return 'user-list'; }
+    static get properties() {
+      return {
+        users: {
+          type: Array,
+          collection: 'users',
+          query: q => q.orderBy('name')
+        }
+      }
+    }
+  }
+  customElements.define(UserList.is, UserList);
+</script>

@@ -1,0 +1,211 @@
+<link rel="import" href="firebase-firestore-script.html">
+<script>
+if (typeof Polymer === 'undefined') {
+  throw new Error('Polymer.FirestoreElement must be imported after Polymer itself.');
+}
+
+(context => {
+  const MATCH_RE = /\{[a-z0-9_]+\}/gi;
+  const TRANSFORMS = {
+    doc: function(snap) { return iDoc(snap); },
+    collection: function(snap) { return snap.empty ? [] : snap.docs.map(doc => iDoc(doc)) }
+  }
+
+  function parsePath(path) {
+    let result;
+    let parts = path.split(MATCH_RE);
+    let props = (path.match(MATCH_RE) || []).map(m => m.substr(1, m.length - 2));
+    return {parts, props};
+  }
+
+  function stitch(parts, values) {
+    let whole = '';
+    for (var i = 0; i < parts.length; i++) {
+      whole += parts[i];
+      whole += values[i] || '';
+    }
+    return whole;
+  }
+
+	function collect(what, which) {
+		let res = {};
+		while (what) {
+			res = Object.assign({}, what[which], res); // Respect prototype priority
+			what = Object.getPrototypeOf(what);
+		}
+		return res;
+	};
+
+  function iDoc(snap) {
+    if (snap.exists) {
+      return Object.assign({__id__: snap.id}, snap.data());
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * This mixin provides bindings to documents and collections in a
+   * Cloud Firestore database through special property declarations.
+   *
+   * ### Basic Usage
+   *
+   * ```js
+   * class MyElement extends Polymer.FirestoreElement(Polymer.Element) {
+   *   // ...
+   *   static get properties() {
+   *     return {
+   *       uid: String,
+   *       user: {
+   *         type: Object,
+   *         doc: 'users/{uid}'
+   *       },
+   *       messages: {
+   *         type: Array,
+   *         collection: 'users/{uid}/messages'
+   *       }
+   *     }
+   *   }
+   * }
+   * ```
+   *
+   * As you can see, specific properties have been decorated with `doc` and
+   * `collection` options. These options provide full paths to documents or
+   * collections in your Firestore database. When templatized with curly
+   * braces (e.g. `{uid}` above), the data will be dynamically rebound as
+   * the templatized properties change.
+   *
+   * PolymerFirestore bindings are **intentionally read-only**. Automatic
+   * three-way binding (i.e. syncing changes from the element back up to
+   * the database) are great for toy apps but largely an antipattern.
+   *
+   * In addition to loading data into the specified property, PolymerFirestore
+   * also makes additional convenience properties:
+   *
+   * * `<propname>Ref`: a Firestore reference to the doc/collection
+   * * `<propname>Ready`: will be true when all path segments are present and data has been fetched at least once
+   *
+   * ### Querying
+   *
+   * PolymerFire supports querying by supplying a builder function to the
+   * `query` option. The function will be bound to the element and called with
+   * the ref and element instance. For example:
+   *
+   * ```js
+   * {
+   *   uid: String,
+   *   label: String,
+   *   category: String,
+   *   notes: {
+   *     type: Array,
+   *     collection: 'users/{uid}/notes',
+   *     query: (q, el) => {
+   *       q = q.orderBy('date', 'desc').limit(100)
+   *       if (el.color) { q.where('color','==', el.color) }
+   *       if (el.category) { q.where('category', '==', el.category) }
+   *       return q;
+   *     },
+   *     observes: ['color', 'category']
+   *   }
+   * }
+   * ```
+   *
+   * In the  above example, a rich query is further filtered down by other
+   * properties on the element. Remember to declare each query-affecting
+   * property in your `observes` option.
+   *
+   * ### Options
+   *
+   * * **doc:** *string*, the full (optionally templatized) path to a document
+   * * **collection:** *string*, the full (optionally templatized) path to a collection
+   * * **live:** *boolean*, whether or not to continue updating the property as data changes in the database
+   * * **query:** *(ref: Reference, el: Element)* a query builder function that takes the computed ref and the element instance
+   * * **observes:** a list of properties which, if changed, should trigger a rebuild of the query
+   *
+   * @polymer
+   * @mixinFunction Polymer.FirestoreElement
+   */
+  Polymer.FirestoreElement = parent => {
+    return class extends parent {
+      constructor() {
+        super();
+        this._firestoreProps = {};
+        this._firestoreListeners = {};
+        this.db = this.constructor.db || firebase.firestore();
+      }
+
+      connectedCallback() {
+        const props = collect(this.constructor, 'properties');
+        for (let name in props) {
+          if (props[name].doc) {
+            this._firestoreBind('doc', props[name].doc, name, props[name].live, props[name].observes);
+          } else if (props[name].collection) {
+            this._firestoreBind('collection', props[name].collection, name, props[name].live, props[name].observes);
+          }
+        }
+        super.connectedCallback();
+      }
+
+      _firestoreBind(type, path, name, live = false, observes = []) {
+        const config = parsePath(path);
+        config.observes = observes;
+        config.live = live;
+
+        this._firestoreProps[name] = config;
+
+        // Create a method observer that will be called every time a templatized or observed property changes
+        let args = config.props.concat(config.observes).join(',');
+        if (args.length) { args = ',' + args; }
+        this._createMethodObserver(`_firestoreUpdateBinding('${type}','${name}'${args})`);
+
+        if (!config.props.length && !config.observes.length) {
+          this._firestoreUpdateBinding(type,name);
+        }
+      }
+
+      _firestoreUpdateBinding(type, name) {
+        this._firestoreUnlisten(name);
+
+        const config = this._firestoreProps[name];
+        const propArgs = Array.prototype.slice.call(arguments, 2, config.props.length + 2).filter(arg => arg);
+        const observesArgs = Array.prototype.slice.call(arguments, config.props.length + 2).filter(arg => arg);
+
+        if (propArgs.length < config.props.length || observesArgs.length < config.observes.length) {
+          this[name] = null;
+          this[name + 'Ref'] = null;
+          this[name + 'Ready'] = false;
+          return;
+        }
+
+        const collPath = stitch(config.parts, propArgs);
+        const assigner = snap => {
+          this[name] = TRANSFORMS[type](snap);
+          this[name + 'Ready'] = true;
+        }
+
+        let ref = this.db[type](collPath);
+        this[name + 'Ref'] = ref;
+        this[name + 'Ready'] = false;
+
+        const query = this.constructor.properties[name].query;
+        if (query) {
+          ref = query.call(this, ref, this);
+        }
+
+        if (config.live) {
+          this._firestoreListeners[name] = ref.onSnapshot(assigner);
+        } else {
+          ref.get().then(assigner);
+        }
+      }
+
+      _firestoreUnlisten(name) {
+        if (this._firestoreListeners[name]) {
+          this._firestoreListeners[name]();
+          delete this._firestoreListeners[name];
+        }
+      }
+    }
+  }
+})(window);
+</script>
