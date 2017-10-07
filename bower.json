@@ -23,7 +23,7 @@
     "app-storage": "PolymerElements/app-storage#1 - 2"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#1 - 2",
+    "iron-component-page": "PolymerElements/iron-component-page#^3.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
     "paper-progress": "PolymerElements/paper-progress#1 - 2",
@@ -49,6 +49,10 @@
     }
   },
   "resolutions": {
-    "webcomponentsjs": "^1.0.0"
+    "webcomponentsjs": "^1.0.0",
+    "hydrolysis": "hydrolysis-1.x",
+    "mocha": "^3.1.2",
+    "test-fixture": "^3.0.0",
+    "iron-doc-viewer": "^3.0.0"
   }
 }
