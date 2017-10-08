@@ -169,12 +169,16 @@ if (typeof Polymer === 'undefined') {
 
         this._firestoreProps = {};
         this._firestoreListeners = {};
-        this.db = this.constructor.db || firebase.firestore();
       }
 
       connectedCallback() {
+        super.connectedCallback();
+
         if (this[CONNECTED_CALLBACK_TOKEN] !== true) {
           this[CONNECTED_CALLBACK_TOKEN] = true;
+
+          this.db = this.constructor.db || firebase.firestore();
+          this.db.settings({timestampsInSnapshots: true});
 
           const props = collect(this.constructor, 'properties');
           Object
@@ -188,8 +192,6 @@ if (typeof Polymer === 'undefined') {
             }
           }
         }
-
-        super.connectedCallback();
       }
 
       _firestoreBind(name, options) {
