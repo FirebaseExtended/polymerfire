@@ -1,6 +1,6 @@
 <link rel="import" href="../firestore-element.html">
 
-<dom-module id="user-list">
+<dom-module id="firestore-element-collection-demo">
   <template>
     <ul>
     <dom-repeat items="[[users]]"><template>
@@ -11,8 +11,8 @@
 </dom-module>
 
 <script>
-  class UserList extends Polymer.FirestoreElement(Polymer.Element) {
-    static get is() { return 'user-list'; }
+  class FirestoreElementCollectionDemo extends Polymer.FirestoreElement(Polymer.Element) {
+    static get is() { return 'firestore-element-collection-demo'; }
     static get properties() {
       return {
         users: {
@@ -23,5 +23,5 @@
       }
     }
   }
-  customElements.define(UserList.is, UserList);
+  customElements.define(FirestoreElementCollectionDemo.is, FirestoreElementCollectionDemo);
 </script>

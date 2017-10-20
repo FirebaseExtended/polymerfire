@@ -1,0 +1,22 @@
+<link rel="import" href="../firestore-element.html">
+
+<dom-module id="firestore-element-document-demo">
+  <template>
+    <div>[[user.name]]</div>
+  </template>
+</dom-module>
+
+<script>
+  class FirestoreElementDocumentDemo extends Polymer.FirestoreElement(Polymer.Element) {
+    static get is() { return 'firestore-element-document-demo'; }
+    static get properties() {
+      return {
+        user: {
+          type: Object,
+          doc: 'users/mBylIa6HUTUU5e4npnoE',
+        }
+      }
+    }
+  }
+  customElements.define(FirestoreElementDocumentDemo.is, FirestoreElementDocumentDemo);
+</script>
