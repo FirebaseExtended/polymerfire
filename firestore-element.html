@@ -4,21 +4,21 @@ if (typeof Polymer === 'undefined') {
   throw new Error('Polymer.FirestoreElement must be imported after Polymer itself.');
 }
 
-(context => {
+{
   const MATCH_RE = /\{[a-z0-9_]+\}/gi;
   const TRANSFORMS = {
     doc: function(snap) { return iDoc(snap); },
     collection: function(snap) { return snap.empty ? [] : snap.docs.map(doc => iDoc(doc)) }
   }
 
-  function parsePath(path) {
+  const parsePath = (path) => {
     let result;
     let parts = path.split(MATCH_RE);
     let props = (path.match(MATCH_RE) || []).map(m => m.substr(1, m.length - 2));
     return {parts, props};
   }
 
-  function stitch(parts, values) {
+  const stitch = (parts, values) => {
     let whole = '';
     for (var i = 0; i < parts.length; i++) {
       whole += parts[i];
@@ -27,7 +27,7 @@ if (typeof Polymer === 'undefined') {
     return whole;
   }
 
-	function collect(what, which) {
+	const collect = (what, which) => {
 		let res = {};
 		while (what) {
 			res = Object.assign({}, what[which], res); // Respect prototype priority
@@ -36,7 +36,7 @@ if (typeof Polymer === 'undefined') {
 		return res;
 	};
 
-  function iDoc(snap) {
+  const iDoc = (snap) => {
     if (snap.exists) {
       return Object.assign({__id__: snap.id}, snap.data());
     } else {
@@ -207,5 +207,5 @@ if (typeof Polymer === 'undefined') {
       }
     }
   }
-})(window);
+}
 </script>
