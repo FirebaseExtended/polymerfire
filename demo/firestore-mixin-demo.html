@@ -1,4 +1,4 @@
-<link rel="import" href="../firestore-element.html">
+<link rel="import" href="../firebase-firestore-mixin.html">
 
 <dom-module id="user-list">
   <template>
@@ -11,7 +11,7 @@
 </dom-module>
 
 <script>
-  class UserList extends Polymer.FirestoreElement(Polymer.Element) {
+  class UserList extends Polymer.FirestoreMixin(Polymer.Element) {
     static get is() { return 'user-list'; }
     static get properties() {
       return {
