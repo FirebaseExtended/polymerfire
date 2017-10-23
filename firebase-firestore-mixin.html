@@ -5,23 +5,27 @@ if (typeof Polymer === 'undefined') {
 }
 
 {
-  const MATCH_RE = /\{[a-z0-9_]+\}/gi;
+  const PROPERTY_BINDING_REGEXP = /{([^{]+)}/g;
   const TRANSFORMS = {
     doc: function(snap) { return iDoc(snap); },
     collection: function(snap) { return snap.empty ? [] : snap.docs.map(doc => iDoc(doc)) }
   }
 
+  const isOdd = (x) => x & 1 === 1;
+
   const parsePath = (path) => {
-    let result;
-    let parts = path.split(MATCH_RE);
-    let props = (path.match(MATCH_RE) || []).map(m => m.substr(1, m.length - 2));
-    return {parts, props};
+    const parts = path.split(PROPERTY_BINDING_REGEXP);
+    let literals = [], props = [];
+    parts.forEach((part, index) => {
+      (isOdd(index) ? props : literals).push(part);
+    })
+    return {literals, props};
   }
 
-  const stitch = (parts, values) => {
+  const stitch = (literals, values) => {
     let whole = '';
-    for (var i = 0; i < parts.length; i++) {
-      whole += parts[i];
+    for (var i = 0; i < literals.length; i++) {
+      whole += literals[i];
       whole += values[i] || '';
     }
     return whole;
@@ -177,7 +181,7 @@ if (typeof Polymer === 'undefined') {
           return;
         }
 
-        const collPath = stitch(config.parts, propArgs);
+        const collPath = stitch(config.literals, propArgs);
         const assigner = snap => {
           this[name] = TRANSFORMS[type](snap);
           this[name + 'Ready'] = true;
