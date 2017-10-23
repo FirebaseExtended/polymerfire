@@ -11,9 +11,13 @@
     static get is() { return 'firestore-element-document-demo'; }
     static get properties() {
       return {
+        uid: {
+          type: String,
+          value: 'mBylIa6HUTUU5e4npnoE',
+        },
         user: {
           type: Object,
-          doc: 'users/mBylIa6HUTUU5e4npnoE',
+          doc: 'users/{uid}',
         }
       }
     }
