@@ -1,7 +1,7 @@
 <link rel="import" href="firebase-firestore-script.html">
 <script>
 if (typeof Polymer === 'undefined') {
-  throw new Error('Polymer.FirestoreElement must be imported after Polymer itself.');
+  throw new Error('Polymer.FirestoreMixin must be imported after Polymer itself.');
 }
 
 {
@@ -51,7 +51,7 @@ if (typeof Polymer === 'undefined') {
    * ### Basic Usage
    *
    * ```js
-   * class MyElement extends Polymer.FirestoreElement(Polymer.Element) {
+   * class MyElement extends Polymer.FirestoreMixin(Polymer.Element) {
    *   // ...
    *   static get properties() {
    *     return {
@@ -123,9 +123,9 @@ if (typeof Polymer === 'undefined') {
    * * **observes:** a list of properties which, if changed, should trigger a rebuild of the query
    *
    * @polymer
-   * @mixinFunction Polymer.FirestoreElement
+   * @mixinFunction Polymer.FirestoreMixin
    */
-  Polymer.FirestoreElement = parent => {
+  Polymer.FirestoreMixin = parent => {
     return class extends parent {
       constructor() {
         super();

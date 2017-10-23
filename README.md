@@ -123,15 +123,15 @@ Polymer({
 </script>
 ```
 
-## Polymer.FirestoreElement
+## Polymer.FirestoreMixin
 
 A class mixin that provides Cloud Firestore bindings to your Polymer elements.
-Import `firestore-element.html` to make the mixin available.
+Import `firebase-firestore-mixin.html` to make the mixin available.
 
 Example usage:
 
 ```js
-class MyElement extends Polymer.FirestoreElement(Polymer.Element) {
+class MyElement extends Polymer.FirestoreMixin(Polymer.Element) {
   // ...
   static get properties() {
     return {

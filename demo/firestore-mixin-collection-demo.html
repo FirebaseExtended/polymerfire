@@ -1,6 +1,6 @@
-<link rel="import" href="../firestore-element.html">
+<link rel="import" href="../firebase-firestore-mixin.html">
 
-<dom-module id="firestore-element-collection-demo">
+<dom-module id="firestore-mixin-collection-demo">
   <template>
     <ul>
     <dom-repeat items="[[users]]"><template>
@@ -11,8 +11,8 @@
 </dom-module>
 
 <script>
-  class FirestoreElementCollectionDemo extends Polymer.FirestoreElement(Polymer.Element) {
-    static get is() { return 'firestore-element-collection-demo'; }
+  class FirestoreMixinCollectionDemo extends Polymer.FirestoreMixin(Polymer.Element) {
+    static get is() { return 'firestore-mixin-collection-demo'; }
     static get properties() {
       return {
         users: {
@@ -23,5 +23,5 @@
       }
     }
   }
-  customElements.define(FirestoreElementCollectionDemo.is, FirestoreElementCollectionDemo);
+  customElements.define(FirestoreMixinCollectionDemo.is, FirestoreMixinCollectionDemo);
 </script>
