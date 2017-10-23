@@ -1,14 +1,14 @@
 <link rel="import" href="../firebase-firestore-mixin.html">
 
-<dom-module id="firestore-mixin-document-demo">
+<dom-module id="firebase-firestore-mixin-document-demo">
   <template>
     <div>[[user.name]]</div>
   </template>
 </dom-module>
 
 <script>
-  class FirestoreMixinDocumentDemo extends Polymer.FirestoreMixin(Polymer.Element) {
-    static get is() { return 'firestore-mixin-document-demo'; }
+  class FirebaseFirestoreMixinDocumentDemo extends Polymer.FirestoreMixin(Polymer.Element) {
+    static get is() { return 'firebase-firestore-mixin-document-demo'; }
     static get properties() {
       return {
         uid: {
@@ -22,5 +22,5 @@
       }
     }
   }
-  customElements.define(FirestoreMixinDocumentDemo.is, FirestoreMixinDocumentDemo);
+  customElements.define(FirebaseFirestoreMixinDocumentDemo.is, FirebaseFirestoreMixinDocumentDemo);
 </script>
