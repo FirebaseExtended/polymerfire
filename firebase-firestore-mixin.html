@@ -131,6 +131,15 @@ if (typeof Polymer === 'undefined') {
    */
   Polymer.FirestoreMixin = parent => {
     return class extends parent {
+      static _ensurePropertyTypeCorrectness(prop) {
+        if (prop.doc !== undefined && prop.type !== Object) {
+          throw new Error(`FirestoreMixin's \`doc\` can only be used with properties of type \`Object\`.`);
+        }
+        if (prop.collection !== undefined && prop.type !== Array) {
+          throw new Error(`FirestoreMixin's \`collection\` can only be used with properties of type \`Array\`.`);
+        }
+      }
+
       constructor() {
         super();
         this._firestoreProps = {};
@@ -140,6 +149,8 @@ if (typeof Polymer === 'undefined') {
 
       connectedCallback() {
         const props = collect(this.constructor, 'properties');
+        Object.values(props).forEach(this.constructor._ensurePropertyTypeCorrectness);
+
         for (let name in props) {
           if (props[name].doc) {
             this._firestoreBind('doc', props[name].doc, name, props[name].live, props[name].observes);
