@@ -5,6 +5,7 @@ if (typeof Polymer === 'undefined') {
 }
 
 {
+  const TOKEN = Symbol('polymerfire-firestore-mixin');
   const PROPERTY_BINDING_REGEXP = /{([^{]+)}/g;
   const TRANSFORMS = {
     doc: function(snap) { return iDoc(snap); },
@@ -133,6 +134,12 @@ if (typeof Polymer === 'undefined') {
     return class extends parent {
       constructor() {
         super();
+
+        if (this[TOKEN]) {
+          throw new Error(`FirestoreMixin must not be applied more than once to the same class.`);
+        }
+
+        this[TOKEN] = true;
         this._firestoreProps = {};
         this._firestoreListeners = {};
         this.db = this.constructor.db || firebase.firestore();
