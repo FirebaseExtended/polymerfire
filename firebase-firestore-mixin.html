@@ -191,9 +191,8 @@ if (typeof Polymer === 'undefined') {
         this[name + 'Ref'] = ref;
         this[name + 'Ready'] = false;
 
-        const query = this.constructor.properties[name].query;
-        if (query) {
-          ref = query.call(this, ref, this);
+        if (config.query) {
+          ref = config.query.call(this, ref, this);
         }
 
         if (config.live) {
