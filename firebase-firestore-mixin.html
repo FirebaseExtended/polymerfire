@@ -211,7 +211,7 @@ if (typeof Polymer === 'undefined') {
         } else if (type === 'collection') {
           return (snap) => this._firestoreAssignCollection(name, snap);
         } else {
-          throw new Error('Unknown listener type.')
+          throw new Error('Unknown listener type.');
         }
       }
 
@@ -240,7 +240,7 @@ if (typeof Polymer === 'undefined') {
                 }
                 break;
               default:
-                throw new Error(`Unhandled document change: ${change.type}.`)
+                throw new Error(`Unhandled document change: ${change.type}.`);
             }
           });
         } else {
