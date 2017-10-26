@@ -141,38 +141,42 @@ if (typeof Polymer === 'undefined') {
       connectedCallback() {
         const props = collect(this.constructor, 'properties');
         for (let name in props) {
-          if (props[name].doc) {
-            this._firestoreBind('doc', props[name].doc, name, props[name].live, props[name].observes);
-          } else if (props[name].collection) {
-            this._firestoreBind('collection', props[name].collection, name, props[name].live, props[name].observes);
+          const options = props[name];
+          if (options.doc || options.collection) {
+            this._firestoreBind(name, options);
           }
         }
         super.connectedCallback();
       }
 
-      _firestoreBind(type, path, name, live = false, observes = []) {
-        const config = parsePath(path);
-        config.observes = observes;
-        config.live = live;
+      _firestoreBind(name, options) {
+        const defaults = {
+          live: false,
+          observes: [],
+        }
+        const parsedPath = parsePath(options.doc || options.collection);
+        const config = Object.assign({}, defaults, options, parsedPath);
+        config.type = config.doc ? 'doc' : 'collection';
 
         this._firestoreProps[name] = config;
 
         // Create a method observer that will be called every time a templatized or observed property changes
         let args = config.props.concat(config.observes).join(',');
         if (args.length) { args = ',' + args; }
-        this._createMethodObserver(`_firestoreUpdateBinding('${type}','${name}'${args})`);
+        this._createMethodObserver(`_firestoreUpdateBinding('${name}'${args})`);
 
         if (!config.props.length && !config.observes.length) {
-          this._firestoreUpdateBinding(type,name);
+          this._firestoreUpdateBinding(name);
         }
       }
 
-      _firestoreUpdateBinding(type, name) {
+      _firestoreUpdateBinding(name, ...args) {
         this._firestoreUnlisten(name);
 
         const config = this._firestoreProps[name];
-        const propArgs = Array.prototype.slice.call(arguments, 2, config.props.length + 2).filter(arg => arg);
-        const observesArgs = Array.prototype.slice.call(arguments, config.props.length + 2).filter(arg => arg);
+        const isDefined = (x) => x !== undefined;
+        const propArgs = args.slice(0, config.props.length).filter(isDefined);
+        const observesArgs = args.slice(config.props.length).filter(isDefined);
 
         if (propArgs.length < config.props.length || observesArgs.length < config.observes.length) {
           this[name] = null;
@@ -183,11 +187,11 @@ if (typeof Polymer === 'undefined') {
 
         const collPath = stitch(config.literals, propArgs);
         const assigner = snap => {
-          this[name] = TRANSFORMS[type](snap);
+          this[name] = TRANSFORMS[config.type](snap);
           this[name + 'Ready'] = true;
         }
 
-        let ref = this.db[type](collPath);
+        let ref = this.db[config.type](collPath);
         this[name + 'Ref'] = ref;
         this[name + 'Ready'] = false;
 
