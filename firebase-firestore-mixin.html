@@ -165,9 +165,7 @@ if (typeof Polymer === 'undefined') {
         if (args.length) { args = ',' + args; }
         this._createMethodObserver(`_firestoreUpdateBinding('${name}'${args})`);
 
-        if (!config.props.length && !config.observes.length) {
-          this._firestoreUpdateBinding(name);
-        }
+        this._firestoreUpdateBinding(type,name);
       }
 
       _firestoreUpdateBinding(name, ...args) {
