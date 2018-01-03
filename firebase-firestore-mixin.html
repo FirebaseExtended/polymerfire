@@ -131,13 +131,18 @@ if (typeof Polymer === 'undefined') {
    */
   Polymer.FirestoreMixin = parent => {
     return class extends parent {
-      static _ensurePropertyTypeCorrectness(prop) {
-        if (prop.doc !== undefined && prop.type !== Object) {
-          throw new Error(`FirestoreMixin's \`doc\` can only be used with properties of type \`Object\`.`);
+      static _assertPropertyTypeCorrectness(prop) {
+        const errorMessage = (listenerType, propertyType) =>
+          `FirestoreMixin's ${listenerType} can only be used with properties ` +
+          `of type ${propertyType}.`;
+        const assert = (listenerType, propertyType) => {
+          if (prop[listenerType] !== undefined && prop.type !== propertyType) {
+            throw new Error(errorMessage(listenerType, propertyType.name));
+          }
         }
-        if (prop.collection !== undefined && prop.type !== Array) {
-          throw new Error(`FirestoreMixin's \`collection\` can only be used with properties of type \`Array\`.`);
-        }
+
+        assert('doc', Object);
+        assert('collection', Array);
       }
 
       constructor() {
@@ -149,7 +154,7 @@ if (typeof Polymer === 'undefined') {
 
       connectedCallback() {
         const props = collect(this.constructor, 'properties');
-        Object.values(props).forEach(this.constructor._ensurePropertyTypeCorrectness);
+        Object.values(props).forEach(this.constructor._assertPropertyTypeCorrectness);
 
         for (let name in props) {
           if (props[name].doc) {
