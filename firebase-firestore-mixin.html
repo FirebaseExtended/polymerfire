@@ -5,7 +5,9 @@ if (typeof Polymer === 'undefined') {
 }
 
 {
-  const TOKEN = Symbol('polymerfire-firestore-mixin');
+  const CONSTRUCTOR_TOKEN = Symbol('polymerfire-firestore-mixin-constructor');
+  const CONNECTED_CALLBACK_TOKEN =
+    Symbol('polymerfire-firestore-mixin-connected-callback');
   const PROPERTY_BINDING_REGEXP = /{([^{]+)}/g;
   const TRANSFORMS = {
     doc: function(snap) { return iDoc(snap); },
@@ -135,17 +137,22 @@ if (typeof Polymer === 'undefined') {
       constructor() {
         super();
 
-        if (this[TOKEN]) {
-          throw new Error(`FirestoreMixin must not be applied more than once to the same class.`);
+        if (this[CONSTRUCTOR_TOKEN] === true) {
+          return;
         }
+        this[CONSTRUCTOR_TOKEN] = true;
 
-        this[TOKEN] = true;
         this._firestoreProps = {};
         this._firestoreListeners = {};
         this.db = this.constructor.db || firebase.firestore();
       }
 
       connectedCallback() {
+        if (this[CONNECTED_CALLBACK_TOKEN] === true) {
+          return;
+        }
+        this[CONNECTED_CALLBACK_TOKEN] = true;
+
         const props = collect(this.constructor, 'properties');
         for (let name in props) {
           if (props[name].doc) {
