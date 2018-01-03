@@ -6,10 +6,6 @@ if (typeof Polymer === 'undefined') {
 
 {
   const PROPERTY_BINDING_REGEXP = /{([^{]+)}/g;
-  const TRANSFORMS = {
-    doc: function(snap) { return iDoc(snap); },
-    collection: function(snap) { return snap.empty ? [] : snap.docs.map(doc => iDoc(doc)) }
-  }
 
   const isOdd = (x) => x & 1 === 1;
 
@@ -31,14 +27,14 @@ if (typeof Polymer === 'undefined') {
     return whole;
   }
 
-	const collect = (what, which) => {
-		let res = {};
-		while (what) {
-			res = Object.assign({}, what[which], res); // Respect prototype priority
-			what = Object.getPrototypeOf(what);
-		}
-		return res;
-	};
+  const collect = (what, which) => {
+    let res = {};
+    while (what) {
+      res = Object.assign({}, what[which], res); // Respect prototype priority
+      what = Object.getPrototypeOf(what);
+    }
+    return res;
+  };
 
   const iDoc = (snap) => {
     if (snap.exists) {
@@ -173,18 +169,20 @@ if (typeof Polymer === 'undefined') {
 
         this._firestoreProps[name] = config;
 
-        // Create a method observer that will be called every time a templatized or observed property changes
-        let args = config.props.concat(config.observes).join(',');
-        if (args.length) { args = ',' + args; }
-        this._createMethodObserver(`_firestoreUpdateBinding('${type}','${name}'${args})`);
-
-        if (!config.props.length && !config.observes.length) {
-          this._firestoreUpdateBinding(type,name);
+        if (config.props.length > 0 || observes.length > 0) {
+          // Create a method observer that will be called every time
+          // a templatized or observed property changes
+          const args = config.props.concat(config.observes).join(',');
+          const observer =
+            `_firestoreUpdateBinding('${name}', '${type}', ${args})`
+          this._createMethodObserver(observer);
         }
+
+        this._firestoreUpdateBinding(name, type);
       }
 
-      _firestoreUpdateBinding(type, name) {
-        this._firestoreUnlisten(name);
+      _firestoreUpdateBinding(name, type) {
+        this._firestoreUnlisten(name, type);
 
         const config = this._firestoreProps[name];
         const propArgs = Array.prototype.slice.call(arguments, 2, config.props.length + 2).filter(arg => arg);
@@ -198,18 +196,14 @@ if (typeof Polymer === 'undefined') {
         }
 
         const collPath = stitch(config.literals, propArgs);
-        const assigner = snap => {
-          this[name] = TRANSFORMS[type](snap);
-          this[name + 'Ready'] = true;
-        }
+        const assigner = this._firestoreAssigner(name, type);
 
         let ref = this.db[type](collPath);
         this[name + 'Ref'] = ref;
         this[name + 'Ready'] = false;
 
-        const query = this.constructor.properties[name].query;
-        if (query) {
-          ref = query.call(this, ref, this);
+        if (config.query) {
+          ref = config.query.call(this, ref, this);
         }
 
         if (config.live) {
@@ -219,10 +213,56 @@ if (typeof Polymer === 'undefined') {
         }
       }
 
-      _firestoreUnlisten(name) {
+      _firestoreUnlisten(name, type) {
         if (this._firestoreListeners[name]) {
           this._firestoreListeners[name]();
           delete this._firestoreListeners[name];
+        }
+
+        this[name] = type === 'collection' ? [] : null;
+      }
+
+      _firestoreAssigner(name, type) {
+        if (type === 'doc') {
+          return (snap) => this._firestoreAssignDocument(name, snap);
+        } else if (type === 'collection') {
+          return (snap) => this._firestoreAssignCollection(name, snap);
+        } else {
+          throw new Error('Unknown listener type.');
+        }
+      }
+
+      _firestoreAssignDocument(name, snap) {
+        this[name] = iDoc(snap);
+        this[name + 'Ready'] = true;
+      }
+
+      _firestoreAssignCollection(name, snap) {
+        const propertyValueIsArray = Array.isArray(this[name])
+        const allDocumentsChanged = snap.docs.length === snap.docChanges.length;
+        if (propertyValueIsArray && allDocumentsChanged === false) {
+          snap.docChanges.forEach((change) => {
+            switch (change.type) {
+              case 'added':
+                this.splice(name, change.newIndex, 0, iDoc(change.doc));
+                break;
+              case 'removed':
+                this.splice(name, change.oldIndex, 1);
+                break;
+              case 'modified':
+                if (change.oldIndex === change.newIndex) {
+                  this.splice(name, change.oldIndex, 1, iDoc(change.doc));
+                } else {
+                  this.splice(name, change.oldIndex, 1);
+                  this.splice(name, change.newIndex, 0, iDoc(change.doc));
+                }
+                break;
+              default:
+                throw new Error(`Unhandled document change: ${change.type}.`);
+            }
+          });
+        } else {
+          this[name] = snap.docs.map(iDoc);
         }
       }
     }
