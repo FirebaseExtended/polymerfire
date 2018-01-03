@@ -200,9 +200,8 @@ if (typeof Polymer === 'undefined') {
           this._firestoreListeners[name]();
           delete this._firestoreListeners[name];
         }
-        if (type === 'collection') {
-          this[name] = [];
-        }
+
+        this[name] = type === 'collection' ? [] : null;
       }
 
       _firestoreAssigner(name, type) {
