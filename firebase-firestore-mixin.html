@@ -5,11 +5,10 @@ if (typeof Polymer === 'undefined') {
 }
 
 {
+  const CONSTRUCTOR_TOKEN = Symbol('polymerfire-firestore-mixin-constructor');
+  const CONNECTED_CALLBACK_TOKEN =
+    Symbol('polymerfire-firestore-mixin-connected-callback');
   const PROPERTY_BINDING_REGEXP = /{([^{]+)}/g;
-  const TRANSFORMS = {
-    doc: function(snap) { return iDoc(snap); },
-    collection: function(snap) { return snap.empty ? [] : snap.docs.map(doc => iDoc(doc)) }
-  }
 
   const isOdd = (x) => x & 1 === 1;
 
@@ -46,6 +45,11 @@ if (typeof Polymer === 'undefined') {
     } else {
       return null;
     }
+  }
+
+  const TRANSFORMS = {
+    doc: iDoc,
+    collection: (snap) => snap.empty ? [] : snap.docs.map(iDoc),
   }
 
   /**
@@ -133,12 +137,23 @@ if (typeof Polymer === 'undefined') {
     return class extends parent {
       constructor() {
         super();
+
+        if (this[CONSTRUCTOR_TOKEN] === true) {
+          return;
+        }
+        this[CONSTRUCTOR_TOKEN] = true;
+
         this._firestoreProps = {};
         this._firestoreListeners = {};
         this.db = this.constructor.db || firebase.firestore();
       }
 
       connectedCallback() {
+        if (this[CONNECTED_CALLBACK_TOKEN] === true) {
+          return;
+        }
+        this[CONNECTED_CALLBACK_TOKEN] = true;
+
         const props = collect(this.constructor, 'properties');
         for (let name in props) {
           if (props[name].doc) {
