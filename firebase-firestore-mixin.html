@@ -131,6 +131,20 @@ if (typeof Polymer === 'undefined') {
    */
   Polymer.FirestoreMixin = parent => {
     return class extends parent {
+      static _assertPropertyTypeCorrectness(prop) {
+        const errorMessage = (listenerType, propertyType) =>
+          `FirestoreMixin's ${listenerType} can only be used with properties ` +
+          `of type ${propertyType}.`;
+        const assert = (listenerType, propertyType) => {
+          if (prop[listenerType] !== undefined && prop.type !== propertyType) {
+            throw new Error(errorMessage(listenerType, propertyType.name));
+          }
+        }
+
+        assert('doc', Object);
+        assert('collection', Array);
+      }
+
       constructor() {
         super();
         this._firestoreProps = {};
@@ -140,6 +154,8 @@ if (typeof Polymer === 'undefined') {
 
       connectedCallback() {
         const props = collect(this.constructor, 'properties');
+        Object.values(props).forEach(this.constructor._assertPropertyTypeCorrectness);
+
         for (let name in props) {
           if (props[name].doc) {
             this._firestoreBind('doc', props[name].doc, name, props[name].live, props[name].observes);
