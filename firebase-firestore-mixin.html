@@ -169,7 +169,9 @@ if (typeof Polymer === 'undefined') {
         this[CONNECTED_CALLBACK_TOKEN] = true;
 
         const props = collect(this.constructor, 'properties');
-        Object.values(props).forEach(this.constructor._assertPropertyTypeCorrectness);
+        Object
+          .values(props)
+          .forEach(this.constructor._assertPropertyTypeCorrectness);
 
         for (let name in props) {
           const options = props[name];
@@ -192,16 +194,16 @@ if (typeof Polymer === 'undefined') {
 
         this._firestoreProps[name] = config;
 
-        if (config.props.length > 0 || config.observes.length > 0) {
+        const args = config.props.concat(config.observes);
+        if (args.length > 0) {
           // Create a method observer that will be called every time
           // a templatized or observed property changes
-          const args = config.props.concat(config.observes).join(',');
           const observer =
-            `_firestoreUpdateBinding('${name}', ${args})`
+            `_firestoreUpdateBinding('${name}', ${args.join(',')})`
           this._createMethodObserver(observer);
         }
 
-        this._firestoreUpdateBinding(name);
+        this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
       }
 
       _firestoreUpdateBinding(name, ...args) {
