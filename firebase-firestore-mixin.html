@@ -252,15 +252,17 @@ if (typeof Polymer === 'undefined') {
       }
 
       _firestoreAssigner(name, type) {
+        const makeAssigner = (assigner) => (snap) => {
+          assigner.call(this, name, snap);
+          this[name + 'Ready'] = true;
+        }
         if (type === 'doc') {
-          return (snap) => this._firestoreAssignDocument(name, snap);
+          return makeAssigner(this._firestoreAssignDocument);
         } else if (type === 'collection') {
-          return (snap) => this._firestoreAssignCollection(name, snap);
+          return makeAssigner(this._firestoreAssignCollection);
         } else {
           throw new Error('Unknown listener type.');
         }
-
-        this[name + 'Ready'] = true;        
       }
 
       _firestoreAssignDocument(name, snap) {
