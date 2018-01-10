@@ -5,11 +5,10 @@ if (typeof Polymer === 'undefined') {
 }
 
 {
+  const CONSTRUCTOR_TOKEN = Symbol('polymerfire-firestore-mixin-constructor');
+  const CONNECTED_CALLBACK_TOKEN =
+    Symbol('polymerfire-firestore-mixin-connected-callback');
   const PROPERTY_BINDING_REGEXP = /{([^{]+)}/g;
-  const TRANSFORMS = {
-    doc: function(snap) { return iDoc(snap); },
-    collection: function(snap) { return snap.empty ? [] : snap.docs.map(doc => iDoc(doc)) }
-  }
 
   const isOdd = (x) => x & 1 === 1;
 
@@ -31,14 +30,14 @@ if (typeof Polymer === 'undefined') {
     return whole;
   }
 
-	const collect = (what, which) => {
-		let res = {};
-		while (what) {
-			res = Object.assign({}, what[which], res); // Respect prototype priority
-			what = Object.getPrototypeOf(what);
-		}
-		return res;
-	};
+  const collect = (what, which) => {
+    let res = {};
+    while (what) {
+      res = Object.assign({}, what[which], res); // Respect prototype priority
+      what = Object.getPrototypeOf(what);
+    }
+    return res;
+  };
 
   const iDoc = (snap) => {
     if (snap.exists) {
@@ -46,6 +45,11 @@ if (typeof Polymer === 'undefined') {
     } else {
       return null;
     }
+  }
+
+  const TRANSFORMS = {
+    doc: iDoc,
+    collection: (snap) => snap.empty ? [] : snap.docs.map(iDoc),
   }
 
   /**
@@ -131,81 +135,166 @@ if (typeof Polymer === 'undefined') {
    */
   Polymer.FirestoreMixin = parent => {
     return class extends parent {
+      static _assertPropertyTypeCorrectness(prop) {
+        const errorMessage = (listenerType, propertyType) =>
+          `FirestoreMixin's ${listenerType} can only be used with properties ` +
+          `of type ${propertyType}.`;
+        const assert = (listenerType, propertyType) => {
+          if (prop[listenerType] !== undefined && prop.type !== propertyType) {
+            throw new Error(errorMessage(listenerType, propertyType.name));
+          }
+        }
+
+        assert('doc', Object);
+        assert('collection', Array);
+      }
+
       constructor() {
         super();
+
+        if (this[CONSTRUCTOR_TOKEN] === true) {
+          return;
+        }
+        this[CONSTRUCTOR_TOKEN] = true;
+
         this._firestoreProps = {};
         this._firestoreListeners = {};
         this.db = this.constructor.db || firebase.firestore();
       }
 
       connectedCallback() {
+        if (this[CONNECTED_CALLBACK_TOKEN] === true) {
+          return;
+        }
+        this[CONNECTED_CALLBACK_TOKEN] = true;
+
         const props = collect(this.constructor, 'properties');
+        Object
+          .values(props)
+          .forEach(this.constructor._assertPropertyTypeCorrectness);
+
         for (let name in props) {
-          if (props[name].doc) {
-            this._firestoreBind('doc', props[name].doc, name, props[name].live, props[name].observes);
-          } else if (props[name].collection) {
-            this._firestoreBind('collection', props[name].collection, name, props[name].live, props[name].observes);
+          const options = props[name];
+          if (options.doc || options.collection) {
+            this._firestoreBind(name, options);
           }
         }
         super.connectedCallback();
       }
 
-      _firestoreBind(type, path, name, live = false, observes = []) {
-        const config = parsePath(path);
-        config.observes = observes;
-        config.live = live;
+      _firestoreBind(name, options) {
+        const defaults = {
+          live: false,
+          observes: [],
+        }
+        const parsedPath = parsePath(options.doc || options.collection);
+        const config = Object.assign({}, defaults, options, parsedPath);
+        const type = config.type =
+          config.doc ? 'doc' : config.collection ? 'collection' : undefined;
 
         this._firestoreProps[name] = config;
 
-        // Create a method observer that will be called every time a templatized or observed property changes
-        let args = config.props.concat(config.observes).join(',');
-        if (args.length) { args = ',' + args; }
-        this._createMethodObserver(`_firestoreUpdateBinding('${type}','${name}'${args})`);
-
-        if (!config.props.length && !config.observes.length) {
-          this._firestoreUpdateBinding(type,name);
+        const args = config.props.concat(config.observes);
+        if (args.length > 0) {
+          // Create a method observer that will be called every time
+          // a templatized or observed property changes
+          const observer =
+            `_firestoreUpdateBinding('${name}', ${args.join(',')})`
+          this._createMethodObserver(observer);
         }
+
+        this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
       }
 
-      _firestoreUpdateBinding(type, name) {
+      _firestoreUpdateBinding(name, ...args) {
         this._firestoreUnlisten(name);
 
         const config = this._firestoreProps[name];
-        const propArgs = Array.prototype.slice.call(arguments, 2, config.props.length + 2).filter(arg => arg);
-        const observesArgs = Array.prototype.slice.call(arguments, config.props.length + 2).filter(arg => arg);
+        const isDefined = (x) => x !== undefined;
+        const propArgs = args.slice(0, config.props.length).filter(isDefined);
+        const observesArgs = args.slice(config.props.length).filter(isDefined);
 
-        if (propArgs.length < config.props.length || observesArgs.length < config.observes.length) {
-          this[name] = null;
-          this[name + 'Ref'] = null;
-          this[name + 'Ready'] = false;
-          return;
-        }
+        const propArgsReady = propArgs.length === config.props.length;
+        const observesArgsReady =
+          observesArgs.length === config.observes.length;
 
-        const collPath = stitch(config.literals, propArgs);
-        const assigner = snap => {
-          this[name] = TRANSFORMS[type](snap);
-          this[name + 'Ready'] = true;
-        }
+        if (propArgsReady && observesArgsReady) {
+          const collPath = stitch(config.literals, propArgs);
+          const assigner = this._firestoreAssigner(name, config.type);
 
-        let ref = this.db[type](collPath);
-        this[name + 'Ref'] = ref;
-        this[name + 'Ready'] = false;
+          let ref = this.db[config.type](collPath);
+          this[name + 'Ref'] = ref;
 
-        if (config.query) {
-          ref = config.query.call(this, ref, this);
-        }
+          if (config.query) {
+            ref = config.query.call(this, ref, this);
+          }
 
-        if (config.live) {
-          this._firestoreListeners[name] = ref.onSnapshot(assigner);
-        } else {
-          ref.get().then(assigner);
+          if (config.live) {
+            this._firestoreListeners[name] = ref.onSnapshot(assigner);
+          } else {
+            ref.get().then(assigner);
+          }
         }
       }
 
-      _firestoreUnlisten(name) {
+      _firestoreUnlisten(name, type) {
         if (this._firestoreListeners[name]) {
           this._firestoreListeners[name]();
           delete this._firestoreListeners[name];
+        }
+
+
+        this.setProperties({
+          [name]: type === 'collection' ? [] : null,
+          [name + 'Ref']: null,
+          [name + 'Ready']: false,
+        })
+      }
+
+      _firestoreAssigner(name, type) {
+        const makeAssigner = (assigner) => (snap) => {
+          assigner.call(this, name, snap);
+          this[name + 'Ready'] = true;
+        }
+        if (type === 'doc') {
+          return makeAssigner(this._firestoreAssignDocument);
+        } else if (type === 'collection') {
+          return makeAssigner(this._firestoreAssignCollection);
+        } else {
+          throw new Error('Unknown listener type.');
+        }
+      }
+
+      _firestoreAssignDocument(name, snap) {
+        this[name] = iDoc(snap);
+      }
+
+      _firestoreAssignCollection(name, snap) {
+        const propertyValueIsArray = Array.isArray(this[name])
+        const allDocumentsChanged = snap.docs.length === snap.docChanges.length;
+        if (propertyValueIsArray && allDocumentsChanged === false) {
+          snap.docChanges.forEach((change) => {
+            switch (change.type) {
+              case 'added':
+                this.splice(name, change.newIndex, 0, iDoc(change.doc));
+                break;
+              case 'removed':
+                this.splice(name, change.oldIndex, 1);
+                break;
+              case 'modified':
+                if (change.oldIndex === change.newIndex) {
+                  this.splice(name, change.oldIndex, 1, iDoc(change.doc));
+                } else {
+                  this.splice(name, change.oldIndex, 1);
+                  this.splice(name, change.newIndex, 0, iDoc(change.doc));
+                }
+                break;
+              default:
+                throw new Error(`Unhandled document change: ${change.type}.`);
+            }
+          });
+        } else {
+          this[name] = snap.docs.map(iDoc);
         }
       }
     }
