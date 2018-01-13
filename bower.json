@@ -1,6 +1,6 @@
 {
   "name": "polymerfire",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "authors": [
     "Firebase"
   ],
@@ -18,8 +18,8 @@
     "/test/"
   ],
   "dependencies": {
-    "polymer": "polymer/polymer#1.9 - 2",
-    "firebase": "^4.1.1",
+    "polymer": "Polymer/polymer#1.9 - 2",
+    "firebase": "^4.5.0",
     "app-storage": "PolymerElements/app-storage#1 - 2"
   },
   "devDependencies": {
@@ -33,8 +33,8 @@
     "1.x": {
       "dependencies": {
         "polymer": "Polymer/polymer#^1.9",
-        "firebase": "^4.1.1",
-        "app-storage": "polymerelements/app-storage#^0.9.0"
+        "firebase": "^4.5.0",
+        "app-storage": "PolymerElements/app-storage#^0.9.0"
       },
       "devDependencies": {
         "iron-component-page": "PolymerElements/iron-component-page#^1.0",
