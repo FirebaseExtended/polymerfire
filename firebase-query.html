@@ -354,7 +354,6 @@ Polymer({
           var key = snapshot.key;
 
           if (this.__initialLoadDone) {
-                        
             var value = snapshot.val();
             var previousChildIndex = this.__indexFromKey(previousChildKey);
 
@@ -363,8 +362,8 @@ Polymer({
             value = this.__snapshotToValue(snapshot);
 
             this.__map[key] = value;
-            this._setExists(true);
             this.splice('data', previousChildIndex + 1, 0, value);
+            this._setExists(true);
           }
         },
 
@@ -382,7 +381,6 @@ Polymer({
               });
               if (this.data.length === 0) {
                 this._setExists(false);
-                this.fire('empty-result');
               }
             });
           }
