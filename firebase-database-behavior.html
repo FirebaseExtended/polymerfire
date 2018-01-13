@@ -14,12 +14,6 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   (function() {
     'use strict';
 
-    /**
-     * the element is notified that the path does not hold any data (fired by firebase-document or firebase query)
-     *
-     * @event empty-result
-     */
-
     /** @polymerBehavior Polymer.FirebaseDatabaseBehavior */
     Polymer.FirebaseDatabaseBehaviorImpl = {
       properties: {
@@ -55,8 +49,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         },
 
         /**
-         * `exists` is set to `true` when the data actually exists for the specified path; `false` otherwise. 
-         * When we are unable to determine whether data exists or not (e.g. first round trip to the server not yet performed) the value is `null`
+         * `exists` is set to `true` when the data actually exists for the 
+         * specified path; `false` otherwise. 
+         * When we are unable to determine whether data exists or not 
+         * (e.g. first round trip to the server not yet performed) the value 
+         * is `null`
          */
         exists: {
           type: Boolean,
