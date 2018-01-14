@@ -122,6 +122,16 @@ Polymer({
            *
            * Changing this value generates a new `query` which includes children
            * which match the specified value.
+           *
+           * Since Polymer requires a type definition for a property and
+           * `equalTo` accepts values of multiple types, `Object` is used as
+           * a placeholder. The argument type depends on which orderBy*()
+           * function was used in this query. Specify a value that matches
+           * the orderBy*() type. When used in combination with orderByKey(),
+           * the value must be a string.
+           *
+           * This property is type-sensitive, i.e. passing a value `'true'`
+           * (string) will not match `true` (boolean).
            */
           equalTo: {
             type: Object,
