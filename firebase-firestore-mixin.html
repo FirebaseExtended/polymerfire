@@ -163,22 +163,22 @@ if (typeof Polymer === 'undefined') {
       }
 
       connectedCallback() {
-        if (this[CONNECTED_CALLBACK_TOKEN] === true) {
-          return;
-        }
-        this[CONNECTED_CALLBACK_TOKEN] = true;
+        if (this[CONNECTED_CALLBACK_TOKEN] !== true) {
+          this[CONNECTED_CALLBACK_TOKEN] = true;
 
-        const props = collect(this.constructor, 'properties');
-        Object
-          .values(props)
-          .forEach(this.constructor._assertPropertyTypeCorrectness);
+          const props = collect(this.constructor, 'properties');
+          Object
+            .values(props)
+            .forEach(this.constructor._assertPropertyTypeCorrectness);
 
-        for (let name in props) {
-          const options = props[name];
-          if (options.doc || options.collection) {
-            this._firestoreBind(name, options);
+          for (let name in props) {
+            const options = props[name];
+            if (options.doc || options.collection) {
+              this._firestoreBind(name, options);
+            }
           }
         }
+
         super.connectedCallback();
       }
 
