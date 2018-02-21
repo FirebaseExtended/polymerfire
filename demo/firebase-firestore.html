@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!--
+@license
+Copyright 2017 Google Inc. All Rights Reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file or at
+https://github.com/firebase/polymerfire/blob/master/LICENSE
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>PolymerFire Firestore Demo</title>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../../polymer/polymer.html">
+    <link rel="import" href="../firebase-app.html">
+    <link rel="import" href="firebase-firestore-mixin-collection-demo.html">
+    <link rel="import" href="firebase-firestore-mixin-document-demo.html">
+    <firebase-app auth-domain="polymerfire-test.firebaseapp.com"
+      database-url="https://polymerfire-test.firebaseio.com/"
+      api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+      project-id="polymerfire-test"></firebase-app>
+  </head>
+  <body>
+    Collection:
+    <firebase-firestore-mixin-collection-demo></firebase-firestore-mixin-collection-demo>
+    Document:
+    <firebase-firestore-mixin-document-demo></firebase-firestore-mixin-document-demo>
+  </body>
+</html>

@@ -14,28 +14,23 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 [![Build status](https://travis-ci.org/firebase/polymerfire.svg?branch=master)](https://travis-ci.org/firebase/polymerfire)
 
-## Loading Polymerfire
-
-The Firebase SDK can be loaded modularly (e.g. I can only load Auth and Database but not Storage or Messaging), but **all features must be loaded before the SDK is initialized** (lazy loading is not supported). A good way to handle this is to import `<firebase-app>` as well as any scripts you need for specific features:
-
-```html
-<link rel="import" href="bower_components/polymerfire/firebase-app.html">
-<link rel="import" href="bower_components/polymerfire/firebase-auth-script.html">
-<link rel="import" href="bower_components/polymerfire/firebase-database-script.html">
-<link rel="import" href="bower_components/polymerfire/firebase-storage-script.html">
-<link rel="import" href="bower_components/polymerfire/firebase-messaging-script.html">
-
-<firebase-app
-  database-url="..." storage-bucket="..." api-key="..." messaging-sender-id="..." auth-domain="...">
-</firebase-app>
-```
-
 ## &lt;firebase-app&gt;
 
 The firebase-app element is used for initializing and configuring your
-connection to firebase.
+connection to firebase. It is only necessary to include this element once
+in your application, and it equivalent to calling `firebase.initializeApp()`
+in the JavaScript SDK.
 
-
+```html
+<firebase-app
+  auth-domain="polymerfire-test.firebaseapp.com"
+  database-url="https://polymerfire-test.firebaseio.com/"
+  api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+  storage-bucket="polymerfire-test.appspot.com"
+  messaging-sender-id="544817973908"
+  project-id="polymerfire-test">
+</firebase-app>
+```
 
 ## &lt;firebase-auth&gt;
 
@@ -47,13 +42,6 @@ workflows.
 Example Usage:
 
 ```html
-<firebase-app
-  auth-domain="polymerfire-test.firebaseapp.com"
-  database-url="https://polymerfire-test.firebaseio.com/"
-  api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
-  storage-bucket="polymerfire-test.appspot.com"
-  messaging-sender-id="544817973908">
-</firebase-app>
 <firebase-auth id="auth" user="{{user}}" provider="google" on-error="handleError">
 </firebase-auth>
 ```
@@ -74,8 +62,6 @@ this.$.auth.signInWithPopup()
 This popup sign-in will then attempt to sign in using Google as an OAuth
 provider since there was no provider argument specified and since `"google"` was
 defined as the default provider.
-
-
 
 ## &lt;firebase-document&gt;
 
@@ -99,8 +85,6 @@ and stored.
 `<firebase-document>` needs some information about how to talk to Firebase.
 Set this configuration by adding a `<firebase-app>` element anywhere in your
 app.
-
-
 
 ## &lt;firebase-query&gt;
 
@@ -139,4 +123,27 @@ Polymer({
 </script>
 ```
 
+## Polymer.FirestoreMixin
 
+A class mixin that provides Cloud Firestore bindings to your Polymer elements.
+Import `firebase-firestore-mixin.html` to make the mixin available.
+
+Example usage:
+
+```js
+class MyElement extends Polymer.FirestoreMixin(Polymer.Element) {
+  // ...
+  static get properties() {
+    return {
+      user: {
+        type: Object,
+        doc: 'users/{uid}'
+      },
+      messages: {
+        type: Array,
+        collection: 'users/{uid}/messages'
+      }
+    }
+  }
+}
+```

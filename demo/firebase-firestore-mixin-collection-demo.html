@@ -1,0 +1,27 @@
+<link rel="import" href="../firebase-firestore-mixin.html">
+
+<dom-module id="firebase-firestore-mixin-collection-demo">
+  <template>
+    <ul>
+    <dom-repeat items="[[users]]"><template>
+      <li>[[item.name]]</li>
+    </template></dom-repeat>
+    </ul>
+  </template>
+</dom-module>
+
+<script>
+  class FirebaseFirestoreMixinCollectionDemo extends Polymer.FirestoreMixin(Polymer.Element) {
+    static get is() { return 'firebase-firestore-mixin-collection-demo'; }
+    static get properties() {
+      return {
+        users: {
+          type: Array,
+          collection: 'users',
+          query: q => q.orderBy('name')
+        }
+      }
+    }
+  }
+  customElements.define(FirebaseFirestoreMixinCollectionDemo.is, FirebaseFirestoreMixinCollectionDemo);
+</script>
