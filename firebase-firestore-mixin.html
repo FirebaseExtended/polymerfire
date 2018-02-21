@@ -169,10 +169,11 @@ if (typeof Polymer === 'undefined') {
 
         this._firestoreProps = {};
         this._firestoreListeners = {};
-        this.db = this.constructor.db || firebase.firestore();
       }
 
       connectedCallback() {
+        super.connectedCallback();
+        this.db = this.constructor.db || firebase.firestore();
         if (this[CONNECTED_CALLBACK_TOKEN] !== true) {
           this[CONNECTED_CALLBACK_TOKEN] = true;
 
@@ -188,8 +189,6 @@ if (typeof Polymer === 'undefined') {
             }
           }
         }
-
-        super.connectedCallback();
       }
 
       _firestoreBind(name, options) {
