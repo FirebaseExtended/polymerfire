@@ -124,17 +124,27 @@ if (typeof Polymer === 'undefined') {
    *
    * ### Options
    *
-   * * **doc:** *string*, the full (optionally templatized) path to a document
-   * * **collection:** *string*, the full (optionally templatized) path to a collection
-   * * **live:** *boolean*, whether or not to continue updating the property as data changes in the database
-   * * **query:** *(ref: Reference, el: Element)* a query builder function that takes the computed ref and the element instance
-   * * **observes:** a list of properties which, if changed, should trigger a rebuild of the query
+   * * **doc:** *string*, the full (optionally templatized) path to a document.
+   *   Property type must be defined as `Object`
+   * * **collection:** *string*, the full (optionally templatized) path to
+   *   a collection. Property type must be defined as `Array`.
+   * * **live:** *boolean*, whether or not to continue updating the property
+   *   as data changes in the database. If persistence is enabled, value of
+   *   a property might be assigned twice (first from cache, then a live copy).
+   *   See `noCache` if you wan't to change this behavior.
+   * * **query:** *(ref: CollectionReference, el: Polymer.Element): Query*
+   *   a query builder function that takes the computed collection reference and
+   *   the element instance. It must return an instance of Query.
+   * * **observes:** a list of properties which, if changed, should trigger
+   *   a rebuild of a listener.
+   * * **noCache:** cached Firestore data won't be assigned to a property
+   *   value even if persistence is enabled.
    *
    * @polymer
    * @mixinFunction Polymer.FirestoreMixin
    */
-  Polymer.FirestoreMixin = parent => {
-    return class extends parent {
+  Polymer.FirestoreMixin = parent =>
+    class extends parent {
       static _assertPropertyTypeCorrectness(prop) {
         const errorMessage = (listenerType, propertyType) =>
           `FirestoreMixin's ${listenerType} can only be used with properties ` +
@@ -220,7 +230,7 @@ if (typeof Polymer === 'undefined') {
 
         if (propArgsReady && observesArgsReady) {
           const collPath = stitch(config.literals, propArgs);
-          const assigner = this._firestoreAssigner(name, config.type);
+          const assigner = this._firestoreAssigner(name, config);
 
           let ref = this.db[config.type](collPath);
           this[name + 'Ref'] = ref;
@@ -229,11 +239,7 @@ if (typeof Polymer === 'undefined') {
             ref = config.query.call(this, ref, this);
           }
 
-          if (config.live) {
-            this._firestoreListeners[name] = ref.onSnapshot(assigner);
-          } else {
-            ref.get().then(assigner);
-          }
+          this._firestoreListeners[name] = ref.onSnapshot(assigner);
         }
       }
 
@@ -251,10 +257,17 @@ if (typeof Polymer === 'undefined') {
         })
       }
 
-      _firestoreAssigner(name, type) {
+      _firestoreAssigner(name, {type, live, noCache}) {
         const makeAssigner = (assigner) => (snap) => {
-          assigner.call(this, name, snap);
-          this[name + 'Ready'] = true;
+          const shouldAssign =
+            noCache !== true || snap.metadata.fromCache === false;
+          if (shouldAssign) {
+            assigner.call(this, name, snap);
+            this[name + 'Ready'] = true;
+            if (live !== true) {
+              this._firestoreListeners[name]();
+            }
+          }
         }
         if (type === 'doc') {
           return makeAssigner(this._firestoreAssignDocument);
@@ -298,6 +311,5 @@ if (typeof Polymer === 'undefined') {
         }
       }
     }
-  }
 }
 </script>
