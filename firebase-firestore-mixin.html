@@ -210,9 +210,9 @@ if (typeof Polymer === 'undefined') {
           const observer =
             `_firestoreUpdateBinding('${name}', ${args.join(',')})`
           this._createMethodObserver(observer);
+        } else {
+          this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
         }
-
-        this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
       }
 
       _firestoreUpdateBinding(name, ...args) {
