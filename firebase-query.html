@@ -289,6 +289,7 @@ Polymer({
             this.syncToMemory(function() {
               this.__map = {};
               this.set('data', this.zeroValue);
+              this._setExists(null);
             });
           }
 
@@ -305,13 +306,14 @@ Polymer({
               query.off('child_changed', this.__onFirebaseChildChanged, this);
               query.off('child_moved', this.__onFirebaseChildMoved, this);
             }
-
-            this._onOnce = true;
-            this._query = query
+            
+            this._setExists(null);   
+            this._onOnce = true;            
+            this._query = query;
 
             // does the on-value first
-            query.off('value', this.__onFirebaseValue, this)
-            query.on('value', this.__onFirebaseValue, this.__onError, this)
+            query.off('value', this.__onFirebaseValue, this);
+            query.on('value', this.__onFirebaseValue, this.__onError, this);
           }
         },
 
@@ -338,6 +340,7 @@ Polymer({
             }.bind(this))
 
             this.set('data', data);
+            this._setExists(true);
           }
 
           const query = this.query
@@ -371,6 +374,7 @@ Polymer({
 
           this.__map[key] = value;
           this.splice('data', previousChildIndex + 1, 0, value);
+          this._setExists(true);
         },
 
         __onFirebaseChildRemoved: function(snapshot) {
@@ -390,6 +394,9 @@ Polymer({
                   this.splice('data', this.__indexFromKey(key), 1);
                 }
               });
+              if (this.data.length === 0) {
+                this._setExists(false);
+              }
             });
           }
         },

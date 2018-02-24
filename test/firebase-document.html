@@ -24,10 +24,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 <body>
 
   <firebase-app
-      name="test"
-      api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
-      auth-domain="polymerfire-test.firebaseapp.com"
-      database-url="https://polymerfire-test.firebaseio.com">
+    name="test"
+    api-key="AIzaSyDTP-eiQezleFsV2WddFBAhF_WEzx_8v_g"
+    auth-domain="polymerfire-test.firebaseapp.com"
+    database-url="https://polymerfire-test.firebaseio.com">
   </firebase-app>
 
   <test-fixture id="BasicStorage">
@@ -65,6 +65,59 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           });
         }
       });
+
+     function pushFirebaseValue(path, value) {
+       return firebase.app('test').database().ref(path).push(value);
+      }
+
+      function clearFirebaseValue(path) {
+        return firebase.app('test').database().ref(path).set(null);
+      }
+
+      var makeObject;
+      var root;
+
+      setup(function() {
+        var objectId = 0;
+        makeObject = function(value) {
+          return {
+            val: value || objectId++
+          };
+        };
+
+        return pushFirebaseValue('/test', { ignore: 'me' }).then(function(snapshot) {
+          root = '/test/' + snapshot.key;
+        });
+      });
+
+      suite('exists attribute', function() {
+         var query;
+
+        setup(function() {
+          query = fixture('BasicStorage');
+          query.path = root + '/list';
+          return query.transactionsComplete;
+        });
+
+        test('exists is null when we change the path', function() {
+          query.path = '/myNewPath';
+          expect(query.exists).to.be.equal(null);
+        });
+
+        test('exists is true when we have data false when we remove it.', function() {
+          var object = makeObject();
+
+          return pushFirebaseValue(query.path, object).then(function() {
+            expect(query.exists).to.be.equal(true);
+          }).then(function(){
+            clearFirebaseValue(query.path);
+          }).then(function() {
+            expect(query.exists).to.be.equal(false);
+          });
+        });
+        
+      });
+
     });
   </script>
 </body>
