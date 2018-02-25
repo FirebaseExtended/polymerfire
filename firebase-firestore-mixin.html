@@ -173,7 +173,6 @@ if (typeof Polymer === 'undefined') {
 
       connectedCallback() {
         super.connectedCallback();
-        this.db = this.constructor.db || firebase.firestore();
         if (this[CONNECTED_CALLBACK_TOKEN] !== true) {
           this[CONNECTED_CALLBACK_TOKEN] = true;
 
@@ -215,7 +214,6 @@ if (typeof Polymer === 'undefined') {
       }
 
       _firestoreUpdateBinding(name, ...args) {
-        this._firestoreUnlisten(name);
 
         const config = this._firestoreProps[name];
         const isDefined = (x) => x !== undefined;
@@ -227,6 +225,8 @@ if (typeof Polymer === 'undefined') {
           observesArgs.length === config.observes.length;
 
         if (propArgsReady && observesArgsReady) {
+          this._firestoreUnlisten(name);
+          this.db = this.db || firebase.firestore();
           const collPath = stitch(config.literals, propArgs);
           const assigner = this._firestoreAssigner(name, config);
 
