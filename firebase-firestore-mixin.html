@@ -204,14 +204,13 @@ if (typeof Polymer === 'undefined') {
         this._firestoreProps[name] = config;
 
         const args = config.props.concat(config.observes);
+        this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
         if (args.length > 0) {
           // Create a method observer that will be called every time
           // a templatized or observed property changes
           const observer =
             `_firestoreUpdateBinding('${name}', ${args.join(',')})`
           this._createMethodObserver(observer);
-        } else {
-          this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
         }
       }
 
