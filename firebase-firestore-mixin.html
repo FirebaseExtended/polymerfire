@@ -214,7 +214,7 @@ if (typeof Polymer === 'undefined') {
       }
 
       _firestoreUpdateBinding(name, ...args) {
-
+        this._firestoreUnlisten(name);
         const config = this._firestoreProps[name];
         const isDefined = (x) => x !== undefined;
         const propArgs = args.slice(0, config.props.length).filter(isDefined);
@@ -225,7 +225,6 @@ if (typeof Polymer === 'undefined') {
           observesArgs.length === config.observes.length;
 
         if (propArgsReady && observesArgsReady) {
-          this._firestoreUnlisten(name);
           this.db = this.db || firebase.firestore();
           const collPath = stitch(config.literals, propArgs);
           const assigner = this._firestoreAssigner(name, config);
