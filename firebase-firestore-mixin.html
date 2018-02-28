@@ -169,10 +169,10 @@ if (typeof Polymer === 'undefined') {
 
         this._firestoreProps = {};
         this._firestoreListeners = {};
-        this.db = this.constructor.db || firebase.firestore();
       }
 
       connectedCallback() {
+        super.connectedCallback();
         if (this[CONNECTED_CALLBACK_TOKEN] !== true) {
           this[CONNECTED_CALLBACK_TOKEN] = true;
 
@@ -188,8 +188,6 @@ if (typeof Polymer === 'undefined') {
             }
           }
         }
-
-        super.connectedCallback();
       }
 
       _firestoreBind(name, options) {
@@ -205,6 +203,7 @@ if (typeof Polymer === 'undefined') {
         this._firestoreProps[name] = config;
 
         const args = config.props.concat(config.observes);
+        this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
         if (args.length > 0) {
           // Create a method observer that will be called every time
           // a templatized or observed property changes
@@ -212,13 +211,10 @@ if (typeof Polymer === 'undefined') {
             `_firestoreUpdateBinding('${name}', ${args.join(',')})`
           this._createMethodObserver(observer);
         }
-
-        this._firestoreUpdateBinding(name, ...args.map(x => this[x]));
       }
 
       _firestoreUpdateBinding(name, ...args) {
         this._firestoreUnlisten(name);
-
         const config = this._firestoreProps[name];
         const isDefined = (x) => x !== undefined;
         const propArgs = args.slice(0, config.props.length).filter(isDefined);
@@ -229,6 +225,7 @@ if (typeof Polymer === 'undefined') {
           observesArgs.length === config.observes.length;
 
         if (propArgsReady && observesArgsReady) {
+          this.db = this.db || firebase.firestore();
           const collPath = stitch(config.literals, propArgs);
           const assigner = this._firestoreAssigner(name, config);
 

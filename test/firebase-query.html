@@ -21,10 +21,10 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
 </head>
 <body>
   <firebase-app
-      name="test"
-      api-key="AIzaSyBzKhxNa2k9pA3m9_Ji3POFAKyGGFnyshI"
-      auth-domain="note-app-firebase-3a483.firebaseapp.com"
-      database-url="https://note-app-firebase-3a483.firebaseio.com">
+    name="test"
+    api-key="AIzaSyBzKhxNa2k9pA3m9_Ji3POFAKyGGFnyshI"
+    auth-domain="note-app-firebase-3a483.firebaseapp.com"
+    database-url="https://note-app-firebase-3a483.firebaseio.com">
   </firebase-app>
 
   <test-fixture id="BasicQuery">
@@ -176,6 +176,7 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
           var object = makeObject();
 
           return pushFirebaseValue(query.path, object).then(function() {
+            expect(query.exists).to.be.equal(true);
             expect(query.data.length).to.be.equal(1);
             expect(query.data[0]).to.be.ok;
             expect(query.data[0].val).to.be.equal(object.val);
@@ -239,6 +240,22 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
                 query.path + '/' + query.data[0].$key + '/foo', null);
           }).then(function() {
             expect(query.data[0].foo).to.be.eql(undefined);
+          });
+        });
+
+        test('exists is null when template is stamped', function() {
+          expect(query.exists).to.be.equal(null);
+        })
+
+        test('exists is true when we have data false when we remove it.', function() {
+          var object = makeObject();
+
+          return pushFirebaseValue(query.path, object).then(function() {
+            expect(query.exists).to.be.equal(true);
+          }).then(function(){
+            clearFirebaseValue(query.path);
+          }).then(function() {
+            expect(query.exists).to.be.equal(false);
           });
         });
       });
