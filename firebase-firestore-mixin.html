@@ -41,7 +41,7 @@ if (typeof Polymer === 'undefined') {
 
   const iDoc = (snap) => {
     if (snap.exists) {
-      return Object.assign({__id__: snap.id}, snap.data());
+      return Object.assign({__id__: snap.id, __snap__: snap}, snap.data());
     } else {
       return null;
     }
