@@ -309,6 +309,21 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
             expect(query.data.length).to.be.eql(2);
           });
         });
+
+        test('should allow an equalTo query with a `null` value to enable query for data without a specific key', function() {
+          query.orderByChild = 'thing';
+          query.equalTo = null;
+          query.equalToNull = true;
+
+          return setFirebaseValue(query.path, {
+            a: {thing: true},
+            b: {thing: false},
+            c: {nothing: false}
+          }).then(function() {
+            expect(query.data[0].$key).to.be.eql('c');
+            expect(query.data.length).to.be.eql(1);
+          });
+        });
       });
 
       suite('instance isolation', function() {
