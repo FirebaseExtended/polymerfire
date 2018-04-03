@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#1.9 - 2",
-    "firebase": "^4.5.0",
+    "firebase": "^4.12.0",
     "app-storage": "PolymerElements/app-storage#1 - 2"
   },
   "devDependencies": {
@@ -33,7 +33,7 @@
     "1.x": {
       "dependencies": {
         "polymer": "Polymer/polymer#^1.9",
-        "firebase": "^4.5.0",
+        "firebase": "^4.12.0",
         "app-storage": "PolymerElements/app-storage#^0.9.0"
       },
       "devDependencies": {
