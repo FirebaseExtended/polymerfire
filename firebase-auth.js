@@ -1,6 +1,6 @@
 import '../../@polymer/polymer/polymer.js';
 import { FirebaseCommonBehavior } from './firebase-common-behavior.js';
-import './firebase-auth-script.js';
+import 'firebase/auth';
 import { Polymer } from '../../@polymer/polymer/lib/legacy/polymer-fn.js';
 
 Polymer({

@@ -1,10 +1,10 @@
 import '../../@polymer/polymer/polymer.js';
-import './firebase-app-script.js';
-import './firebase-database-script.js';
-import './firebase-auth-script.js';
-import './firebase-storage-script.js';
-import './firebase-messaging-script.js';
-import './firebase-firestore-script.js';
+import 'firebase/app';
+import 'firebase/database';
+import 'firebase/auth';
+import 'firebase/storage';
+import 'firebase/messaging';
+import 'firebase/firestore';
 import { Polymer } from '../../@polymer/polymer/lib/legacy/polymer-fn.js';
 
 /**

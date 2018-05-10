@@ -15,8 +15,9 @@
   "license": "http://polymer.github.io/LICENSE.txt",
   "homepage": "https://github.com/firebase/polymerfire",
   "dependencies": {
+    "@polymer/app-storage": "^3.0.0-pre.1",
     "@polymer/polymer": "^3.0.0-pre.1",
-    "@polymer/app-storage": "^3.0.0-pre.1"
+    "firebase": "^5.0.1"
   },
   "devDependencies": {}
 }

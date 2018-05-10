@@ -1,6 +1,6 @@
 import '../../@polymer/polymer/polymer.js';
 import { FirebaseCommonBehavior } from './firebase-common-behavior.js';
-import './firebase-storage-script.js';
+import 'firebase/storage';
 
 export const FirebaseStorageBehaviorImpl = {
   properties: {

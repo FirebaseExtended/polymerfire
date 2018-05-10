@@ -1,4 +1,4 @@
-import './firebase-firestore-script.js';
+import 'firebase/firestore';
 import { Polymer as Polymer$0 } from '../../@polymer/polymer/lib/legacy/polymer-fn.js';
 if (typeof Polymer$0 === 'undefined') {
   throw new Error('Polymer.FirestoreMixin must be imported after Polymer itself.');

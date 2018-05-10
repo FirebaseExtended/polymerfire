@@ -1,6 +1,6 @@
 import '../../@polymer/polymer/polymer.js';
 import { AppNetworkStatusBehavior } from '../../@polymer/app-storage/app-network-status-behavior.js';
-import './firebase-app-script.js';
+import 'firebase/app';
 
 export const FirebaseCommonBehaviorImpl = {
   properties: {
