@@ -13,12 +13,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   <title>FirebaseDatabaseBehavior tests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../web-component-tester/browser.js"></script>
 
-  <link rel="import" href="../../app-storage/test/app-storage-compatibility-suite.html">
-  <link rel="import" href="../firebase-database-behavior.html">
-  <link rel="import" href="../firebase-app.html">
+  <script type="module" src="../../../@polymer/app-storage/test/app-storage-compatibility-suite.js"></script>
+  <script type="module" src="../firebase-database-behavior.js"></script>
+  <script type="module" src="../firebase-app.js"></script>
 </head>
 <body>
 
@@ -41,43 +41,45 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </template>
   </test-fixture>
 
-  <script>
-    HTMLImports.whenReady(function() {
-      Polymer({
-        is: 'x-firebase-database',
+  <script type="module">
+import '../../../@polymer/app-storage/test/app-storage-compatibility-suite.js';
+import { FirebaseDatabaseBehavior } from '../firebase-database-behavior.js';
+import '../firebase-app.js';
+import { Polymer } from '../../../@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'x-firebase-database',
 
-        behaviors: [
-          Polymer.FirebaseDatabaseBehavior
-        ]
-      });
+  behaviors: [
+    FirebaseDatabaseBehavior
+  ]
+});
+
+suite('FirebaseDatabaseBehavior', function() {
+  var databaseElement;
+
+  suite('with a configured app', function() {
+    setup(function() {
+      databaseElement = fixture('BasicDatabase');
     });
 
-    suite('FirebaseDatabaseBehavior', function() {
-      var databaseElement;
+    test('has a database instance', function() {
+      expect(databaseElement.db).to.be.ok;
+    });
 
-      suite('with a configured app', function() {
-        setup(function() {
-          databaseElement = fixture('BasicDatabase');
-        });
+    test('does not have a ref by default', function() {
+      expect(databaseElement.ref).to.not.be.ok;
+    });
 
-        test('has a database instance', function() {
-          expect(databaseElement.db).to.be.ok;
-        });
+    suite('and a path', function() {
+      setup(function() {
+        databaseElement = fixture('PathedDatabase');
+      });
 
-        test('does not have a ref by default', function() {
-          expect(databaseElement.ref).to.not.be.ok;
-        });
-
-        suite('and a path', function() {
-          setup(function() {
-            databaseElement = fixture('PathedDatabase');
-          });
-
-          test('has a ref instance', function() {
-            expect(databaseElement.ref).to.be.ok;
-          });
-        });
+      test('has a ref instance', function() {
+        expect(databaseElement.ref).to.be.ok;
       });
     });
-  </script>
+  });
+});
+</script>
 </body>

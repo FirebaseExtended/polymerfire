@@ -13,13 +13,13 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   <title>firebase-document tests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../web-component-tester/browser.js"></script>
 
-  <link rel="import" href="../polymerfire.html">
-  <link rel="import" href="../../app-storage/test/app-storage-compatibility-suite.html">
-  <link rel="import" href="../firebase-app.html">
-  <link rel="import" href="../firebase-document.html">
+  <script type="module" src="../polymerfire.js"></script>
+  <script type="module" src="../../../@polymer/app-storage/test/app-storage-compatibility-suite.js"></script>
+  <script type="module" src="../firebase-app.js"></script>
+  <script type="module" src="../firebase-document.js"></script>
 </head>
 <body>
 
@@ -43,29 +43,32 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </template>
   </test-fixture>
 
-  <script>
-    HTMLImports.whenReady(function() {
-      testAppStorageDocumentCompatibility({
-        tagName: 'firebase-document',
-        awaitUpdate: function(element) {
-          return new Promise(function(resolve) {
-            element.ref.on('value', function onValue() {
-              element.ref.off('value', onValue);
-              Polymer.Base.async(resolve, 1);
-            });
-          });
-        },
-        fetchStoredValue: window.foo = function(storagePath) {
-          return new Promise(function(resolve) {
-            var ref = firebase.app('test').database().ref(storagePath);
-            ref.on('value', function(snapshot) {
-              ref.off('value');
-              resolve(snapshot.val());
-            });
-          });
-        }
+  <script type="module">
+import '../polymerfire.js';
+import '../../../@polymer/app-storage/test/app-storage-compatibility-suite.js';
+import '../firebase-app.js';
+import '../firebase-document.js';
+import { Base } from '../../../@polymer/polymer/polymer.js';
+testAppStorageDocumentCompatibility({
+  tagName: 'firebase-document',
+  awaitUpdate: function(element) {
+    return new Promise(function(resolve) {
+      element.ref.on('value', function onValue() {
+        element.ref.off('value', onValue);
+        Base.async(resolve, 1);
       });
     });
-  </script>
+  },
+  fetchStoredValue: window.foo = function(storagePath) {
+    return new Promise(function(resolve) {
+      var ref = firebase.app('test').database().ref(storagePath);
+      ref.on('value', function(snapshot) {
+        ref.off('value');
+        resolve(snapshot.val());
+      });
+    });
+  }
+});
+</script>
 </body>
 </html>

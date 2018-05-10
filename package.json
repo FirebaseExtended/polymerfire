@@ -1,0 +1,22 @@
+{
+  "name": "@polymer/polymerfire",
+  "flat": true,
+  "version": "3.0.0",
+  "description": "Polymer Web Components for Firebase",
+  "contributors": [
+    "Firebase"
+  ],
+  "keywords": [
+    "web-component",
+    "polymer",
+    "firebase"
+  ],
+  "main": "polymerfire.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/firebase/polymerfire",
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0-pre.1",
+    "@polymer/app-storage": "^3.0.0-pre.1"
+  },
+  "devDependencies": {}
+}

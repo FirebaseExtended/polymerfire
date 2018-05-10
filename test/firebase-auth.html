@@ -13,11 +13,11 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   <title>firebase-auth tests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../web-component-tester/browser.js"></script>
 
-  <link rel="import" href="../firebase-app.html">
-  <link rel="import" href="../firebase-auth.html">
+  <script type="module" src="../firebase-app.js"></script>
+  <script type="module" src="../firebase-auth.js"></script>
 </head>
 <body>
 
@@ -60,77 +60,79 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   </template>
 </test-fixture>
 
-<script>
-  suite('firebase-auth', function() {
-    var authElement;
+<script type="module">
+import '../firebase-app.js';
+import '../firebase-auth.js';
+suite('firebase-auth', function() {
+  var authElement;
 
-    suite('with no configured provider', function() {
-      setup(function() {
-        authElement = fixture('BasicAuth');
+  suite('with no configured provider', function() {
+    setup(function() {
+      authElement = fixture('BasicAuth');
+    });
+
+    test('has an auth instance', function() {
+      expect(authElement.auth).to.be.ok;
+    });
+
+    test('eventually signs in', function() {
+      return authElement.signInAnonymously().then(function(user) {
+        expect(user.uid).to.be.ok;
       });
-
-      test('has an auth instance', function() {
-        expect(authElement.auth).to.be.ok;
-      });
-
-      test('eventually signs in', function() {
-        return authElement.signInAnonymously().then(function(user) {
-          expect(user.uid).to.be.ok;
-        });
-      });
+    });
 
 
-      test('statusKnown state change', function(done) {
-        var originalElement = fixture('RefreshAuth');
+    test('statusKnown state change', function(done) {
+      var originalElement = fixture('RefreshAuth');
 
-        //These credentials have been previously created in polyfire-test
-        const email = 'test.1465417606005@polyfiretestdomain.com';
-        const password = 'polyfiretestdomain';
+      //These credentials have been previously created in polyfire-test
+      const email = 'test.1465417606005@polyfiretestdomain.com';
+      const password = 'polyfiretestdomain';
 
-        expect(originalElement.statusKnown).to.be.equal(false);
+      expect(originalElement.statusKnown).to.be.equal(false);
 
-        originalElement.signInWithEmailAndPassword(email, 'polyfiretestdomain')
-            .then(function (user) {
-          //Verify the sign in results
-          expect(user.uid).to.be.ok;
-          expect(originalElement.statusKnown).to.be.equal(true);
-          expect(user.email).to.be.equal(email);
+      originalElement.signInWithEmailAndPassword(email, 'polyfiretestdomain')
+          .then(function (user) {
+        //Verify the sign in results
+        expect(user.uid).to.be.ok;
+        expect(originalElement.statusKnown).to.be.equal(true);
+        expect(user.email).to.be.equal(email);
 
-          //Create another firebase element
-          var dynamicAuth = fixture("DynamicAuth");
+        //Create another firebase element
+        var dynamicAuth = fixture("DynamicAuth");
 
-          //Verify the initial state:  statusKnown = false and user is null
-          expect(dynamicAuth.user).to.be.equal(null);
-          expect(dynamicAuth.statusKnown).to.be.equal(false);
+        //Verify the initial state:  statusKnown = false and user is null
+        expect(dynamicAuth.user).to.be.equal(null);
+        expect(dynamicAuth.statusKnown).to.be.equal(false);
 
-          //Wait for the status-known event to be thrown (set in
-          dynamicAuth.addEventListener('status-known-changed', function(event) {
-            if (event.detail.value) {
-              //Verify the final state:  statusKnown = false and user is null
-              expect(dynamicAuth.statusKnown).to.be.equal(true);
-              expect(dynamicAuth.user.uid).to.be.ok;
-              expect(dynamicAuth.user.email).to.be.equal(email);
-              done();
-            } else {
-              expect(dynamicAuth.statusKnown).to.be.equal(false);
-            }
-          });
-        });
-      });
-
-
-      test('failed promises should be forwarded', function() {
-        expect(authElement.user).to.be.equal(null);
-        expect(authElement.statusKnown).to.be.equal(false);
-        return authElement.signInWithEmailAndPassword('', '').then(function(user) {
-          throw 'sign in with email and password should not have succeeded';
-        }).catch(function(err) {
-          expect(err).to.be.ok;
-          expect(authElement.statusKnown).to.be.equal(true);
+        //Wait for the status-known event to be thrown (set in
+        dynamicAuth.addEventListener('status-known-changed', function(event) {
+          if (event.detail.value) {
+            //Verify the final state:  statusKnown = false and user is null
+            expect(dynamicAuth.statusKnown).to.be.equal(true);
+            expect(dynamicAuth.user.uid).to.be.ok;
+            expect(dynamicAuth.user.email).to.be.equal(email);
+            done();
+          } else {
+            expect(dynamicAuth.statusKnown).to.be.equal(false);
+          }
         });
       });
     });
+
+
+    test('failed promises should be forwarded', function() {
+      expect(authElement.user).to.be.equal(null);
+      expect(authElement.statusKnown).to.be.equal(false);
+      return authElement.signInWithEmailAndPassword('', '').then(function(user) {
+        throw 'sign in with email and password should not have succeeded';
+      }).catch(function(err) {
+        expect(err).to.be.ok;
+        expect(authElement.statusKnown).to.be.equal(true);
+      });
+    });
   });
+});
 </script>
 </body>
 

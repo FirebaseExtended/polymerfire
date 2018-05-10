@@ -12,9 +12,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     <meta charset="utf-8">
     <title>firebase-auth demo</title>
     <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
-    <link rel="import" href="../../polymer/polymer.html">
-    <link rel="import" href="../firebase-app.html">
-    <link rel="import" href="../firebase-auth.html">
+    <script type="module" src="../../../@polymer/polymer/polymer.js"></script>
+    <script type="module" src="../firebase-app.js"></script>
+    <script type="module" src="../firebase-auth.js"></script>
     <style media="screen">
       body {
         font-family: Roboto, sans-serif;
@@ -96,44 +96,45 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         <button on-tap="signOut">Sign Out</button>
       </div>
     </template>
-    <script type="text/javascript">
-      document.addEventListener('WebComponentsReady', function() {
-        var app = document.getElementById('app');
-        app.error = null;
-        app.showError = function(e) {
-          this.error = e.detail;
-        };
+    <script type="module">
+import '../../../@polymer/polymer/polymer.js';
+import '../firebase-app.js';
+import '../firebase-auth.js';
+var app = document.getElementById('app');
+app.error = null;
+app.showError = function(e) {
+  this.error = e.detail;
+};
 
-        app.signInAnonymously = function() {
-          this.error = null;
-          this.$.auth.signInAnonymously();
-        };
+app.signInAnonymously = function() {
+  this.error = null;
+  this.$.auth.signInAnonymously();
+};
 
-        app.signInWithGoogle = function() {
-          this.error = null;
-          this.$.auth.signInWithPopup();
-        };
+app.signInWithGoogle = function() {
+  this.error = null;
+  this.$.auth.signInWithPopup();
+};
 
-        app.signInWithEmailAndPassword = function(e) {
-          if (e) { e.preventDefault(); }
-          this.error = null;
-          this.$.auth.signInWithEmailAndPassword(this.email, this.password);
-          this.email = null;
-          this.password = null;
-        };
+app.signInWithEmailAndPassword = function(e) {
+  if (e) { e.preventDefault(); }
+  this.error = null;
+  this.$.auth.signInWithEmailAndPassword(this.email, this.password);
+  this.email = null;
+  this.password = null;
+};
 
-        app.createUserWithEmailAndPassword = function() {
-          this.error = null;
-          this.$.auth.createUserWithEmailAndPassword(this.email, this.password);
-          this.email = null;
-          this.password = null;
-        };
+app.createUserWithEmailAndPassword = function() {
+  this.error = null;
+  this.$.auth.createUserWithEmailAndPassword(this.email, this.password);
+  this.email = null;
+  this.password = null;
+};
 
-        app.signOut = function() {
-          this.error = null;
-          this.$.auth.signOut();
-        };
-      });
-    </script>
+app.signOut = function() {
+  this.error = null;
+  this.$.auth.signOut();
+};
+</script>
   </body>
 </html>

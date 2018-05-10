@@ -11,8 +11,8 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   <head>
     <title>firebase-messaging demo</title>
     <link rel="manifest" href="manifest.json">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="../firebase-messaging.html">
+    <script src="../../../@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+    <script type="module" src="../firebase-messaging.js"></script>
     <style>
       body { font-family: Roboto, sans-serif; padding: 0; margin: 0 }
 
@@ -52,26 +52,26 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </style>
   </head>
   <body>
-    <script>
-      firebase.initializeApp({
-        messagingSenderId: '153517668099'
-      });
+    <script type="module">
+import '../firebase-messaging.js';
+import { Element } from '../../../@polymer/polymer/polymer-element.js';
+firebase.initializeApp({
+  messagingSenderId: '153517668099'
+});
 
-      window.addEventListener('WebComponentsReady', function() {
-        if (navigator.serviceWorker) {
-          navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(sw) {
-            var app = document.getElementById('app');
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.register('firebase-messaging-sw.js').then(function(sw) {
+    var app = document.getElementById('app');
 
-            // Polymer 2.0 compat
-            if (Polymer.Element) {
-              app = app.parentNode;
-            }
+    // Polymer 2.0 compat
+    if (Element) {
+      app = app.parentNode;
+    }
 
-            app.$.messaging.activate(sw);
-          });
-        }
-      });
-    </script>
+    app.$.messaging.activate(sw);
+  });
+}
+</script>
     <h1>firebase-messaging demo</h1>
     <p>This demo will allow you to request notification permissions and obtain an instance token.
     To actually test receipt of push messages, you will need to clone the demo and modify the
@@ -101,25 +101,27 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         </main>
       </template>
     </dom-bind>
-    <script>
-      var app = document.getElementById('app');
+    <script type="module">
+import '../firebase-messaging.js';
+import { Element } from '../../../@polymer/polymer/polymer-element.js';
+var app = document.getElementById('app');
 
-      // Polymer 2.0 compat
-      if (Polymer.Element) {
-        app = app.parentNode;
-      }
+// Polymer 2.0 compat
+if (Element) {
+  app = app.parentNode;
+}
 
-      app.requestMessaging = function() {
-        return this.$.messaging.requestPermission();
-      }
+app.requestMessaging = function() {
+  return this.$.messaging.requestPermission();
+}
 
-      app.json = function(val) {
-        return JSON.stringify(val || null, null, 2);
-      }
+app.json = function(val) {
+  return JSON.stringify(val || null, null, 2);
+}
 
-      app.logit = function(e) {
-        this.$.log.innerHTML = JSON.stringify(e.detail.message) + "\n" + app.$.log.innerHTML;
-      }
-    </script>
+app.logit = function(e) {
+  this.$.log.innerHTML = JSON.stringify(e.detail.message) + "\n" + app.$.log.innerHTML;
+}
+</script>
   </body>
 </html>

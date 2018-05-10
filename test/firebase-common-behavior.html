@@ -13,12 +13,12 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
   <title>FirebaseCommonBehavior tests</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-  <script src="../../web-component-tester/browser.js"></script>
+  <script src="../../../@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../../web-component-tester/browser.js"></script>
 
-  <link rel="import" href="../../app-storage/test/app-storage-compatibility-suite.html">
-  <link rel="import" href="../firebase-common-behavior.html">
-  <link rel="import" href="../firebase-app.html">
+  <script type="module" src="../../../@polymer/app-storage/test/app-storage-compatibility-suite.js"></script>
+  <script type="module" src="../firebase-common-behavior.js"></script>
+  <script type="module" src="../firebase-app.js"></script>
 </head>
 <body>
 
@@ -54,58 +54,60 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
     </template>
   </test-fixture>
 
-  <script>
-    HTMLImports.whenReady(function() {
-      Polymer({
-        is: 'x-firebase-common',
+  <script type="module">
+import '../../../@polymer/app-storage/test/app-storage-compatibility-suite.js';
+import { FirebaseCommonBehavior } from '../firebase-common-behavior.js';
+import '../firebase-app.js';
+import { Polymer } from '../../../@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'x-firebase-common',
 
-        behaviors: [
-          Polymer.FirebaseCommonBehavior
-        ]
-      });
+  behaviors: [
+    FirebaseCommonBehavior
+  ]
+});
+
+suite('FirebaseCommonBehavior', function() {
+  var commonElement;
+
+  suite('without a name', function() {
+    setup(function() {
+      commonElement = fixture('BasicCommon');
     });
 
-    suite('FirebaseCommonBehavior', function() {
-      var commonElement;
+    test('sets app to the default app', function() {
+      expect(commonElement.app.name).to.be.equal(firebase.app().name);
+    });
 
-      suite('without a name', function() {
-        setup(function() {
-          commonElement = fixture('BasicCommon');
-        });
-
-        test('sets app to the default app', function() {
-          expect(commonElement.app.name).to.be.equal(firebase.app().name);
-        });
-
-        suite('when an app is set', function() {
-          test('changes the appName to the app\'s name', function() {
-            commonElement.app = firebase.app('test');
-            expect(commonElement.appName).to.be.equal('test');
-          });
-        });
-      });
-
-      suite('with a name', function() {
-        setup(function() {
-          commonElement = fixture('NamedCommon');
-        });
-
-        test('sets app to the named app', function() {
-          expect(commonElement.app.name).to.be.equal(firebase.app('test').name);
-        });
-
-        suite('when the name is changed', function() {
-          test('changes to the appropriate app', function() {
-            commonElement.appName = 'alt';
-            expect(commonElement.app.name).to.be.equal(firebase.app('alt').name);
-          });
-
-          test('if no name is specified, selects default app', function() {
-            commonElement.appName = null;
-            expect(commonElement.app.name).to.be.equal(firebase.app().name);
-          });
-        });
+    suite('when an app is set', function() {
+      test('changes the appName to the app\'s name', function() {
+        commonElement.app = firebase.app('test');
+        expect(commonElement.appName).to.be.equal('test');
       });
     });
-  </script>
+  });
+
+  suite('with a name', function() {
+    setup(function() {
+      commonElement = fixture('NamedCommon');
+    });
+
+    test('sets app to the named app', function() {
+      expect(commonElement.app.name).to.be.equal(firebase.app('test').name);
+    });
+
+    suite('when the name is changed', function() {
+      test('changes to the appropriate app', function() {
+        commonElement.appName = 'alt';
+        expect(commonElement.app.name).to.be.equal(firebase.app('alt').name);
+      });
+
+      test('if no name is specified, selects default app', function() {
+        commonElement.appName = null;
+        expect(commonElement.app.name).to.be.equal(firebase.app().name);
+      });
+    });
+  });
+});
+</script>
 </body>
