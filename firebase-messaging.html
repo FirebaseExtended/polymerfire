@@ -29,7 +29,7 @@ to use notifications:
 ```js
 this.$.messaging.requestPermission().then(function() {
   // permission was granted
-}, function(err) {
+}).catch(function(err) {
   // permission was denied
 });
 ```
