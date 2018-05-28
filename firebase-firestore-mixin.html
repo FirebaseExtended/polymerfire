@@ -172,8 +172,6 @@ if (typeof Polymer === 'undefined') {
       }
 
       connectedCallback() {
-        super.connectedCallback();
-
         if (this[CONNECTED_CALLBACK_TOKEN] !== true) {
           this[CONNECTED_CALLBACK_TOKEN] = true;
 
@@ -192,6 +190,8 @@ if (typeof Polymer === 'undefined') {
             }
           }
         }
+
+        super.connectedCallback();
       }
 
       _firestoreBind(name, options) {
