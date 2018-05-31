@@ -148,6 +148,14 @@ Polymer({
           limitToLast: {
             type: Number,
             value: 0
+          },
+          
+          /**
+           * Provides data in reversed order.
+           */
+          reversed: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -307,8 +315,8 @@ Polymer({
               query.off('child_moved', this.__onFirebaseChildMoved, this);
             }
             
-            this._setExists(null);   
-            this._onOnce = true;            
+            this._setExists(null);
+            this._onOnce = true;
             this._query = query;
 
             // does the on-value first
@@ -338,8 +346,11 @@ Polymer({
               this.__map[key] = value;
               data.push(value)
             }.bind(this))
-
-            this.set('data', data);
+            if(this.reversed){
+              this.set('data', data.reverse());
+            } else {
+              this.set('data', data);
+            }
             this._setExists(true);
           }
 
@@ -373,7 +384,15 @@ Polymer({
           value = this.__snapshotToValue(snapshot);
 
           this.__map[key] = value;
-          this.splice('data', previousChildIndex + 1, 0, value);
+          if(this.reversed){
+          	if (previousChildKey) {
+          	  this.splice('data', previousChildIndex, 0, value);
+            } else {
+          	  this.push('data', value);
+          	}
+          } else {
+            this.splice('data', previousChildIndex + 1, 0, value);
+          }
           this._setExists(true);
         },
 
@@ -437,8 +456,15 @@ Polymer({
         __onFirebaseChildMoved: function(snapshot, previousChildKey) {
           var key = snapshot.key;
           var value = this.__map[key];
-          var targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) + 1 : 0;
-
+          
+          var targetIndex;
+          if(this.reversed){
+          	targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) - 1 : this.data.length - 1;
+          	targetIndex = targetIndex === -1 ? 0 : targetIndex;
+          } else {
+          	targetIndex = previousChildKey ? this.__indexFromKey(previousChildKey) + 1 : 0;
+          }
+          
           this._log('Firebase child_moved:', key, value,
               'to index', targetIndex);
 
