@@ -352,6 +352,8 @@ Polymer({
               this.set('data', data);
             }
             this._setExists(true);
+          } else {
+          	this._setExists(false);
           }
 
           const query = this.query
