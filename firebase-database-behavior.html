@@ -82,6 +82,9 @@ https://github.com/firebase/polymerfire/blob/master/LICENSE
         }
         var result = this.db.ref(path).set(leaf ? value.$val : value)
           .catch(e => {
+            e.key = key || value.$key;
+            e.path = path; 
+            e.value = value;
             this.__onError(e);
           });
         if (key) {
