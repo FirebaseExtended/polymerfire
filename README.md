@@ -14,6 +14,14 @@ thing! https://github.com/PolymerLabs/tedium/issues
 
 [![Build status](https://travis-ci.org/firebase/polymerfire.svg?branch=master)](https://travis-ci.org/firebase/polymerfire)
 
+## Status
+
+![Status: Archived](https://img.shields.io/badge/Status-Archived-red)
+
+This library is no longer actively maintained. We **do not recommend** using this library in production.
+
+If you maintain a fork of this library that you believe is healthier than the official version, we may consider recommending your fork.  Please open a Pull Request if you believe that is the case.
+
 ## &lt;firebase-app&gt;
 
 The firebase-app element is used for initializing and configuring your
