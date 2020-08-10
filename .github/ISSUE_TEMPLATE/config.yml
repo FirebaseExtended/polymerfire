@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🛑 Library Archived
+    url: https://firebaseopensource.com/
+    about: This repository is archived. Visit our open source site to browse other Firebase libraries.
