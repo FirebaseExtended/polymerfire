@@ -231,7 +231,41 @@ be a problem.
         sendPasswordResetEmail: function(email) {
           return this._handleSignIn(this.auth.sendPasswordResetEmail(email));
         },
-        
+
+        /**
+         * Authenticates a Firebase client using a phone number.
+         *
+         * @param  {!String} phoneNumber The user's phone number string in E.164 format (e.g. +16505550101).
+         * @param  {!String|HTMLElement} container The HTML element (the ID of the container (string)
+         * or the DOM element itself) to render the reCAPTCHA widget. For a visible reCAPTCHA corresponding
+         * element must be empty. reCAPTCHA doesn't work inside Shadow DOM, so it must not be in the Shadow DOM.
+         * It must also be in the DOM at the time of initialization.
+         * @param  {Object} [parameters] The optional object containing reCAPTCHA parameters as "key":"value" pairs.
+         * Check the reCAPTCHA docs for a comprehensive list. All parameters are accepted except for the "sitekey".
+         * Firebase Auth backend provisions a reCAPTCHA for each project and will configure this upon rendering.
+         * For an invisible reCAPTCHA, a "size" key must have the value "invisible".
+         * @param  {Object} [app] The corresponding Firebase app. If none is provided, the default Firebase App instance
+         * is used. A Firebase App instance must be initialized with an API key, otherwise an error will be thrown.
+         * @return {Promise} Promise that handles success and failure.
+         */
+        signInWithPhoneNumber: function(phoneNumber, container, parameters, app) {
+          var applicationVerifier = new firebase.auth.RecaptchaVerifier(container, parameters, app);
+          return this._handleSignIn(this.auth.signInWithPhoneNumber(phoneNumber, applicationVerifier)
+            .then(function(confirmationResult) {
+              window.confirmationResult = confirmationResult;
+            }));
+        },
+
+        /**
+         * Confirms authentication code for phone number sign-in.
+         *
+         * @param  {!String} code One-time code contained in the SMS message.
+         * @return {Promise} Promise that handles success and failure.
+         */
+        confirmCode: function(code) {
+          return this._handleSignIn(window.confirmationResult.confirm(code));
+        },
+
         /**
          * Unauthenticates a Firebase client.
          *
